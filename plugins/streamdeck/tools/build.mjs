@@ -4,7 +4,7 @@ import { cp, mkdir, readFile, writeFile, readdir, lstat, rename } from 'node:fs/
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ACTIONS, PLUGIN_ID } from '../src/model.mjs';
+import { ACTIONS, PLUGIN_ID, streamDeckVersion } from '../src/model.mjs';
 import { keySvg, COLORS } from '../src/render.mjs';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -36,11 +36,12 @@ for (const [name,size] of [['category',28],['category@2x',56],['action',20],['ac
 for (const [kind,name] of ACTIONS) {
   for (const size of [72,144]) await writeFile(path.join(output,`imgs/${kind}${size===144?'@2x':''}.svg`),keySvg({top:'TEMHALO',value:kind==='direct'?'0s':kind==='increase'?'+10s':kind==='decrease'?'−10s':kind==='preset'?'30s':'—',bottom:name.toUpperCase(),color:COLORS.mint},size));
 }
-const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+const versions = [...(await readFile(path.join(root,'Directory.Build.props'),'utf8')).matchAll(/<Version>([^<]+)<\/Version>/g)];
+if (versions.length !== 1) throw new Error('Version Temhalo absente ou ambiguë.');
 const manifest = {
   $schema:'https://schemas.elgato.com/streamdeck/plugins/manifest.json', UUID:PLUGIN_ID, Name:'Temhalo', Author:'Temhalo',
   Description:'Contrôlez le délai de votre live : protection, direct, presets et suivi en temps réel.',
-  Version:packageJson.version+'.0', SDKVersion:2, Nodejs:{Version:'20'}, CodePath:'bin/plugin.js',
+  Version:streamDeckVersion(versions[0][1]), SDKVersion:2, Nodejs:{Version:'20'}, CodePath:'bin/plugin.js',
   OS:[{Platform:'windows',MinimumVersion:'10'}],Software:{MinimumVersion:'6.6'},
   Icon:'imgs/plugin',Category:'Temhalo',CategoryIcon:'imgs/category', PropertyInspectorPath:'ui/inspector.html',
   URL:'https://github.com/Zeeroz/Temhalo',

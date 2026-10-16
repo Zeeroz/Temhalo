@@ -1,11 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
-import { actionSettings, clock, commandFor, parseDockLink, readState } from '../src/model.mjs';
+import { actionSettings, clock, commandFor, parseDockLink, readState, streamDeckVersion } from '../src/model.mjs';
 import { COLORS, keySvg, keyView } from '../src/render.mjs';
 
 export const state = (extra = {}) => ({ running:true,canControl:true,targetSeconds:30,currentDelayMilliseconds:15230,
   phase:'IncreasingPause',ingestConnected:true,protectionSeconds:60,outputs:[{ready:true,reconnecting:false}],...extra });
+
+test('la version du plugin suit le seul numéro choisi pour Temhalo',()=>{
+  assert.equal(streamDeckVersion('0.7.0-preview.3'),'0.7.0.3');assert.equal(streamDeckVersion('0.7.0'),'0.7.0.65535');
+  for(const value of ['v0.7.0','01.2.3','1.2.3-preview.65535','65536.0.0','1.2.3\n'])assert.throws(()=>streamDeckVersion(value));
+});
 
 test('le lien ne peut envoyer la capacité qu’au dock IPv4 local', () => {
   const token=randomBytes(32).toString('hex');

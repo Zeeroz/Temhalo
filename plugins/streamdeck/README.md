@@ -9,6 +9,8 @@ Des commandes de délai et un suivi lisible pendant le live, avec le halo, la me
 3. Dans Stream Deck, glissez une action du groupe **Temhalo** sur une touche. Collez le lien dans ses propriétés et cliquez sur **Relier**. La connexion est commune à toutes les touches ; le champ est ensuite effacé.
 4. Configurez vos délais et vos pas si nécessaire. Lancez le relais et OBS depuis leurs applications habituelles.
 
+Le numéro du plugin suit automatiquement celui de Temhalo (par exemple `0.7.0-preview.3` devient `0.7.0.3` pour Stream Deck). Lors d'une nouvelle livraison, rouvrez le fichier `.streamDeckPlugin` fourni pour mettre à jour la copie installée dans Stream Deck ; la mise à jour de Temhalo remplace le fichier distribué dans son propre dossier. Il n'y a pas de second numéro à choisir dans le script de publication.
+
 Temhalo et Stream Deck doivent fonctionner sur le **même PC**. Le lien de l'overlay permet seulement la lecture et ne convient pas : utilisez bien celui du **dock**. Ne partagez jamais ce lien. Il ne s'agit pas de la clé Twitch/YouTube/Kick.
 
 ## Les actions

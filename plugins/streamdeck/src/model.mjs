@@ -10,6 +10,16 @@ export const ACTIONS = Object.freeze([
   ['dial', 'Régler à la molette', 'Tourner pour ajuster le délai ; appuyer pour appliquer la protection.'],
 ]);
 
+/** Use the same ordering as the Windows installer: stable follows all previews. */
+export function streamDeckVersion(value) {
+  const match = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-preview\.(0|[1-9][0-9]*))?$/.exec(value);
+  if (!match || match[0] !== value) throw new Error('Version Temhalo invalide.');
+  const numbers = match.slice(1,4).map(Number);
+  numbers.push(match[4] === undefined ? 65535 : Number(match[4]));
+  if (numbers.some(number=>!Number.isSafeInteger(number)||number>65535) || match[4] !== undefined && numbers[3] === 65535) throw new Error('Version Temhalo hors limites.');
+  return numbers.join('.');
+}
+
 export function integer(value, fallback, min, max) {
   const result = value === undefined ? fallback : value;
   if (!Number.isInteger(result) || result < min || result > max) throw new Error('Valeur entière hors limites.');

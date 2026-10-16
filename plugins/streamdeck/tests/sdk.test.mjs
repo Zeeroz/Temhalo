@@ -40,8 +40,9 @@ test('bundle officiel : protocole Stream Deck 6.8, huit actions, molette, stocka
     if(message.event==='setGlobalSettings'){globals=message.payload;connection.send(JSON.stringify({event:'didReceiveGlobalSettings',payload:{settings:globals}}));}
     if(message.event==='setSettings')settings.set(message.context,message.payload);
   });});
+  const manifest=JSON.parse(await readFile(path.join(output,'manifest.json'),'utf8'));
   const info={application:{version:'6.8.0.21252',platform:'windows',platformVersion:'10.0',language:'fr',font:'Segoe UI'},
-    plugin:{uuid:PLUGIN_ID,version:'1.0.0.0'},devicePixelRatio:1,colors:{},devices:[{id:'test-device',name:'Test',type:7,size:{columns:4,rows:2}}]};
+    plugin:{uuid:PLUGIN_ID,version:manifest.Version},devicePixelRatio:1,colors:{},devices:[{id:'test-device',name:'Test',type:7,size:{columns:4,rows:2}}]};
   const child=spawn(process.execPath,[path.join(output,'bin/plugin.js'),'-port',String(host.address().port),'-pluginUUID',PLUGIN_ID,
     '-registerEvent','registerPlugin','-info',JSON.stringify(info)],{cwd:fixture,windowsHide:true,stdio:['ignore','pipe','pipe']});
   child.stderr.on('data',data=>{errorOutput+=data.toString();});
