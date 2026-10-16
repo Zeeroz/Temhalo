@@ -1,6 +1,6 @@
 # Historique
 
-## 0.7.0-preview.3 — en préparation
+## 0.7.0-preview.3
 
 - Plugin Stream Deck facultatif : protection, retour direct, preset, ajout/retrait, délai mesuré, état OBS/sorties et réglage à la molette du Stream Deck +.
 - Association locale commune aux touches via le lien privé du dock, stockage global exclu des profils exportés et reconnexion sans rejeu des commandes.
