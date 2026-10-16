@@ -23,6 +23,20 @@ foreach ($file in 'Temhalo.App.exe','coreclr.dll','hostfxr.dll','Microsoft.UI.Xa
     if (-not (Test-Path -LiteralPath (Join-Path $package $file) -PathType Leaf)) { throw "Fichier essentiel absent : $file" }
 }
 if (@($actualFiles | Where-Object { $_.Extension -in '.dpapi','.log','.pfx','.p12','.cs' -or $_.Name -eq 'native-tools.resolved.json' }).Count) { throw 'Fichier privé/source inattendu dans le package.' }
+$streamDeckPackage = Join-Path $package 'plugins/streamdeck/Temhalo.streamDeckPlugin'
+if (-not (Test-Path -LiteralPath $streamDeckPackage -PathType Leaf)) { throw 'Plugin Stream Deck absent du package.' }
+$streamDeckDigest = ((Get-Content -LiteralPath ($streamDeckPackage + '.sha256') -Raw).Trim() -split '\s+')[0]
+if ((Get-FileHash -LiteralPath $streamDeckPackage).Hash -ne $streamDeckDigest) { throw 'Empreinte du plugin Stream Deck invalide.' }
+$streamDeckZip = [IO.Compression.ZipFile]::OpenRead($streamDeckPackage)
+try {
+    $entry = $streamDeckZip.GetEntry('com.temhalo.streamdeck.sdPlugin/manifest.json')
+    if (-not $entry) { throw 'Manifeste Stream Deck absent.' }
+    $reader = [IO.StreamReader]::new($entry.Open())
+    try { $streamDeckManifest = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+    if ($streamDeckManifest.UUID -ne 'com.temhalo.streamdeck' -or @($streamDeckManifest.Actions).Count -ne 8) { throw 'Actions du plugin Stream Deck incomplètes.' }
+    if (@($streamDeckZip.Entries | Where-Object { $_.FullName -match '(?i)(^|/)(logs|node_modules)/|\.dpapi$' }).Count) { throw 'Fichiers privés ou de développement dans le plugin.' }
+}
+finally { $streamDeckZip.Dispose() }
 $icon = [IO.File]::ReadAllBytes((Join-Path $package 'Assets\Brand\temhalo.ico'))
 if ([BitConverter]::ToUInt16($icon, 2) -ne 1) { throw 'ICO invalide.' }
 $sizes = @(); for ($i = 0; $i -lt [BitConverter]::ToUInt16($icon, 4); $i++) { $width = [int]$icon[6 + 16 * $i]; if ($width -eq 0) { $width = 256 }; $sizes += $width }

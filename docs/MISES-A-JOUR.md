@@ -24,20 +24,20 @@ Depuis PowerShell 7, apres vos modifications, lancez le script unique a la racin
 ./Publier-Temhalo.ps1
 ```
 
-Il demande seulement la version, par exemple `0.7.0-preview.2`. Vous pouvez aussi la passer directement :
+Il demande seulement la version, par exemple `0.7.0-preview.3`. Vous pouvez aussi la passer directement :
 
 ```powershell
-./Publier-Temhalo.ps1 -Version 0.7.0-preview.2
+./Publier-Temhalo.ps1 -Version 0.7.0-preview.3
 ```
 
 Le script met a jour `Directory.Build.props`, execute les tests, construit et verifie le ZIP et l'installeur, teste installation/mise a jour/desinstallation, audite les fichiers, committe tous les changements non ignores du projet (dont l'inventaire de desinstallation), puis pousse `main` et le tag en une operation atomique, sans forcer les references. Il suit GitHub Actions jusqu'a la publication et verifie les quatre actifs publics et leurs empreintes presentes dans les metadonnees GitHub. Aucune selection manuelle de fichiers ni manipulation de tag n'est requise dans le cas normal.
 
-Il faut travailler sur `main`, avoir Git, le SDK de `global.json` et GitHub CLI disponibles, ainsi qu'un compte GitHub deja connecte avec les droits d'ecriture. Sur le poste de developpement existant, le script peut reutiliser GitHub CLI sous `artifacts/tools/github-cli/bin`. Le script ne ferme aucun processus : terminez votre live et fermez la copie de developpement de Temhalo avant de compiler si ses fichiers sont utilises.
+Il faut travailler sur `main`, avoir Git, le SDK de `global.json`, Node.js 24, pnpm 11.25.0 et GitHub CLI disponibles, ainsi qu'un compte GitHub deja connecte avec les droits d'ecriture. Sur le poste de developpement existant, le script peut reutiliser GitHub CLI sous `artifacts/tools/github-cli/bin`. Le script ne ferme aucun processus : terminez votre live et fermez la copie de developpement de Temhalo avant de compiler si ses fichiers sont utilises.
 
 Pour verifier les prerequis et voir le parcours sans modifier la version, l'index Git ou les tags :
 
 ```powershell
-./Publier-Temhalo.ps1 -Version 0.7.0-preview.2 -WhatIf
+./Publier-Temhalo.ps1 -Version 0.7.0-preview.3 -WhatIf
 ```
 
 `-WhatIf` n'execute pas les compilations ou tests et ne publie rien. Les tests d'orchestration se lancent avec `./tools/Test-Publication.ps1` ; ils utilisent des commandes simulees et des dossiers isoles, sans publication reelle.
@@ -50,7 +50,7 @@ La mise a jour est proposee dans Temhalo a la recherche suivante, selon le canal
 
 Prérequis : droits d’écriture sur `Zeeroz/Temhalo`, GitHub Actions activé, Windows x64, SDK `global.json`, runtimes .NET/ASP.NET Core 8 pour les tests. La publication ne nécessite aucun secret OAuth. Le workflow emploie son `GITHUB_TOKEN` avec l’écriture de contenu uniquement dans le job de release.
 
-1. Modifiez le code et incrémentez `<Version>` dans `Directory.Build.props`, par exemple `0.7.0-preview.2`.
+1. Modifiez le code et incrémentez `<Version>` dans `Directory.Build.props`, par exemple `0.7.0-preview.3`.
 2. Lancez les vérifications et produisez les livrables localement :
 
    ```powershell
@@ -67,8 +67,8 @@ Prérequis : droits d’écriture sur `Zeeroz/Temhalo`, GitHub Actions activé, 
 5. Créez et poussez le tag correspondant exactement à la version :
 
    ```powershell
-   git tag -a v0.7.0-preview.2 -m "Temhalo 0.7.0-preview.2"
-   git push origin v0.7.0-preview.2
+   git tag -a v0.7.0-preview.3 -m "Temhalo 0.7.0-preview.3"
+   git push origin v0.7.0-preview.3
    ```
 
 6. Le workflow Windows restaure les packages verrouillés, compile, teste, construit le ZIP et l’installeur, puis teste une installation isolée avec mise à jour et désinstallation. Il dépose ensuite quatre actifs dans un brouillon de release : EXE, ZIP et leurs deux fichiers `.sha256`. Le brouillon devient public seulement après vérification des empreintes fournies par GitHub.

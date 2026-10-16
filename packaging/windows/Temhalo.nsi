@@ -63,6 +63,7 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "Temhalo"
 !define MUI_FINISHPAGE_RUN_TEXT "Ouvrir Temhalo"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchTemhalo
 !define MUI_FINISHPAGE_RUN_NOTCHECKED
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW FinishPageShow
 !insertmacro MUI_PAGE_FINISH
 
 !define MUI_UNWELCOMEPAGE_TITLE "Désinstaller Temhalo"
@@ -302,6 +303,13 @@ SectionEnd
 Function LaunchTemhalo
   SetOutPath "$INSTDIR"
   Exec '"$INSTDIR\Temhalo.App.exe" $ShortcutArguments'
+FunctionEnd
+
+Function FinishPageShow
+  ; The themed Windows checkbox ignores SetCtlColors (NSIS MUI bug #443).
+  ; Disable theming only on this control so its label uses the dark-page palette.
+  System::Call 'UXTHEME::SetWindowTheme(p $mui.FinishPage.Run, w " ", w " ")'
+  SetCtlColors $mui.FinishPage.Run "${MUI_TEXTCOLOR}" "${MUI_BGCOLOR}"
 FunctionEnd
 
 Section "Uninstall"

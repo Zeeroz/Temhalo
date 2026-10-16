@@ -12,3 +12,6 @@ Les binaires MediaMTX et FFmpeg ne sont pas redistribués dans cette archive. L'
 - FFmpeg : build LGPL partagée, sans `--enable-gpl` ni `--enable-nonfree`, [licences officielles](https://ffmpeg.org/legal.html), [fournisseur BtbN](https://github.com/BtbN/FFmpeg-Builds). Version, SHA-256, sources FFmpeg et recettes de build exactes dans le manifeste. Le dossier téléchargé garde `LICENSE.txt` et la documentation amont.
 
 Une future archive embarquant ces outils devra également préparer les sources correspondantes et les éléments de redistribution requis ; ce package choisit l'acquisition amont directe. Les détails de ce choix sont dans le guide de l'étape 6 et `docs/DEPENDANCES.md` des sources.
+## Plugin Stream Deck
+
+Le fichier `plugins/streamdeck/Temhalo.streamDeckPlugin` contient l'intégration facultative Stream Deck de Temhalo. Ses dépendances d'exécution sont le SDK officiel `@elgato/streamdeck`, `@elgato/utils`, `@elgato/schemas` et `ws`, sous licence MIT. Leurs notices sont incluses dans le répertoire `licenses` du plugin. Les outils de construction Elgato CLI, esbuild et sharp ne sont pas nécessaires sur le poste de l'utilisateur et ne sont pas embarqués avec le runtime du plugin. Stream Deck reste un logiciel tiers distribué par Elgato.

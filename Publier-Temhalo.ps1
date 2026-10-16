@@ -3,9 +3,9 @@
 .SYNOPSIS
 Teste et publie une nouvelle version de Temhalo depuis ce depot.
 .EXAMPLE
-./Publier-Temhalo.ps1 -Version 0.7.0-preview.2
+./Publier-Temhalo.ps1 -Version 0.7.0-preview.3
 .EXAMPLE
-./Publier-Temhalo.ps1 -Version 0.7.0-preview.2 -WhatIf
+./Publier-Temhalo.ps1 -Version 0.7.0-preview.3 -WhatIf
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param([string]$Version)

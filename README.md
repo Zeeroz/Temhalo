@@ -32,7 +32,13 @@ Dans **Réglages → Au quotidien → Mises à jour**, recherchez, téléchargez
 
 L’installation conserve les comptes, clés et réglages. Une copie portable ou de développement ne remplace jamais automatiquement son dossier. Voir [la procédure utilisateur, les tests et la publication d’une version](docs/MISES-A-JOUR.md).
 
-Pour publier vos changements depuis les sources, lancez `./Publier-Temhalo.ps1` dans PowerShell 7 et choisissez le numéro de version. Le script prend en charge les tests, les livrables, le commit, le tag et le suivi de la publication GitHub. `./Publier-Temhalo.ps1 -Version 0.7.0-preview.2 -WhatIf` permet de voir le parcours sans publier.
+Pour publier vos changements depuis les sources, lancez `./Publier-Temhalo.ps1` dans PowerShell 7 et choisissez le numéro de version. Le script prend en charge les tests, les livrables, le commit, le tag et le suivi de la publication GitHub. `./Publier-Temhalo.ps1 -Version 0.7.0-preview.3 -WhatIf` permet de voir le parcours sans publier.
+
+## Stream Deck
+
+Le plugin Stream Deck facultatif fournit huit actions : protection, direct 0 s, preset, ajout/retrait du délai, affichage du délai mesuré, état OBS/sorties et réglage à la molette pour Stream Deck +. À partir de `0.7.0-preview.3`, ouvrez `plugins/streamdeck/Temhalo.streamDeckPlugin` dans le dossier de l'application ou le ZIP, puis reliez-le une seule fois avec le lien privé du dock de Temhalo. [Installation, actions et procédure de test](plugins/streamdeck/README.md).
+
+Pour le construire ou produire les paquets Windows depuis les sources, installez aussi Node.js 24 et pnpm 11.25.0. `./tools/Build-StreamDeck.ps1` construit, teste, valide et emballe le plugin sans modifier vos profils Stream Deck. Ces outils ne sont pas nécessaires aux utilisateurs du paquet précompilé.
 
 ## Fonctionnement et limites
 

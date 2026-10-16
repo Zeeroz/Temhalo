@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src ws://127.0.0.1:*; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="inspector.css">
+  <script defer src="inspector.js"></script>
+  <title>Temhalo · Stream Deck</title>
+</head>
+<body>
+  <h1 id="action-name">Votre live. Votre tempo.</h1>
+  <p id="description">Pilotez Temhalo depuis vos touches.</p>
+  <section aria-labelledby="connection-title">
+    <h2 id="connection-title">Relier Temhalo</h2>
+    <p>Une seule fois pour toutes vos touches, sur ce PC.</p>
+    <ol><li>Ouvrez Temhalo → Diffusion → « Options : test local, overlay et dock OBS ».</li><li>Dans « Piloter depuis OBS », copiez le lien privé du dock.</li><li>Collez-le ici et cliquez sur Relier.</li></ol>
+    <label for="dock-link">Lien privé du dock</label>
+    <input id="dock-link" type="password" autocomplete="off" spellcheck="false" placeholder="http://127.0.0.1:43120/dock#…">
+    <div class="buttons"><button id="connect" type="button">Relier</button><button id="refresh" class="secondary" type="button">Vérifier</button></div>
+    <p id="status" role="status" aria-live="polite">En attente de Stream Deck…</p>
+    <p class="small">Aucune clé de stream à saisir. Le lien reste dans les réglages globaux locaux de Stream Deck et n’est pas inclus dans vos profils exportés.</p>
+  </section>
+  <section id="options" hidden aria-labelledby="options-title">
+    <h2 id="options-title">Cette commande</h2>
+    <label id="value-label" for="value">Délai en secondes</label>
+    <input id="value" type="number" min="0" max="300" step="1" value="30">
+    <button id="save" type="button">Enregistrer</button>
+    <p id="settings-status" role="status" aria-live="polite"></p>
+  </section>
+  <p class="small">Le délai augmente par paliers et diminue sur une image clé, comme dans Temhalo. « 0 s » conserve la latence minimale du relais et du lecteur.</p>
+</body>
+</html>

@@ -1,5 +1,16 @@
 # Historique
 
+## 0.7.0-preview.3 — en préparation
+
+- Plugin Stream Deck facultatif : protection, retour direct, preset, ajout/retrait, délai mesuré, état OBS/sorties et réglage à la molette du Stream Deck +.
+- Association locale commune aux touches via le lien privé du dock, stockage global exclu des profils exportés et reconnexion sans rejeu des commandes.
+- Plugin et sa documentation inclus dans les paquets Windows, avec validation officielle Elgato et tests automatisés.
+- Correction du texte de la case « Ouvrir Temhalo » sur le fond sombre de la dernière page de l'installeur.
+
+## 0.7.0-preview.2
+
+- Script unique de publication : numéro de version, tests, paquets Windows, commit/tag, push atomique et suivi de GitHub Actions.
+
 ## 0.7.0-preview.1
 
 - Publication open source du projet Windows, de ses tests, documents et ressources graphiques.

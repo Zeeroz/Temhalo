@@ -37,6 +37,14 @@ jobs:
           dotnet-version: |
             10.0.401
             8.0.x
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Préparer pnpm verrouillé
+        shell: pwsh
+        run: |
+          npm install --global pnpm@11.25.0 --ignore-scripts
+          if ($LASTEXITCODE) { throw 'Installation pnpm échouée' }
       - name: Audit des fichiers publics
         shell: pwsh
         run: ./tools/Test-PublicSource.ps1
@@ -63,10 +71,17 @@ jobs:
         shell: pwsh
         run: |
           ./tools/Package-Windows.ps1
+          $archives = @(Get-ChildItem artifacts/packages/Temhalo-*-win-x64.zip)
+          if ($archives.Count -ne 1) { throw 'Un seul ZIP était attendu.' }
+          ./tools/Test-WindowsPackage.ps1 -ArchivePath $archives[0].FullName
           ./tools/Build-Installer.ps1
           # The deletion inventory must include every shipped version and stay in Git.
           git diff --exit-code -- packaging/windows/uninstall-inventory.json
           if ($LASTEXITCODE) { throw 'Inventaire modifié : exécuter Build-Installer localement et committer uninstall-inventory.json avant de publier.' }
+      - name: Valider le plugin Stream Deck sur les pull requests
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: ./tools/Build-StreamDeck.ps1
       - name: Tester installation, mise à jour et désinstallation isolées
         if: github.event_name != 'pull_request'
         shell: pwsh

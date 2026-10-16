@@ -14,6 +14,8 @@ $stage = Join-Path $releaseRoot ($packageName + '-' + [Guid]::NewGuid().ToString
 $package = Join-Path $stage 'Temhalo'
 Push-Location -LiteralPath $repoRoot
 try {
+    $streamDeckPackage = & (Join-Path $PSScriptRoot 'Build-StreamDeck.ps1') | Select-Object -Last 1
+    if (-not (Test-Path -LiteralPath $streamDeckPackage -PathType Leaf)) { throw 'Plugin Stream Deck absent après construction.' }
     if (-not $SkipPublish) {
         & dotnet restore src/Temhalo.App -p:Platform=x64 -p:PublishProfile=Portable -p:SelfContained=true --locked-mode
         if ($LASTEXITCODE -ne 0) { throw 'Restauration du profil portable échouée.' }
@@ -48,6 +50,11 @@ try {
     Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\ETAPE-5BIS-SERVICES.md') -Destination (Join-Path $package 'GUIDE-OBS.md')
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\LISEZ-MOI.txt') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\THIRD-PARTY-NOTICES.md') -Destination $package
+    $streamDeckDirectory = Join-Path $package 'plugins\streamdeck'
+    [void][IO.Directory]::CreateDirectory($streamDeckDirectory)
+    Copy-Item -LiteralPath $streamDeckPackage -Destination (Join-Path $streamDeckDirectory 'Temhalo.streamDeckPlugin')
+    Copy-Item -LiteralPath ($streamDeckPackage + '.sha256') -Destination $streamDeckDirectory
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'plugins\streamdeck\README.md') -Destination $streamDeckDirectory
     $noticeDirectory = Join-Path $package 'Licenses'
     [void][IO.Directory]::CreateDirectory($noticeDirectory)
     $assets = Get-Content -LiteralPath (Join-Path $repoRoot 'src\Temhalo.App\obj\project.assets.json') -Raw | ConvertFrom-Json
