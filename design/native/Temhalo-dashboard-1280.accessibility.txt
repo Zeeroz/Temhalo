@@ -1,0 +1,75 @@
+Window: "Temhalo", App: Temhalo.App.exe.
+	0 fenêtre Temhalo Secondary Actions: Raise
+		1 volet Non Client Input Sink Window
+		2 volet AppWindow Custom Title Bar
+			3 Bouton Minimize ID: Minimize
+			4 Bouton Maximize ID: Maximize
+			5 Bouton Close ID: Close
+		6 volet
+			7 volet
+				8 image Temhalo
+				9 texte Relais actif ID: SessionLabel
+				10 bouton Arrêter le relais ID: StartStop
+				11 personnalisé ID: Navigation
+					12 volet
+						13 groupe ID: TopNavMenuItemsHost
+							14 élément d’onglet (selectable) Tableau de bord ID: DashboardTab
+							15 élément d’onglet (selectable) Destination ID: DestinationTab
+							16 élément d’onglet (selectable) Journal ID: JournalTab
+					17 groupe ID: TopFooterMenuItemsHost
+					18 volet ID: MainScroll
+						19 texte Tableau de bord ID: PageTitle
+						20 texte Contrôlez le délai ajouté à votre diffusion.
+						21 texte Délai de diffusion
+						22 texte Délai atteint
+						23 texte Délai actuel
+						24 texte 00:15 ID: CurrentDelay
+						25 texte Cible appliquée
+						26 texte 00:15 ID: TargetDelay
+						27 texte Délai local · La latence de la plateforme s’ajoute.
+						28 bouton Appliquer zéro seconde
+						29 bouton 15 s
+						30 bouton 30 s
+						31 bouton 60 s
+						32 bouton Personnalisé
+						33 texte Nouvelle cible
+						34 compteur (settable, float) Nouvelle cible en secondes, entier de 0 à 300 Value: 15 ID: DelayNumber
+							35 modifier (settable, string) Nouvelle cible en secondes, entier de 0 à 300 Value: 15 ID: InputBox
+							36 bouton Augmenter ID: UpSpinButton
+							37 bouton Diminuer ID: DownSpinButton
+						38 potentiomètre (settable, float) Nouvelle cible de délai en secondes Value: 15 ID: DelaySlider
+						39 texte 0 s
+						40 texte 300 s · 5 min
+						41 texte
+						42 bouton Appliquer ID: ApplyDelay
+						43 texte Préparez une valeur, puis appliquez-la. Les presets agissent immédiatement.
+						44 texte Suivi du relais
+						45 texte Entrée OBS
+						46 texte Connecté ID: IngestState
+						47 texte RTMP local · 127.0.0.1:1935
+						48 texte Sortie fichier local ID: OutputTitle
+						49 texte Écriture active ID: OutputState
+						50 texte FLV · H.264 / AAC · passthrough ID: OutputDetail
+						51 texte Débit entrant
+						52 texte 1,67 Mbit/s
+						53 texte Débit sortant
+						54 texte 1,72 Mbit/s
+						55 texte Durée du live
+						56 texte 00:00:42
+						57 texte Buffer RAM
+						58 texte 3,6 / 512 Mio
+						59 barre de progression Occupation du buffer RAM en pourcentage Value: 0.7037995383143425 ID: BufferBar
+						60 texte Mémoire utilisée par le buffer RAM
+						61 texte Dernier événement
+						62 texte 01:17:59 · Publication OBS connectée. ID: LastEvent
+						63 barre de défilement (settable, float) Vertical Value: 0 ID: VerticalScrollBar
+		68 barre de titre (settable, string) Value: Temhalo
+			69 barre de menus Système ID: MenuBar
+				70 élément de menu Système
+			71 Bouton Réduire
+			72 Bouton Agrandir
+			73 Bouton Fermer
+
+Document text: ```
+15
+```

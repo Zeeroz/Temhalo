@@ -1,0 +1,12 @@
+{
+  "obs": {
+    "version": "32.2.2",
+    "fileName": "OBS-Studio-32.2.2-Windows-x64-Installer.exe",
+    "url": "https://github.com/obsproject/obs-studio/releases/download/32.2.2/OBS-Studio-32.2.2-Windows-x64-Installer.exe",
+    "bytes": 159809104,
+    "sha256": "c3a0b880adbe64dc4bcb68f93016916ab5b55ae43fd227115287bf80257d92dc",
+    "hashSource": "https://api.github.com/repos/obsproject/obs-studio/releases/tags/32.2.2",
+    "source": "https://github.com/obsproject/obs-studio/tree/32.2.2",
+    "license": "GPL-2.0-or-later"
+  }
+}

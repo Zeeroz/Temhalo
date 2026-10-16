@@ -1,0 +1,12 @@
+* text=auto
+*.cs text
+*.xaml text
+*.ps1 text
+*.md text
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.svg text
+*.png binary
+*.ico binary
+*.ttf binary

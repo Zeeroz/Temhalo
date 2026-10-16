@@ -1,0 +1,28 @@
+{
+  "Ingest": {
+    "Url": "rtmp://127.0.0.1:1935/live/stream",
+    "MediaMtxConfig": "config/mediamtx.yml"
+  },
+  "Delay": {
+    "InitialSeconds": 0,
+    "MaximumSeconds": 300,
+    "PresetsSeconds": [0, 15, 30, 60],
+    "ProtectionPresetSeconds": 60,
+    "RequestedMaximumPauseStepSeconds": 5,
+    "ResumeBetweenStepsSeconds": 1
+  },
+  "Buffer": {
+    "MaximumBytes": 536870912,
+    "WarningUsageRatio": 0.8
+  },
+  "Destination": {
+    "Provider": "Custom",
+    "ServerUrl": ""
+  },
+  "Logging": {
+    "MinimumLevel": "Information",
+    "FileSizeLimitBytes": 10485760,
+    "RetainedFileCountLimit": 7,
+    "RollingInterval": "Day"
+  }
+}

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>FLV, horloges et buffer de délai, indépendants de Windows et de l'UI.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Temhalo.Core.Tests" />
+    <InternalsVisibleTo Include="Temhalo.NativeValidation" />
+  </ItemGroup>
+</Project>

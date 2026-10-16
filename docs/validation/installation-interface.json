@@ -1,0 +1,13 @@
+{
+  "InstalledGuiStartedViaShortcut": true,
+  "UpgradeRefusedWhileGuiOpen": true,
+  "UninstallRefusedWhileGuiOpen": true,
+  "ProcessStillRunning": true,
+  "UninstallPreservesActualEncryptedSettings": true,
+  "InstalledDirectoryRemoved": true,
+  "DefaultUninstallerSelfCopyPassed": true,
+  "RegistryRemoved": true,
+  "DpapiCanaryBytesAndDecryptionPreserved": true,
+  "NormalGuiShutdown": true,
+  "RepairPreservesActualEncryptedSettings": true
+}

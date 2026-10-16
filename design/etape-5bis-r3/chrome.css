@@ -1,0 +1,36 @@
+/* Shell revision only. The four screen compositions retain their R2 styling. */
+.app-shell { display:block; min-height:0; }
+.workspace-bar { padding:0 28px; min-height:64px; gap:24px; }
+.main-nav { display:flex; align-items:center; flex-wrap:wrap; gap:28px; margin:0; }
+.main-nav button {
+  display:block; min-height:48px; padding:14px 0; border:0; border-radius:0;
+  background:transparent; color:var(--secondary); text-align:center; font-size:14px;
+}
+.main-nav button:hover { color:var(--text); background:transparent; }
+.main-nav button[aria-selected=true] { background:transparent; color:var(--text); }
+.main-nav button[aria-selected=true]::before { display:none; }
+.main-nav button[aria-selected=true]::after {
+  content:""; position:absolute; left:0; right:0; bottom:0; height:3px;
+  border-radius:3px; background:var(--halo);
+}
+.session-actions { width:auto; gap:16px; }
+.relay-footer {
+  display:flex; align-items:center; flex-wrap:wrap; gap:24px;
+  padding:12px 28px; border-top:1px solid var(--rule);
+}
+.settings-layout { display:block; }
+.settings-nav { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.settings-nav button { text-align:center; }
+@media(max-width:760px) {
+  .workspace-bar { padding:0 20px 12px; gap:4px; }
+  .main-nav { width:100%; gap:24px; }
+  .session-actions { width:100%; gap:12px; justify-content:space-between; }
+  .relay-footer { padding:12px 20px; gap:16px; }
+}
+@media(max-width:600px) {
+  .main-nav { gap:22px; }
+  .main-nav button { padding:12px 0; font-size:13px; }
+}
+@media(forced-colors:active) {
+  .main-nav button[aria-selected=true] { border-left:0; border-bottom:3px solid Highlight; }
+}

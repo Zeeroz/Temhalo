@@ -1,0 +1,37 @@
+# Optional local destination for watching Temhalo's delayed output in VLC.
+# The ingest used by OBS remains on port 1935 (mediamtx.yml).
+logLevel: info
+logDestinations: [stdout]
+logStructured: true
+readTimeout: 30s
+writeTimeout: 30s
+writeQueueSize: 512
+
+authMethod: internal
+authInternalUsers:
+  - user: any
+    ips: [127.0.0.1]
+    permissions:
+      - action: publish
+        path: live/preview
+      - action: read
+        path: live/preview
+
+api: false
+metrics: false
+pprof: false
+playback: false
+rtsp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+
+rtmp: true
+rtmpAddress: 127.0.0.1:1936
+rtmpEncryption: "no"
+
+paths:
+  live/preview:
+    source: publisher
+    overridePublisher: false

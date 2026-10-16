@@ -1,0 +1,371 @@
+{
+  "Status": "passed",
+  "At": "2026-10-16T14:28:50.499318+02:00",
+  "GuestTestsExecuted": true,
+  "GuestResult": "passed",
+  "HostRestartPerformed": true,
+  "UserChoseManualRestart": true,
+  "AutomaticRestartPerformed": false,
+  "HostWindowsBuild": "Microsoft Windows NT 10.0.26200.0",
+  "HostLastBoot": "2026-10-16T14:00:28.5000000+02:00",
+  "Guest": {
+    "OS": "Microsoft Windows NT 10.0.26100.0",
+    "Machine": "D5F1B951-68F2-4",
+    "Account": "WDAGUtilityAccount",
+    "Elevated": true,
+    "SourceHostIsDifferent": true,
+    "WindowsSandbox": true,
+    "NoSdkInstalled": true,
+    "Note": "Le compte Sandbox peut être administrateur ; ce test ne remplace pas un compte standard sur un autre PC."
+  },
+  "SandboxClosedAfterEvidenceExport": true,
+  "RunDirectory": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd",
+  "OriginalInstallerSHA256": "68639487e32bd762e872d2bec0962f2439b662eae5106842732df55718962270",
+  "ApprovedInstallerUnchanged": true,
+  "UpgradeInstallerSHA256": "2cae057aa07b776035e959dca66127602bbae021907e82d9a43e97974147e528",
+  "InitialNumericVersion": "0.6.0.1",
+  "UpgradeNumericVersion": "0.6.0.2",
+  "UpgradeAppPayloadUnchanged": true,
+  "FutureSettingsSchemaMigrationTested": false,
+  "ObsVersion": "32.2.2",
+  "ObsSHA256": "c3a0b880adbe64dc4bcb68f93016916ab5b55ae43fd227115287bf80257d92dc",
+  "ObsConfiguration": {
+    "VideoEncoder": "x264",
+    "RateControl": "CBR",
+    "VideoBitrateKbps": 6000,
+    "KeyframeIntervalSeconds": 1,
+    "Width": 1280,
+    "Height": 720,
+    "Fps": 30,
+    "AudioCodec": "AAC",
+    "AudioSampleRate": 48000,
+    "AudioChannels": 2,
+    "Source": "Synthetic looped local test pattern",
+    "Output": "Local FLV file"
+  },
+  "Assertions": {
+    "Total": 1881,
+    "FunctionalAndInputChecks": 41,
+    "InstalledFileChecksPerRevision": 920,
+    "RevisionsChecked": 2,
+    "Failures": 0
+  },
+  "DelayChecks": {
+    "TargetsSeconds": [
+      0,
+      15,
+      0
+    ],
+    "Measurement": "Moteur, vérification des plages ; échantillons numériques individuels non exportés",
+    "FifteenSecondsRangeMilliseconds": [
+      13000,
+      17000
+    ],
+    "ZeroSecondsRangeMilliseconds": [
+      0,
+      2000
+    ],
+    "Passed": true,
+    "IndependentViewerMeasurement": false
+  },
+  "VisualReview": {
+    "CheckedAt": "2026-10-16T12:28:49.159Z",
+    "Presets": [
+      0,
+      12,
+      24,
+      48
+    ],
+    "MemoryLimitMiB": 384,
+    "HotkeysEnabled": false,
+    "ProtectionSeconds": 48,
+    "OverlayStyle": "Fil du temps",
+    "Method": "Inspection visuelle des captures de la fenêtre Sandbox après mise à jour"
+  },
+  "Checks": [
+    {
+      "Name": "Baseline sans installation ni profil Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:09:34.8220181+02:00"
+    },
+    {
+      "Name": "Aucun SDK .NET global dans le Windows invité",
+      "Passed": true,
+      "At": "2026-10-16T14:09:34.830485+02:00"
+    },
+    {
+      "Name": "Aucune installation ni profil OBS préexistant",
+      "Passed": true,
+      "At": "2026-10-16T14:09:34.8328395+02:00"
+    },
+    {
+      "Name": "Empreinte de l'entrée OBS-Studio-32.2.2-Windows-x64-Installer.exe",
+      "Passed": true,
+      "At": "2026-10-16T14:09:35.3289574+02:00"
+    },
+    {
+      "Name": "Empreinte de l'entrée Temhalo-0.6.0-preview.1-Setup-x64.exe",
+      "Passed": true,
+      "At": "2026-10-16T14:09:35.6331463+02:00"
+    },
+    {
+      "Name": "Empreinte de l'entrée Temhalo-Validation-Upgrade.exe",
+      "Passed": true,
+      "At": "2026-10-16T14:09:35.9219137+02:00"
+    },
+    {
+      "Name": "Empreinte de l'entrée test-pattern.mp4",
+      "Passed": true,
+      "At": "2026-10-16T14:09:35.9651349+02:00"
+    },
+    {
+      "Name": "Révision et dossier enregistrés dans Windows",
+      "Passed": true,
+      "At": "2026-10-16T14:09:42.9333409+02:00"
+    },
+    {
+      "Name": "Raccourci présent : Desktop",
+      "Passed": true,
+      "At": "2026-10-16T14:09:42.9578398+02:00"
+    },
+    {
+      "Name": "Cible et icône du raccourci",
+      "Passed": true,
+      "At": "2026-10-16T14:09:43.0107859+02:00"
+    },
+    {
+      "Name": "Raccourci présent : Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:09:43.016658+02:00"
+    },
+    {
+      "Name": "Cible et icône du raccourci",
+      "Passed": true,
+      "At": "2026-10-16T14:09:43.0255853+02:00"
+    },
+    {
+      "Name": "Entrée Désinstaller dans le menu Démarrer",
+      "Passed": true,
+      "At": "2026-10-16T14:09:43.031696+02:00"
+    },
+    {
+      "Name": ".NET chargé depuis le dossier installé de Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:09:45.2296949+02:00"
+    },
+    {
+      "Name": "WinUI chargé depuis le dossier installé de Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:09:45.2356669+02:00"
+    },
+    {
+      "Name": "Acquisition à froid par Temhalo et lancement des outils média avant installation d'OBS",
+      "Passed": true,
+      "At": "2026-10-16T14:10:27.8665744+02:00"
+    },
+    {
+      "Name": "OBS officiel installé dans l'invité",
+      "Passed": true,
+      "At": "2026-10-16T14:14:43.1313198+02:00"
+    },
+    {
+      "Name": "OBS connecté au relais installé, contrôle du moteur disponible",
+      "Passed": true,
+      "At": "2026-10-16T14:26:01.831494+02:00"
+    },
+    {
+      "Name": "Commande locale de délai acceptée : 15 s",
+      "Passed": true,
+      "At": "2026-10-16T14:26:11.8660669+02:00"
+    },
+    {
+      "Name": "Délai mesuré par le moteur entre 13 et 17 secondes pour une cible de 15 secondes",
+      "Passed": true,
+      "At": "2026-10-16T14:26:33.0925654+02:00"
+    },
+    {
+      "Name": "Commande locale de délai acceptée : 0 s",
+      "Passed": true,
+      "At": "2026-10-16T14:26:33.102051+02:00"
+    },
+    {
+      "Name": "Retour au minimum local sur le flux OBS",
+      "Passed": true,
+      "At": "2026-10-16T14:26:34.1185193+02:00"
+    },
+    {
+      "Name": "Premier arrêt normal de Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:27:36.5313968+02:00"
+    },
+    {
+      "Name": "Enregistrement OBS relayé non vide",
+      "Passed": true,
+      "At": "2026-10-16T14:27:36.541669+02:00"
+    },
+    {
+      "Name": "Fichier relayé reconnu H.264 et AAC",
+      "Passed": true,
+      "At": "2026-10-16T14:27:36.6099218+02:00"
+    },
+    {
+      "Name": "Décodage complet du fichier relayé sans erreur FFmpeg",
+      "Passed": true,
+      "At": "2026-10-16T14:27:37.1488935+02:00"
+    },
+    {
+      "Name": "Révision et dossier enregistrés dans Windows",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.3956702+02:00"
+    },
+    {
+      "Name": "Raccourci présent : Desktop",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4068908+02:00"
+    },
+    {
+      "Name": "Cible et icône du raccourci",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4212963+02:00"
+    },
+    {
+      "Name": "Raccourci présent : Temhalo",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4294966+02:00"
+    },
+    {
+      "Name": "Cible et icône du raccourci",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4414087+02:00"
+    },
+    {
+      "Name": "Entrée Désinstaller dans le menu Démarrer",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4497101+02:00"
+    },
+    {
+      "Name": "Octets DPAPI conservés pendant la mise à jour",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4581234+02:00"
+    },
+    {
+      "Name": "Réglages et clé témoin déchiffrables après mise à jour",
+      "Passed": true,
+      "At": "2026-10-16T14:27:44.4667692+02:00"
+    },
+    {
+      "Name": "Relancement et arrêt normal après mise à jour",
+      "Passed": true,
+      "At": "2026-10-16T14:28:49.3328549+02:00"
+    },
+    {
+      "Name": "Réglages conservés après relancement de la version mise à jour",
+      "Passed": true,
+      "At": "2026-10-16T14:28:49.3667943+02:00"
+    },
+    {
+      "Name": "Entrée Windows désinstallée",
+      "Passed": true,
+      "At": "2026-10-16T14:28:50.4551279+02:00"
+    },
+    {
+      "Name": "Raccourcis Bureau et menu Démarrer retirés",
+      "Passed": true,
+      "At": "2026-10-16T14:28:50.4640696+02:00"
+    },
+    {
+      "Name": "Seul le fichier personnel ajouté reste dans le dossier",
+      "Passed": true,
+      "At": "2026-10-16T14:28:50.4728047+02:00"
+    },
+    {
+      "Name": "Réglages et clé témoin conservés après désinstallation",
+      "Passed": true,
+      "At": "2026-10-16T14:28:50.4812896+02:00"
+    },
+    {
+      "Name": "Dossier applicatif vide retiré",
+      "Passed": true,
+      "At": "2026-10-16T14:28:50.4906079+02:00"
+    }
+  ],
+  "Claims": {
+    "Windows10Tested": false,
+    "OtherWindows11BuildsTested": false,
+    "PublicPlatformTested": false,
+    "IndependentStopwatchLatencyTested": false,
+    "PerceptualAudioVideoSyncTested": false
+  },
+  "StandardUserOnSeparatePcTested": false,
+  "ThirtyMinuteLiveInThisSessionTested": false,
+  "NoRealPlatformKeyUsed": true,
+  "DecryptedSettingsExported": false,
+  "HostClipboardShared": false,
+  "SupplementalInputFiles": [
+    "OBS-local.url",
+    "OBS-test-values.txt"
+  ],
+  "EvidenceFiles": [
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\baseline.json",
+      "Bytes": 351,
+      "SHA256": "4525c1ebc6c8c6ed8b27ab0af291154c7451ab2fc9d7561721211e8e19b0a029"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\media-probe.json",
+      "Bytes": 3397,
+      "SHA256": "94b396291614129bdd9fc59aa76447058e2e30d7ee23c59631f6e79f9fbbb081"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\obs-relayed.flv",
+      "Bytes": 33639158,
+      "SHA256": "412d05c492d5cbbbfeaff34ed23335db7a36d8a68993607f0be4ad33600d0195"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\result.json",
+      "Bytes": 340343,
+      "SHA256": "bade66d02da3ed9b143d931f836625142fa035c1b39fd5ba75d73fbb6c575c56"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\01-obs-relay-delay.png",
+      "Bytes": 133077,
+      "SHA256": "817d323646760fd8e847a149cf3e8607c02d7495ce8f076a31b6668dc7874bfa"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\02-obs-relay-zero.png",
+      "Bytes": 132654,
+      "SHA256": "e104a1e08cfedd8de3cc28a09d5b65ec8795bf6cc91ba0b3085f13b74ff8c511"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\03-obs-source-streaming.png",
+      "Bytes": 151859,
+      "SHA256": "23b7ce724cdfc2c1897c923da10b3685200ff5c2f4f3e5616d1b459183f071ef"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\04-updated-presets-memory.png",
+      "Bytes": 94406,
+      "SHA256": "186a36b8a0e905f8b91fabcd6e077f641bf2f68784239db82978daac299d720d"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\05-updated-hotkeys.png",
+      "Bytes": 81763,
+      "SHA256": "37e680809653026ec59d510649f21d05a5f9467a3283a6b4ad3cf66c9237f55f"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\06-updated-overlay-fil.png",
+      "Bytes": 89130,
+      "SHA256": "7897eeee5b64b66ff61d408d28eb58bcc6920dcab00a48ea43a4ecbed44d15cd"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\07-desktop-after-uninstall.png",
+      "Bytes": 284553,
+      "SHA256": "6d2a7f1cd44d453ecf95517425acd1aaa166354a5256fbcf8a8c93bb5bfe76de"
+    },
+    {
+      "Path": "artifacts\\validation\\clean-windows\\lab-20261016-134734-5cdbf5bb\\Results\\run-20261016-120934-f45ed9bd\\screenshots\\visual-checks.json",
+      "Bytes": 299,
+      "SHA256": "436c2c722c0fe2d7f637328700c7b0f3f32155876586406608a904ae491bd454"
+    }
+  ],
+  "EvidenceArchive": "Temhalo-Validation-Windows-Vierge-2026-10-16.zip"
+}

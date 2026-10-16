@@ -1,0 +1,147 @@
+{
+  "Status": "passed",
+  "At": "2026-10-16T13:23:38.9200710+02:00",
+  "Checks": [
+    {
+      "Name": "Identité de test absente avant installation",
+      "Passed": true
+    },
+    {
+      "Name": "920 fichiers installés conformes par SHA-256",
+      "Passed": true
+    },
+    {
+      "Name": "Enregistrement HKCU et version corrects",
+      "Passed": true
+    },
+    {
+      "Name": "Commande de désinstallation citée correctement",
+      "Passed": true
+    },
+    {
+      "Name": "Raccourci cible et dossier de travail corrects",
+      "Passed": true
+    },
+    {
+      "Name": "Icône Temhalo du raccourci",
+      "Passed": true
+    },
+    {
+      "Name": "Profil du raccourci isolé du profil personnel",
+      "Passed": true
+    },
+    {
+      "Name": "Raccourci cible et dossier de travail corrects",
+      "Passed": true
+    },
+    {
+      "Name": "Icône Temhalo du raccourci",
+      "Passed": true
+    },
+    {
+      "Name": "Profil du raccourci isolé du profil personnel",
+      "Passed": true
+    },
+    {
+      "Name": "Entrée de désinstallation dans le menu Démarrer",
+      "Passed": true
+    },
+    {
+      "Name": "Données du profil conservées",
+      "Passed": true
+    },
+    {
+      "Name": "Mise à jour refusée sans modification lorsque le fichier est utilisé",
+      "Passed": true
+    },
+    {
+      "Name": "Désinstallation refusée et enregistrement conservé lorsque le fichier est utilisé",
+      "Passed": true
+    },
+    {
+      "Name": "920 fichiers installés conformes par SHA-256",
+      "Passed": true
+    },
+    {
+      "Name": "920 fichiers installés conformes par SHA-256",
+      "Passed": true
+    },
+    {
+      "Name": "Fichier connu devenu obsolète retiré à la mise à jour",
+      "Passed": true
+    },
+    {
+      "Name": "Fichier personnel conservé lors de la réparation",
+      "Passed": true
+    },
+    {
+      "Name": "Données du profil conservées",
+      "Passed": true
+    },
+    {
+      "Name": "920 fichiers installés conformes par SHA-256",
+      "Passed": true
+    },
+    {
+      "Name": "Installation d'une version antérieure refusée",
+      "Passed": true
+    },
+    {
+      "Name": "Entrée des applications installées retirée",
+      "Passed": true
+    },
+    {
+      "Name": "Raccourci Bureau retiré",
+      "Passed": true
+    },
+    {
+      "Name": "Dossier Temhalo du menu Démarrer retiré",
+      "Passed": true
+    },
+    {
+      "Name": "Seul le fichier personnel ajouté reste dans le dossier",
+      "Passed": true
+    },
+    {
+      "Name": "Données du profil conservées",
+      "Passed": true
+    },
+    {
+      "Name": "Fichier personnel conservé lors de la désinstallation",
+      "Passed": true
+    },
+    {
+      "Name": "920 fichiers installés conformes par SHA-256",
+      "Passed": true
+    },
+    {
+      "Name": "Données du profil conservées",
+      "Passed": true
+    }
+  ],
+  "Build": {
+    "Installer": "C:\\Temhalo\\artifacts\\validation\\installer\\isolated with spaces-é-f9381dd624f746268cda5030c2320587\\Temhalo-Test-Setup.exe",
+    "Version": "0.6.0-preview.1",
+    "NumericVersion": "0.6.0.1",
+    "Bytes": 73070674,
+    "SHA256": "a6d332983d5799d9d89a6222a7890f1c470e21e6f238cc6e8754f15c6d24a773",
+    "Compiler": "NSIS 3.13",
+    "CompilerSHA256": "ba63dffc4410ee89193e1cb5a41989991bd77c61068da17e3156d136b7b0b3d8",
+    "SourceArchive": "C:\\Temhalo\\artifacts\\packages\\Temhalo-0.6.0-preview.1-win-x64.zip",
+    "SourceArchiveSHA256": "25ebd1ac1a6414c1dc8252c4690d1e72982a00fd8d1b220f8828be88939a0ca2",
+    "PayloadFiles": 920,
+    "HistoricalFiles": 921,
+    "ObsoleteFiles": 1,
+    "TestRoot": "C:\\Temhalo\\artifacts\\validation\\installer\\isolated with spaces-é-f9381dd624f746268cda5030c2320587",
+    "TestId": "f9381dd624f746268cda5030c2320587",
+    "UninstallRegistrySubKey": "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Temhalo.Installer.Test.f9381dd624f746268cda5030c2320587",
+    "BuildDirectory": "C:\\Temhalo\\artifacts\\installer\\build-efc4a34e8fa041f69347fad25e21a6ae",
+    "Signed": false,
+    "InstallerSourceSHA256": "d4d7b4a562d5df3c9e64277398b063085c496230b6b62b8b23b7df6f22f9b8a9"
+  },
+  "InstallDirectory": "C:\\Temhalo\\artifacts\\validation\\installer\\isolated with spaces-é-f9381dd624f746268cda5030c2320587\\Programs\\Temhalo",
+  "ProfileData": "C:\\Temhalo\\artifacts\\validation\\installer\\isolated with spaces-é-f9381dd624f746268cda5030c2320587\\profile data",
+  "KeptInstalledForUi": true,
+  "CleanWindowsVmTested": false,
+  "Failure": null
+}

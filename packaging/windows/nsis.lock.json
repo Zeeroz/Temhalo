@@ -1,0 +1,8 @@
+{
+  "version": "3.13",
+  "url": "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.13/nsis-3.13.zip",
+  "bytes": 2363925,
+  "sha256": "ba63dffc4410ee89193e1cb5a41989991bd77c61068da17e3156d136b7b0b3d8",
+  "hashSource": "https://nsis-dev.github.io/release-data/versions.json",
+  "license": "https://nsis.sourceforge.io/Docs/AppendixI.html"
+}

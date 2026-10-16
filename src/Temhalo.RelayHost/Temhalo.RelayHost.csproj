@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Description>Hôte de diagnostic du relais sans dépendance WinUI.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Temhalo.Core\Temhalo.Core.csproj" />
+    <ProjectReference Include="..\Temhalo.Infrastructure.Windows\Temhalo.Infrastructure.Windows.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\config\temhalo.defaults.json" Link="config\temhalo.defaults.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\config\mediamtx.yml" Link="config\mediamtx.yml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

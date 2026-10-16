@@ -1,0 +1,56 @@
+{
+  "Status": "passed",
+  "At": "2026-10-16T13:30:26.8892037+02:00",
+  "Version": "0.6.0-preview.1",
+  "ProductionInstaller": {
+    "File": "Temhalo-0.6.0-preview.1-Setup-x64.exe",
+    "Bytes": 73074081,
+    "Sha256": "68639487e32bd762e872d2bec0962f2439b662eae5106842732df55718962270",
+    "Signed": false,
+    "Compiler": "NSIS 3.13",
+    "SourceSHA256": "d4d7b4a562d5df3c9e64277398b063085c496230b6b62b8b23b7df6f22f9b8a9"
+  },
+  "ValidatedPortablePayloadSha256": "25ebd1ac1a6414c1dc8252c4690d1e72982a00fd8d1b220f8828be88939a0ca2",
+  "PayloadFiles": 920,
+  "AutomatedChecksPassed": 29,
+  "SameNsisTemplateInProductionAndTests": true,
+  "TestModeChanges": [
+    "Isolated HKCU uninstall key and setup mutex",
+    "Desktop and Start Menu directories redirected inside workspace",
+    "Shortcut uses isolated --data-directory",
+    "One known obsolete file fixture added to generated inventory"
+  ],
+  "ProductionWizardPreviewChecked": true,
+  "InstalledAppSmoke": {
+    "InstalledGuiStartedViaShortcut": true,
+    "UpgradeRefusedWhileGuiOpen": true,
+    "UninstallRefusedWhileGuiOpen": true,
+    "ProcessStillRunning": true,
+    "UninstallPreservesActualEncryptedSettings": true,
+    "InstalledDirectoryRemoved": true,
+    "DefaultUninstallerSelfCopyPassed": true,
+    "RegistryRemoved": true,
+    "DpapiCanaryBytesAndDecryptionPreserved": true,
+    "NormalGuiShutdown": true,
+    "RepairPreservesActualEncryptedSettings": true
+  },
+  "FinalTestInstallationRemoved": true,
+  "FinalTestRegistryRemoved": true,
+  "SourceOrCoreApplicationCodeChanged": false,
+  "CleanWindows10And11VmTested": false,
+  "Notes": [
+    "The published portable payload is reused without rebuilding application binaries.",
+    "Three installer-only documentation/license files are added.",
+    "The production wizard was previewed and cancelled before installation.",
+    "Automated install/repair/uninstall run in isolation with the same NSIS source.",
+    "The final guide text was updated after the isolated installer build; the application payload is identical.",
+    "Power-loss/disk-full interruption is not transactional; rerun setup if interrupted."
+  ],
+  "Evidence": [
+    "installation-automatisee.json",
+    "installation-interface.json",
+    "../../design/native-installer/Temhalo-installed.jpg",
+    "../../design/native-installer/Temhalo-Setup-welcome.jpg",
+    "../../design/native-installer/Temhalo-Setup-components.jpg"
+  ]
+}

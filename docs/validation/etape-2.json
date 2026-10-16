@@ -1,0 +1,82 @@
+{
+  "Stage": 2,
+  "Build": {
+    "Warnings": 0,
+    "Errors": 0,
+    "Platform": "x64",
+    "Configuration": "Debug"
+  },
+  "UnitTests": {
+    "Core": 24,
+    "Failed": 0,
+    "Passed": 29,
+    "Skipped": 0,
+    "Infrastructure": 5
+  },
+  "CapacityTest": {
+    "ActualPayloadBytesHeldAtLeast": 300000000,
+    "DelaySeconds": 300,
+    "FreedAfterDrain": true,
+    "BudgetBytes": 536870912,
+    "Clock": "Simulated",
+    "WarningThresholdTested": true
+  },
+  "NativeIntegration": [
+    {
+      "Stage": 2,
+      "Status": "passed",
+      "CheckedAtUtc": "2026-10-15T22:17:10.6651681Z",
+      "DelaySeconds": 5,
+      "MinimumMediaAgeMilliseconds": 5000,
+      "LastMediaAgeMilliseconds": 5007,
+      "MaximumMediaAgeMilliseconds": 5016,
+      "PeakBufferBytes": 1841714,
+      "FinalBufferBytes": 0,
+      "TailMediaTagsAfterSourceDisconnect": 366,
+      "PacketsVerified": 566,
+      "VideoSliceHashesVerified": 221,
+      "AvEndDifferenceSeconds": 0.008000000000000007,
+      "FirstVideoIsKeyframe": true,
+      "DecodedWithoutError": true,
+      "OverflowFailedClosed": true,
+      "OverflowPeakBytes": 1042846,
+      "SourceReport": "artifacts/validation/stage2-382d39e7b58a4803923bc6320b257209/result.json"
+    },
+    {
+      "Stage": 2,
+      "Status": "passed",
+      "CheckedAtUtc": "2026-10-15T22:13:27.2517179Z",
+      "DelaySeconds": 3,
+      "MinimumMediaAgeMilliseconds": 3000,
+      "LastMediaAgeMilliseconds": 3007,
+      "PeakBufferBytes": 1429883,
+      "FinalBufferBytes": 0,
+      "TailMediaTagsAfterSourceDisconnect": 215,
+      "PacketsVerified": 407,
+      "VideoSliceHashesVerified": 159,
+      "AvEndDifferenceSeconds": 0.01100000000000012,
+      "FirstVideoIsKeyframe": true,
+      "DecodedWithoutError": true,
+      "OverflowFailedClosed": true,
+      "OverflowPeakBytes": 1046954,
+      "SourceReport": "artifacts/validation/stage2-956910e0d228413fb0b816b6a25062ce/result.json"
+    }
+  ],
+  "ZeroDelaySupervisionRegression": {
+    "CheckedAtUtc": "2026-10-15T22:11:14.8640373Z",
+    "Events": [
+      "EmitterCrashRecovered",
+      "ReaderCrashRecovered",
+      "PublisherReconnectRecovered",
+      "MediaMtxCrashRecovered",
+      "GracefulStopNoOrphans",
+      "PacketPayloadsPreservedAndDecodable",
+      "HardHostCrashNoOrphans"
+    ],
+    "Status": "passed"
+  },
+  "RealObsTest": "Pending user procedure",
+  "DynamicDelay": "Stage 3 pending user approval",
+  "OutputCrashBufferPersistence": "Stage 5",
+  "RemainingOwnedNativeProcesses": 0
+}

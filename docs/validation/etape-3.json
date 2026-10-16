@@ -1,0 +1,76 @@
+{
+  "Stage": 3,
+  "CheckedOnLocalDate": "2026-10-16",
+  "Build": {
+    "Configuration": "Debug",
+    "Platform": "x64",
+    "Warnings": 0,
+    "Errors": 0
+  },
+  "UnitTests": {
+    "Core": 31,
+    "Infrastructure": 5,
+    "Passed": 36,
+    "Failed": 0,
+    "Skipped": 0
+  },
+  "NativeIntegration": {
+    "Stage": 3,
+    "Status": "passed",
+    "CheckedAtUtc": "2026-10-15T22:37:00.7910627Z",
+    "SameNativePidsThroughout": true,
+    "SameOutputFile": true,
+    "InvalidCommandRejected": true,
+    "SixSecondAgeMs": 6001,
+    "ThreeSecondAgeMs": 3014,
+    "ZeroAgeMs": 0,
+    "SixSecondPauseSteps": 3,
+    "CompletedSeeks": 5,
+    "MaximumPauseMilliseconds": 2009,
+    "PeakBufferBytes": 1858889,
+    "FinalBufferBytes": 0,
+    "PacketsVerified": 1104,
+    "VideoSliceHashesVerified": 431,
+    "AvEndDifferenceSeconds": 0.017000000000001236,
+    "DecodedWithoutError": true,
+    "SourceReport": "artifacts/validation/stage3-5c5f9e9cab2244f284e2e3e40702a9a3/result.json"
+  },
+  "FixedDelayRegression": {
+    "Stage": 2,
+    "Status": "passed",
+    "CheckedAtUtc": "2026-10-15T22:39:38.9114066Z",
+    "DelaySeconds": 5,
+    "MinimumMediaAgeMilliseconds": 5000,
+    "LastMediaAgeMilliseconds": 5008,
+    "MaximumMediaAgeMilliseconds": 5016,
+    "PeakBufferBytes": 1842805,
+    "FinalBufferBytes": 0,
+    "TailMediaTagsAfterSourceDisconnect": 369,
+    "PacketsVerified": 566,
+    "VideoSliceHashesVerified": 221,
+    "AvEndDifferenceSeconds": 0.008000000000000007,
+    "FirstVideoIsKeyframe": true,
+    "DecodedWithoutError": true,
+    "OverflowFailedClosed": true,
+    "OverflowPeakBytes": 1041755,
+    "SourceReport": "artifacts/validation/stage2-ba5110e6141942b0b131521d44361225/result.json"
+  },
+  "NativeManifestHashesVerified": true,
+  "RemainingOwnedNativeProcesses": 0,
+  "Scope": {
+    "Output": "Local FLV file",
+    "Runtime": ".NET 8, C# 12",
+    "DefaultMaximumPauseStepSeconds": 5,
+    "DefaultResumeBetweenStepsSeconds": 1,
+    "SmoothModeImplemented": false,
+    "HttpApiImplemented": false,
+    "UiStage4Implemented": false,
+    "OutputCrashBufferPersistence": "Stage 5"
+  },
+  "NotPerformed": [
+    "Real OBS publication and perceptual A/V verification",
+    "Thirty-minute live session",
+    "Platform ingest timeout and playback checks on Twitch/YouTube/Kick",
+    "Product CPU target measurement"
+  ]
+}

@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <RootNamespace>Temhalo.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\assets\brand\temhalo.ico</ApplicationIcon>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>false</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" PrivateAssets="all" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <ProjectReference Include="..\Temhalo.Core\Temhalo.Core.csproj" />
+    <ProjectReference Include="..\Temhalo.Infrastructure.Windows\Temhalo.Infrastructure.Windows.csproj" />
+    <ProjectReference Include="..\Temhalo.Presentation\Temhalo.Presentation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\config\oauth-clients.example.json" Link="oauth-clients.example.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\brand\svg\temhalo-logo-horizontal-color.svg" Link="Assets\Brand\temhalo-logo-horizontal-color.svg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\brand\svg\temhalo-symbol-color.svg" Link="Assets\Brand\temhalo-symbol-color.svg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\brand\fonts\*-Variable.ttf" Link="Assets\Fonts\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\brand\fonts\licenses\*.txt" Link="Assets\Fonts\Licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\brand\temhalo.ico" Link="Assets\Brand\temhalo.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <!-- The unpackaged XAML compiler emits these beside the executable; ordinary Content
+       copying is insufficient for dotnet publish with this SDK-reference configuration. -->
+  <Target Name="IncludeApplicationXamlInPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(TargetDir)$(AssemblyName).pri" RelativePath="$(AssemblyName).pri" CopyToPublishDirectory="PreserveNewest" />
+      <_TemhaloXbf Include="$(TargetDir)**\*.xbf" Exclude="$(TargetDir)publish\**\*" />
+      <ResolvedFileToPublish Include="@(_TemhaloXbf)" RelativePath="%(_TemhaloXbf.RecursiveDir)%(_TemhaloXbf.Filename)%(_TemhaloXbf.Extension)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

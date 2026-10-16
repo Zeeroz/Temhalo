@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Temhalo.App.Controls" x:Class="Temhalo.App.Views.DashboardPage" Background="{ThemeResource TemhaloCanvasBrush}">
+  <Page.Resources>
+    <StaticResource x:Key="AccentFillColorDefaultBrush" ResourceKey="TemhaloHaloBrush"/>
+    <StaticResource x:Key="SliderTrackFill" ResourceKey="TemhaloControlBrush"/>
+    <StaticResource x:Key="SliderTrackValueFill" ResourceKey="TemhaloHaloBrush"/>
+    <StaticResource x:Key="SliderThumbBackground" ResourceKey="TemhaloHaloBrush"/>
+    <StaticResource x:Key="SelectorBarItemPillFill" ResourceKey="TemhaloHaloBrush"/>
+    <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="TemhaloHaloBrush"/>
+  </Page.Resources>
+  <Grid x:Name="LayoutRoot" RowDefinitions="Auto,*,Auto" SizeChanged="LayoutChanged">
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="WidthStates">
+        <VisualState x:Name="WideLayout">
+          <VisualState.Setters>
+            <Setter Target="MainContent.Padding" Value="28,24,28,28"/>
+            <Setter Target="DelayPanel.Padding" Value="24"/>
+            <Setter Target="CurrentValue.FontSize" Value="48"/>
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState x:Name="CompactLayout">
+          <VisualState.Setters>
+            <Setter Target="MainContent.Padding" Value="20,20,20,24"/>
+            <Setter Target="DelayPanel.Padding" Value="20"/>
+            <Setter Target="CurrentValue.FontSize" Value="40"/>
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    <Grid x:Name="HeaderGrid" Padding="20,0,28,8" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" BorderBrush="{ThemeResource TemhaloRuleBrush}" BorderThickness="0,0,0,1">
+      <NavigationView x:Name="Navigation" PaneDisplayMode="Top" Height="56" IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsTitleBarAutoPaddingEnabled="False" AlwaysShowHeader="False" SelectionChanged="NavigationChanged" Background="{ThemeResource TemhaloCanvasBrush}">
+        <NavigationView.Resources>
+          <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="{ThemeResource TemhaloHaloColor}"/>
+          <Thickness x:Key="TopNavigationViewItemContentMargin">8,0,8,0</Thickness>
+          <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
+          <Thickness x:Key="TopNavigationViewContentGridBorderThickness">0</Thickness>
+        </NavigationView.Resources>
+        <NavigationView.MenuItems>
+          <NavigationViewItem Content="Direct" Tag="direct" AutomationProperties.AutomationId="DirectTab"/>
+          <NavigationViewItem Content="Diffusion" Tag="diffusion" AutomationProperties.AutomationId="DiffusionTab"/>
+          <NavigationViewItem Content="Overlay" Tag="overlay" AutomationProperties.AutomationId="OverlayTab"/>
+          <NavigationViewItem Content="Réglages" Tag="settings" AutomationProperties.AutomationId="SettingsTab"/>
+        </NavigationView.MenuItems>
+      </NavigationView>
+      <StackPanel x:Name="SessionCommands" Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+        <TextBlock x:Name="SessionLabel" Text="{x:Bind Vm.SessionText, Mode=OneWay}" Style="{StaticResource TemhaloCaption}" VerticalAlignment="Center"/>
+        <TextBlock Text="{x:Bind Vm.LiveDuration, Mode=OneWay}" Style="{StaticResource TemhaloMono}" FontSize="12" VerticalAlignment="Center"/>
+        <Button x:Name="StartStopButton" Content="Démarrer le relais" Click="StartStopClicked" AutomationProperties.AutomationId="StartStop"/>
+      </StackPanel>
+    </Grid>
+    <ScrollViewer x:Name="MainScroll" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" HorizontalContentAlignment="Stretch">
+      <StackPanel x:Name="MainContent" Padding="28,24,28,28" Spacing="24">
+        <InfoBar x:Name="Notice" IsOpen="False" Visibility="Collapsed" Severity="Error" IsClosable="True" Closed="NoticeClosed"/>
+        <StackPanel x:Name="DashboardView" Spacing="24">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Direct" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
+            <TextBlock Text="Choisissez quand votre live devient visible." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
+            <TextBlock Text="{x:Bind Vm.TransitionText, Mode=OneWay}" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+          </StackPanel>
+          <Border x:Name="DelayPanel" Style="{StaticResource TemhaloPanel}">
+            <local:AdaptiveColumns>
+              <StackPanel Spacing="16">
+                <TextBlock Text="Votre décalage" Style="{StaticResource TemhaloSectionTitle}"/>
+                <Grid x:Name="DelayValues" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16">
+                  <StackPanel x:Name="CurrentGroup" Spacing="4">
+                    <TextBlock Text="Délai actuel" Style="{StaticResource TemhaloCaption}"/>
+                    <TextBlock x:Name="CurrentValue" Text="{x:Bind Vm.CurrentText, Mode=OneWay}" FontFamily="{StaticResource TemhaloMonoFont}" FontSize="48" FontWeight="Medium" AutomationProperties.AutomationId="CurrentDelay"/>
+                  </StackPanel>
+                  <StackPanel x:Name="TargetGroup" Grid.Column="1" Spacing="4">
+                    <TextBlock Text="Cible appliquée" Style="{StaticResource TemhaloCaption}"/>
+                    <TextBlock Text="{x:Bind Vm.TargetText, Mode=OneWay}" FontFamily="{StaticResource TemhaloMonoFont}" FontSize="24" Foreground="{ThemeResource TemhaloEchoBrush}" AutomationProperties.AutomationId="TargetDelay"/>
+                  </StackPanel>
+                </Grid>
+                <TextBlock Text="Mesure à la sortie du moteur. La latence de lecture s’ajoute." Style="{StaticResource TemhaloCaption}"/>
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Sortie différée" Style="{StaticResource TemhaloCaption}"/>
+                  <TextBlock Grid.Column="1" Text="Entrée OBS · maintenant" Style="{StaticResource TemhaloCaption}"/>
+                </Grid>
+                <local:DelayTimeline x:Name="TimeRail"/>
+                <TextBlock Text="● Média émis     │ Cible appliquée" Style="{StaticResource TemhaloCaption}"/>
+              </StackPanel>
+              <StackPanel Spacing="12">
+                <TextBlock Text="Choisir le tempo" Style="{StaticResource TemhaloSectionTitle}"/>
+                <ContentControl IsEnabled="{x:Bind Vm.CanEdit, Mode=OneWay}" HorizontalContentAlignment="Stretch">
+                  <local:WrapPanel x:Name="DirectPresets" Spacing="8"/>
+                </ContentControl>
+                <TextBlock Text="Nouvelle cible"/>
+                <NumberBox x:Name="DelayNumber" Value="{x:Bind Vm.NumberDraft, Mode=TwoWay}" ValidationMode="Disabled" SpinButtonPlacementMode="Inline" SmallChange="1" LargeChange="10" HorizontalAlignment="Left" Width="156" IsEnabled="{x:Bind Vm.CanEdit, Mode=OneWay}" AutomationProperties.Name="Nouvelle cible en secondes, entier de 0 à 300" AutomationProperties.AutomationId="DelayNumber"/>
+                <Slider x:Name="DelaySlider" Minimum="0" Maximum="300" StepFrequency="1" SmallChange="1" LargeChange="10" MinHeight="44" Value="{x:Bind Vm.SliderDraft, Mode=TwoWay}" IsEnabled="{x:Bind Vm.CanEdit, Mode=OneWay}" AutomationProperties.Name="Nouvelle cible de délai en secondes" AutomationProperties.AutomationId="DelaySlider">
+                  <Slider.Resources>
+                    <StaticResource x:Key="SliderTrackFill" ResourceKey="TemhaloControlBrush"/>
+                    <StaticResource x:Key="SliderTrackValueFill" ResourceKey="TemhaloHaloBrush"/>
+                    <StaticResource x:Key="SliderThumbBackground" ResourceKey="TemhaloHaloBrush"/>
+                  </Slider.Resources>
+                </Slider>
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="0 s" Style="{StaticResource TemhaloCaption}"/>
+                  <TextBlock Grid.Column="1" Text="300 s · 5 min" Style="{StaticResource TemhaloCaption}"/>
+                </Grid>
+                <TextBlock Text="{x:Bind Vm.DraftError, Mode=OneWay}" Foreground="{ThemeResource TemhaloErrorBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
+                <local:WrapPanel Spacing="16">
+                  <TextBlock Text="Preset : application au clic. Saisie : validez avec Appliquer." Style="{StaticResource TemhaloCaption}" VerticalAlignment="Center"/>
+                  <Button Content="Appliquer" Command="{x:Bind Vm.ApplyCommand}" Style="{StaticResource TemhaloPrimaryButton}" AutomationProperties.AutomationId="ApplyDelay"/>
+                </local:WrapPanel>
+              </StackPanel>
+            </local:AdaptiveColumns>
+          </Border>
+          <local:AdaptiveColumns Threshold="700">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel Spacing="4">
+                <TextBlock Text="OBS" FontWeight="Medium"/>
+                <TextBlock Text="Votre entrée · RTMP local" Style="{StaticResource TemhaloCaption}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="{x:Bind Vm.InputRate, Mode=OneWay}" Style="{StaticResource TemhaloMono}"/>
+                <TextBlock x:Name="IngestState" Text="{x:Bind Vm.IngestText, Mode=OneWay}" Style="{StaticResource TemhaloCaption}"/>
+              </StackPanel>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel Spacing="4">
+                <TextBlock x:Name="OutputTitle" Text="Sortie fichier local" FontWeight="Medium"/>
+                <TextBlock x:Name="OutputDetail" Text="FLV · H.264 / AAC · copie du flux" Style="{StaticResource TemhaloCaption}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="{x:Bind Vm.OutputRate, Mode=OneWay}" Style="{StaticResource TemhaloMono}"/>
+                <TextBlock x:Name="OutputState" Text="{x:Bind Vm.OutputText, Mode=OneWay}" Style="{StaticResource TemhaloCaption}"/>
+              </StackPanel>
+            </Grid>
+          </local:AdaptiveColumns>
+          <TextBlock x:Name="ActiveOutputs" Visibility="Collapsed" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+          <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
+          <local:AdaptiveColumns Columns="4" Threshold="900">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Buffer RAM" Style="{StaticResource TemhaloCaption}"/>
+              <TextBlock x:Name="BufferValue" Text="{x:Bind Vm.BufferText, Mode=OneWay}" Style="{StaticResource TemhaloMono}"/>
+              <ProgressBar x:Name="BufferBar" Value="{x:Bind Vm.BufferPercent, Mode=OneWay}" Maximum="100" Height="4" Foreground="{ThemeResource TemhaloControlBrush}"/>
+            </StackPanel>
+            <StackPanel Spacing="6">
+              <TextBlock Text="Média en réserve" Style="{StaticResource TemhaloCaption}"/>
+              <TextBlock x:Name="ReserveValue" Text="0 tag FLV" Style="{StaticResource TemhaloMono}"/>
+            </StackPanel>
+            <StackPanel Spacing="6">
+              <TextBlock Text="Reconnexions de sortie" Style="{StaticResource TemhaloCaption}"/>
+              <TextBlock x:Name="ReconnectValue" Text="0" Style="{StaticResource TemhaloMono}"/>
+            </StackPanel>
+            <StackPanel Spacing="6">
+              <TextBlock Text="Média sauté" Style="{StaticResource TemhaloCaption}"/>
+              <TextBlock x:Name="SkippedValue" Text="0 tag FLV" Style="{StaticResource TemhaloMono}"/>
+            </StackPanel>
+          </local:AdaptiveColumns>
+          <Expander Header="Activité du flux · 60 dernières secondes" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="12">
+              <local:WrapPanel Spacing="20">
+                <TextBlock Text="━ Entrée OBS" Foreground="{ThemeResource TemhaloHaloBrush}" FontSize="12"/>
+                <TextBlock Text="┄ Sortie" Foreground="{ThemeResource TemhaloEchoBrush}" FontSize="12"/>
+                <TextBlock Text="Mbit/s · Mesures réelles de la session" Style="{StaticResource TemhaloCaption}"/>
+              </local:WrapPanel>
+              <local:BitrateChart x:Name="RateChart"/>
+            </StackPanel>
+          </Expander>
+          <TextBlock x:Name="LastEvent" Style="{StaticResource TemhaloCaption}"/>
+          <Button Content="Ouvrir le journal →" Click="ShowJournalClicked" HorizontalAlignment="Left"/>
+        </StackPanel>
+        <StackPanel x:Name="DestinationView" Visibility="Collapsed" Spacing="24">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Préparer votre live" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
+            <TextBlock Text="Choisissez vos plateformes. Nous vous guidons pour la suite." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
+          </StackPanel>
+          <local:AdaptiveColumns Columns="3" Threshold="700" Spacing="8">
+            <local:AdaptiveColumns.Resources>
+              <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="TemhaloRaisedBrush"/>
+              <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="TemhaloRaisedBrush"/>
+              <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="TemhaloSurfaceBrush"/>
+              <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="TemhaloTextBrush"/>
+              <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="TemhaloTextBrush"/>
+              <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="TemhaloHaloBrush"/>
+              <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="TemhaloHaloBrush"/>
+            </local:AdaptiveColumns.Resources>
+            <ToggleButton x:Name="PlatformsStep" Content="1 · Vos plateformes" Tag="1" Click="SetupStepClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" AutomationProperties.AutomationId="PlatformsStep"/>
+            <ToggleButton x:Name="ObsStep" Content="2 · Relier OBS" Tag="2" Click="SetupStepClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
+            <ToggleButton x:Name="LaunchStep" Content="3 · Lancer votre live" Tag="3" Click="SetupStepClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
+          </local:AdaptiveColumns>
+          <Border Style="{StaticResource TemhaloPanel}">
+            <StackPanel Spacing="24">
+              <StackPanel x:Name="PlatformsPanel" Spacing="20">
+                <TextBlock Text="ÉTAPE 1 SUR 3" Style="{StaticResource TemhaloCaption}"/>
+                <TextBlock Text="Où souhaitez-vous diffuser ?" Style="{StaticResource TemhaloSectionTitle}"/>
+                <TextBlock Text="Une ou plusieurs plateformes, avec le même délai. Jusqu’à quatre destinations." Style="{StaticResource TemhaloCaption}"/>
+                <ContentControl x:Name="DestinationFields" HorizontalContentAlignment="Stretch">
+                  <StackPanel Spacing="16">
+                    <StackPanel x:Name="DestinationsList" Spacing="12"/>
+                    <local:AdaptiveColumns x:Name="EmptyPlatforms" Columns="3" Threshold="900" Spacing="12">
+                      <Button Tag="0" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter Twitch">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="Tw" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="Twitch" FontWeight="SemiBold"/><TextBlock Text="Connecter votre compte" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="1" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter YouTube">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="Yt" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="YouTube" FontWeight="SemiBold"/><TextBlock Text="Compte Google et live" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="2" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter Kick">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="K" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="Kick" FontWeight="SemiBold"/><TextBlock Text="Connecter votre compte" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="4" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter TikTok">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="Tk" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="TikTok" FontWeight="SemiBold"/><TextBlock Text="Avec une clé LIVE RTMP" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="5" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter Facebook">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="Fb" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="Facebook" FontWeight="SemiBold"/><TextBlock Text="Votre diffusion Live" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="6" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter Restream">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="Re" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="Restream" FontWeight="SemiBold"/><TextBlock Text="Votre relais de diffusion" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                      <Button Tag="3" Click="ChoosePlatformClicked" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" AutomationProperties.Name="Ajouter Autre serveur RTMP">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <Border Width="36" Height="36" CornerRadius="8" Background="{ThemeResource TemhaloRaisedBrush}" VerticalAlignment="Center"><TextBlock Text="↗" Foreground="{ThemeResource TemhaloHaloBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                          <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="Autre serveur RTMP" FontWeight="SemiBold"/><TextBlock Text="L’adresse de votre choix" Style="{StaticResource TemhaloCaption}"/></StackPanel>
+                        </Grid>
+                      </Button>
+                    </local:AdaptiveColumns>
+                    <Button x:Name="AddDestinationButton" Content="+ Ajouter une plateforme" Click="AddDestinationClicked" HorizontalAlignment="Left" AutomationProperties.AutomationId="AddDestination"/>
+                  </StackPanel>
+                </ContentControl>
+                <TextBlock x:Name="DestinationHelp" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+                <Button x:Name="PlatformsNext" Content="Continuer vers OBS →" Click="PlatformsNextClicked" Style="{StaticResource TemhaloPrimaryButton}" HorizontalAlignment="Right"/>
+              </StackPanel>
+              <StackPanel x:Name="ObsPanel" Spacing="20" Visibility="Collapsed">
+                <TextBlock Text="ÉTAPE 2 SUR 3" Style="{StaticResource TemhaloCaption}"/>
+                <TextBlock Text="Branchez OBS à Temhalo." Style="{StaticResource TemhaloSectionTitle}"/>
+                <TextBlock Text="Dans OBS → Paramètres → Stream, choisissez Service : Personnalisé, puis copiez ces deux valeurs."/>
+                <local:AdaptiveColumns Threshold="760">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="Serveur" Style="{StaticResource TemhaloCaption}"/>
+                    <TextBlock Text="rtmp://127.0.0.1:1935/live" Style="{StaticResource TemhaloMono}" IsTextSelectionEnabled="True"/>
+                    <Button Content="Copier le serveur" Tag="rtmp://127.0.0.1:1935/live" Click="CopyObsValueClicked" HorizontalAlignment="Left"/>
+                  </StackPanel>
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="Clé locale OBS" Style="{StaticResource TemhaloCaption}"/>
+                    <TextBlock Text="stream" Style="{StaticResource TemhaloMono}" IsTextSelectionEnabled="True"/>
+                    <Button Content="Copier la clé locale" Tag="stream" Click="CopyObsValueClicked" HorizontalAlignment="Left"/>
+                  </StackPanel>
+                </local:AdaptiveColumns>
+                <TextBlock Text="Les clés de vos plateformes restent dans Temhalo. Dans OBS, utilisez uniquement la clé locale stream." Style="{StaticResource TemhaloCaption}"/>
+                <Expander Header="Les réglages vidéo et audio à vérifier" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                  <TextBlock Text="Vidéo H.264 · Audio AAC · Débit CBR · Intervalle d’images clés : 1 seconde. Choisissez dans OBS un débit et une résolution acceptés par toutes vos plateformes."/>
+                </Expander>
+                <CheckBox x:Name="ObsAcknowledged" Content="J’ai terminé ces réglages dans OBS." Checked="ObsAcknowledgedChanged" Unchecked="ObsAcknowledgedChanged"/>
+                <TextBlock Text="Cette case confirme votre lecture du guide. Elle ne détecte pas la configuration ni la connexion d’OBS." Style="{StaticResource TemhaloCaption}"/>
+                <local:WrapPanel Spacing="8">
+                  <Button Content="Retour" Tag="1" Click="SetupStepClicked"/>
+                  <Button x:Name="ObsNext" Content="Continuer →" Click="ObsNextClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
+                </local:WrapPanel>
+              </StackPanel>
+              <StackPanel x:Name="LaunchPanel" Spacing="20" Visibility="Collapsed">
+                <TextBlock Text="ÉTAPE 3 SUR 3" Style="{StaticResource TemhaloCaption}"/>
+                <TextBlock Text="Tout est prêt pour votre live." Style="{StaticResource TemhaloSectionTitle}"/>
+                <TextBlock x:Name="RouteDestination" Style="{StaticResource TemhaloSectionTitle}"/>
+                <TextBlock x:Name="LaunchHelp" Text="Activez Temhalo, puis cliquez sur Commencer le streaming dans OBS."/>
+                <local:AdaptiveColumns Threshold="700">
+                  <StackPanel Spacing="8"><TextBlock Text="OBS → Temhalo" Style="{StaticResource TemhaloCaption}"/><TextBlock Text="{x:Bind Vm.IngestText, Mode=OneWay}"/></StackPanel>
+                  <StackPanel Spacing="8"><TextBlock Text="Temhalo → vos destinations" Style="{StaticResource TemhaloCaption}"/><TextBlock Text="{x:Bind Vm.OutputText, Mode=OneWay}"/></StackPanel>
+                </local:AdaptiveColumns>
+                <TextBlock Text="Un compte lié ne signifie pas que le flux est reçu ou diffusé. Les états ci-dessus reflètent le relais." Style="{StaticResource TemhaloCaption}"/>
+                <local:WrapPanel Spacing="8">
+                  <Button Content="Retour" Tag="2" Click="SetupStepClicked"/>
+                  <Button x:Name="ActivateTemhalo" Content="Activer Temhalo" Click="StartStopClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
+                  <Button x:Name="OpenDirect" Content="Ouvrir le Direct →" Click="OpenDirectClicked" Visibility="Collapsed"/>
+                </local:WrapPanel>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Expander Header="Options : test local, overlay et dock OBS" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="20">
+              <ComboBox x:Name="OutputMode" Header="Destination du relais" SelectedIndex="0" SelectionChanged="OutputModeChanged" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="Fichier FLV local · test sans plateforme"/><ComboBoxItem Content="Mes plateformes · RTMP / RTMPS"/>
+              </ComboBox>
+              <Button Content="Enregistrer le mode de sortie" Click="SaveDestinationClicked" HorizontalAlignment="Left"/>
+              <TextBlock Text="En mode fichier, ouvrez la session depuis Réglages pour lire le FLV dans VLC. Un nouveau fichier est créé pour chaque connexion de sortie." Style="{StaticResource TemhaloCaption}"/>
+              <local:AdaptiveColumns Threshold="760">
+                <StackPanel Spacing="12">
+                  <TextBlock Text="Voir le flux dans VLC en direct" Style="{StaticResource TemhaloSectionTitle}"/>
+                  <TextBlock Text="Lancez tools/Start-LocalPreview.ps1 pour le second serveur, puis préparez cette destination locale." Style="{StaticResource TemhaloCaption}"/>
+                  <TextBlock Text="rtmp://127.0.0.1:1936/live/preview" Style="{StaticResource TemhaloMono}" IsTextSelectionEnabled="True"/>
+                  <Button Content="Préparer la destination locale" Click="LocalPreviewClicked" HorizontalAlignment="Left"/>
+                </StackPanel>
+                <StackPanel Spacing="12">
+                  <TextBlock Text="Piloter depuis OBS" Style="{StaticResource TemhaloSectionTitle}"/>
+                  <Button Content="Personnaliser l’overlay →" Click="ShowOverlayClicked" HorizontalAlignment="Left"/>
+                  <TextBlock x:Name="DockAddress" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}"/>
+                  <Button x:Name="CopyDockButton" Content="Copier le lien privé du dock" Click="CopyDockClicked" HorizontalAlignment="Left"/>
+                  <TextBlock Text="OBS → Docks → Docks de navigateur personnalisés. Le lien reste privé sur cet ordinateur." Style="{StaticResource TemhaloCaption}"/>
+                </StackPanel>
+              </local:AdaptiveColumns>
+            </StackPanel>
+          </Expander>
+        </StackPanel>
+        <StackPanel x:Name="OverlayView" Visibility="Collapsed" Spacing="24">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Overlay" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
+            <TextBlock Text="Le temps porte votre signature." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
+          </StackPanel>
+          <local:WrapPanel Spacing="8">
+            <ToggleButton Content="En direct" Tag="0" Click="PreviewStateClicked" x:Name="PreviewLive" IsChecked="False"/>
+            <ToggleButton Content="Ajout du délai" Tag="1" Click="PreviewStateClicked" x:Name="PreviewAdding" IsChecked="False"/>
+            <ToggleButton Content="Différé" Tag="2" Click="PreviewStateClicked" x:Name="PreviewDelayed" IsChecked="True"/>
+            <TextBlock Text="Simulation d’affichage · 1920 × 1080" Style="{StaticResource TemhaloCaption}" VerticalAlignment="Center"/>
+          </local:WrapPanel>
+          <Border Style="{StaticResource TemhaloPanel}">
+            <local:OverlayPreview x:Name="OverlayStage"/>
+          </Border>
+          <StackPanel x:Name="OverlayGallery" Spacing="12">
+            <StackPanel.Resources>
+              <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="TemhaloRaisedBrush"/>
+              <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="TemhaloRaisedBrush"/>
+              <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="TemhaloSurfaceBrush"/>
+              <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="TemhaloHaloBrush"/>
+              <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="TemhaloHaloBrush"/>
+              <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="TemhaloHaloBrush"/>
+            </StackPanel.Resources>
+            <TextBlock Text="Composition" Style="{StaticResource TemhaloSectionTitle}"/>
+            <local:WrapPanel Spacing="12">
+              <ToggleButton x:Name="SignatureChoice" AutomationProperties.Name="Composition Signature" Tag="0" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
+                <StackPanel Spacing="8">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image Source="ms-appx:///Assets/Brand/temhalo-symbol-color.svg" Width="24" Height="24"/>
+                    <TextBlock Text="00:30" Style="{StaticResource TemhaloMono}"/>
+                  </StackPanel>
+                  <TextBlock Text="Signature"/>
+                </StackPanel>
+              </ToggleButton>
+              <ToggleButton x:Name="RepereChoice" AutomationProperties.Name="Composition Repère" Tag="1" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="┃╎  00:30" Style="{StaticResource TemhaloMono}"/>
+                  <TextBlock Text="Repère"/>
+                </StackPanel>
+              </ToggleButton>
+              <ToggleButton x:Name="FilChoice" AutomationProperties.Name="Composition Fil du temps" Tag="2" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="───  00:30" Style="{StaticResource TemhaloMono}"/>
+                  <TextBlock Text="Fil du temps"/>
+                </StackPanel>
+              </ToggleButton>
+              <ToggleButton x:Name="ChronoChoice" AutomationProperties.Name="Composition Chrono" Tag="3" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="00:30" Style="{StaticResource TemhaloMono}"/>
+                  <TextBlock Text="Chrono"/>
+                </StackPanel>
+              </ToggleButton>
+            </local:WrapPanel>
+          </StackPanel>
+          <ComboBox x:Name="OverlayStyle" Header="Composition" Visibility="Collapsed" SelectedIndex="0" SelectionChanged="OverlayStyleChanged" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="OverlayStyle">
+            <ComboBoxItem Content="Signature · Halo et valeur"/>
+            <ComboBoxItem Content="Repère · Traits décalés"/>
+            <ComboBoxItem Content="Fil du temps · Ligne et valeur"/>
+            <ComboBoxItem Content="Chrono · Valeur seule"/>
+          </ComboBox>
+          <local:AdaptiveColumns Columns="3" Threshold="920">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Dans votre scène" Style="{StaticResource TemhaloSectionTitle}"/>
+              <ComboBox x:Name="OverlayPosition" Header="Position" SelectedIndex="1" HorizontalAlignment="Stretch" SelectionChanged="OverlaySelectionChanged">
+                <ComboBoxItem Content="Haut gauche"/>
+                <ComboBoxItem Content="Haut droite"/>
+                <ComboBoxItem Content="Bas gauche"/>
+                <ComboBoxItem Content="Bas droite"/>
+              </ComboBox>
+              <TextBlock Text="Chaque composition conserve ses réglages." Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
+            <StackPanel Spacing="12">
+              <TextBlock Text="Au bon format" Style="{StaticResource TemhaloSectionTitle}"/>
+              <Slider x:Name="OverlayScale" Header="Taille · 75 à 150 %" Minimum="75" Maximum="150" Value="100" StepFrequency="5" ValueChanged="OverlayScaleChanged"/>
+              <TextBox x:Name="OverlayAccent" Header="Accent #RRGGBB" Text="#7CE8CD" MaxLength="7" TextChanged="OverlayTextChanged"/>
+              <TextBlock Text="L’accent ne recolore pas le logo." Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
+            <StackPanel Spacing="12">
+              <TextBlock Text="À votre façon" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBox x:Name="OverlayLabel" Header="Libellé du différé" Text="Différé" MaxLength="24" TextChanged="OverlayTextChanged"/>
+              <ToggleSwitch x:Name="OverlayVisibleLive" Header="Afficher aussi à 0 s" IsOn="True" Toggled="OverlayVisibilityChanged" OnContent="Oui" OffContent="Non"/>
+            </StackPanel>
+          </local:AdaptiveColumns>
+          <TextBlock x:Name="OverlayError" Foreground="{ThemeResource TemhaloErrorBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
+          <local:WrapPanel Spacing="8">
+            <Button Content="Enregistrer l’overlay" Click="SaveOverlayClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
+            <Button Content="Rétablir les compositions" Click="ResetOverlayClicked"/>
+          </local:WrapPanel>
+          <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="Source navigateur OBS" Message="L’aperçu reste une simulation. Enregistrez pour appliquer l’habillage à la source navigateur en direct ; celle-ci traversera le délai avec votre image OBS."/>
+          <TextBlock Text="Un habillage capturé dans OBS traversera le même délai que votre image." Style="{StaticResource TemhaloCaption}"/>
+          <StackPanel Spacing="12">
+            <TextBlock Text="Votre source navigateur" Style="{StaticResource TemhaloSectionTitle}"/>
+            <TextBlock x:Name="OverlayAddress" Text="Serveur en préparation" Style="{StaticResource TemhaloMono}" FontSize="12"/>
+            <Button x:Name="CopyOverlayButton" Content="Copier le lien privé de l’overlay" Click="CopyOverlayClicked" HorizontalAlignment="Left"/>
+            <TextBlock Text="OBS · Source navigateur · 1920 × 1080. Le lien de lecture ne peut pas changer votre délai." Style="{StaticResource TemhaloCaption}"/>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel x:Name="SettingsView" Visibility="Collapsed" Spacing="24">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Réglages" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
+            <TextBlock Text="Un outil qui suit vos habitudes." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
+          </StackPanel>
+          <SelectorBar x:Name="SettingsNavigation" SelectionChanged="SettingsNavigationChanged">
+            <SelectorBarItem Text="Au quotidien" Tag="usage"/>
+            <SelectorBarItem Text="Vos commandes" Tag="commands"/>
+            <SelectorBarItem Text="Continuité" Tag="continuity"/>
+            <SelectorBarItem Text="Confidentialité" Tag="privacy"/>
+          </SelectorBar>
+          <ComboBox x:Name="CompactSettingsNavigation" Header="Rubrique" Visibility="Collapsed" SelectedIndex="1" SelectionChanged="CompactSettingsChanged" HorizontalAlignment="Stretch">
+            <ComboBoxItem Content="Au quotidien"/>
+            <ComboBoxItem Content="Vos commandes"/>
+            <ComboBoxItem Content="Continuité"/>
+            <ComboBoxItem Content="Confidentialité"/>
+          </ComboBox>
+          <StackPanel x:Name="UsageView" Spacing="20" Visibility="Collapsed">
+            <TextBlock Text="Au quotidien" Style="{StaticResource TemhaloSectionTitle}"/>
+            <TextBlock Text="Langue de l’interface : français."/>
+            <TextBlock Text="Le relais démarre uniquement sur votre commande." Style="{StaticResource TemhaloCaption}"/>
+            <Button Content="Voir les paramètres OBS" Click="ObsGuideClicked" HorizontalAlignment="Left"/>
+            <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
+            <StackPanel Spacing="12">
+              <TextBlock Text="Mises à jour" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBlock x:Name="InstalledVersionText" Style="{StaticResource TemhaloMono}" FontSize="14"/>
+              <TextBlock x:Name="UpdateStatus" Text="Les nouvelles versions sont publiées sur GitHub." Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+              <ProgressBar x:Name="UpdateProgress" Visibility="Collapsed" Minimum="0" Maximum="100" AutomationProperties.Name="Téléchargement de la mise à jour"/>
+              <local:WrapPanel Spacing="8">
+                <Button x:Name="CheckUpdatesButton" Content="Rechercher une mise à jour" Click="CheckUpdatesClicked"/>
+                <Button x:Name="DownloadUpdateButton" Content="Télécharger la mise à jour" Visibility="Collapsed" Click="DownloadUpdateClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
+                <Button x:Name="InstallUpdateButton" Content="Installer et fermer Temhalo" Visibility="Collapsed" Click="InstallUpdateClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
+                <Button x:Name="CancelUpdateButton" Content="Annuler" Visibility="Collapsed" Click="CancelUpdateClicked"/>
+                <HyperlinkButton Content="Notes de version ↗" Foreground="{ThemeResource TemhaloHaloBrush}" NavigateUri="https://github.com/Zeeroz/Temhalo/releases"/>
+              </local:WrapPanel>
+              <TextBlock x:Name="UpdateInstallHint" Text="L’installation sera disponible une fois le relais arrêté. Vos réglages et comptes sont conservés." Style="{StaticResource TemhaloCaption}"/>
+              <local:SettingRow>
+                <TextBlock Text="Rechercher au démarrage"/>
+                <ToggleSwitch x:Name="CheckUpdatesAtStartup" AutomationProperties.Name="Rechercher les mises à jour au démarrage" OnContent="Oui" OffContent="Non" Toggled="UpdatePreferencesChanged"/>
+              </local:SettingRow>
+              <local:SettingRow>
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Recevoir les versions de test"/>
+                  <TextBlock Text="Les versions preview permettent d’essayer les nouveautés avant leur sortie stable." Style="{StaticResource TemhaloCaption}"/>
+                </StackPanel>
+                <ToggleSwitch x:Name="IncludePreviewUpdates" AutomationProperties.Name="Recevoir les versions de test" OnContent="Oui" OffContent="Non" Toggled="UpdatePreferencesChanged"/>
+              </local:SettingRow>
+            </StackPanel>
+          </StackPanel>
+          <StackPanel x:Name="HotkeysView" Spacing="20">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Vos commandes" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBlock Text="Les bons délais, sous la main et au clavier." Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
+            <StackPanel Spacing="12">
+              <TextBlock Text="Vos temps favoris"/>
+              <local:WrapPanel x:Name="SettingsPresets" Spacing="8"/>
+              <local:WrapPanel Spacing="8">
+                <NumberBox x:Name="NewPreset" Header="Nouveau preset · secondes" Value="45" Minimum="1" Maximum="300" Width="200" SpinButtonPlacementMode="Inline"/>
+                <Button Content="Ajouter" Click="AddPresetClicked" VerticalAlignment="Bottom"/>
+              </local:WrapPanel>
+              <TextBlock x:Name="PresetError" Foreground="{ThemeResource TemhaloErrorBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
+            </StackPanel>
+            <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
+            <ContentControl x:Name="HotkeyFields" HorizontalContentAlignment="Stretch">
+              <StackPanel Spacing="16">
+                <local:SettingRow>
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Délai de protection"/>
+                    <TextBlock Text="La cible du raccourci de protection." Style="{StaticResource TemhaloCaption}"/>
+                  </StackPanel>
+                  <NumberBox x:Name="ProtectionSeconds" AutomationProperties.Name="Délai du raccourci de protection en secondes" Value="300" Minimum="0" Maximum="300" SpinButtonPlacementMode="Inline"/>
+                </local:SettingRow>
+                <local:SettingRow>
+                  <TextBlock Text="Raccourcis globaux"/>
+                  <ToggleSwitch x:Name="HotkeysEnabled" AutomationProperties.Name="Activer les raccourcis globaux" IsOn="True" OnContent="Actifs" OffContent="Inactifs"/>
+                </local:SettingRow>
+                <local:SettingRow>
+                  <TextBlock Text="Appliquer le délai de protection"/>
+                  <TextBox x:Name="ProtectionHotkey" AutomationProperties.Name="Appliquer le délai de protection" Text="Ctrl+Alt+F6"/>
+                </local:SettingRow>
+                <local:SettingRow>
+                  <TextBlock Text="Revenir au direct · 0 s"/>
+                  <TextBox x:Name="ZeroHotkey" AutomationProperties.Name="Revenir au direct · 0 s" Text="Ctrl+Alt+F7"/>
+                </local:SettingRow>
+                <local:SettingRow>
+                  <TextBlock Text="Ajouter 10 s"/>
+                  <TextBox x:Name="IncreaseHotkey" AutomationProperties.Name="Ajouter 10 s" Text="Ctrl+Alt+F8"/>
+                </local:SettingRow>
+                <local:SettingRow>
+                  <TextBlock Text="Retirer 10 s"/>
+                  <TextBox x:Name="DecreaseHotkey" AutomationProperties.Name="Retirer 10 s" Text="Ctrl+Alt+F9"/>
+                </local:SettingRow>
+                <Button Click="SaveHotkeysClicked" HorizontalAlignment="Left">
+                  <TextBlock Text="Enregistrer les commandes" TextWrapping="Wrap"/>
+                </Button>
+                <TextBlock x:Name="HotkeyStatus" Text="Chargement des raccourcis…" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+              </StackPanel>
+            </ContentControl>
+          </StackPanel>
+          <StackPanel x:Name="ContinuityView" Visibility="Collapsed" Spacing="20">
+            <TextBlock Text="Continuité" Style="{StaticResource TemhaloSectionTitle}"/>
+            <NumberBox x:Name="MemoryLimit" Header="Limite du buffer RAM (MiB)" Value="512" Minimum="1" Maximum="4096" SpinButtonPlacementMode="Inline" Width="200" HorizontalAlignment="Left"/>
+            <TextBlock Text="Alerte à 80 %. Une limite atteinte ne réduit jamais silencieusement le délai de protection." Style="{StaticResource TemhaloCaption}"/>
+            <Button Content="Enregistrer la limite mémoire" Click="SaveMemoryClicked" HorizontalAlignment="Left"/>
+            <TextBlock x:Name="MemoryStatus" Style="{StaticResource TemhaloCaption}"/>
+            <TextBlock Text="Augmentation progressive · Paliers de 5 s séparés par une reprise du flux."/>
+            <TextBlock Text="Historique avec relecture : à étudier. Aucun mode de reprise immédiate n’est activé." Style="{StaticResource TemhaloCaption}"/>
+          </StackPanel>
+          <StackPanel x:Name="PrivacyView" Visibility="Collapsed" Spacing="20">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Accès OBS sur cet ordinateur" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBlock x:Name="LocalServerStatus" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+              <NumberBox x:Name="LocalServerPort" Header="Port du serveur navigateur" Minimum="1024" Maximum="65535" Value="43120" Width="220" HorizontalAlignment="Left" SpinButtonPlacementMode="Inline"/>
+              <Button Content="Appliquer le port / relancer l’accès OBS" Click="SaveLocalServerClicked" HorizontalAlignment="Left"/>
+              <TextBlock Text="Un changement de port demande de recopier les liens dans OBS. Il ne redémarre pas le relais média." Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
+            <TextBlock Text="Confidentialité" Style="{StaticResource TemhaloSectionTitle}"/>
+            <TextBlock Text="Clés chiffrées avec DPAPI · Liées à votre compte Windows."/>
+            <TextBlock Text="Aucun envoi automatique. Les clés et URL de publication sont masquées dans les journaux." Style="{StaticResource TemhaloCaption}"/>
+            <TextBlock Text="L’accès OBS reste sur cet ordinateur. Les liens privés de lecture et de commande sont conservés dans le document DPAPI." Style="{StaticResource TemhaloCaption}"/>
+            <local:WrapPanel Spacing="8">
+              <Button Content="Exporter les événements affichés" Click="ExportLogsClicked"/>
+              <Button Content="Ouvrir les journaux" Click="OpenLogsClicked"/>
+              <Button Content="Ouvrir le dossier de session" Click="OpenSessionClicked"/>
+            </local:WrapPanel>
+            <TextBlock x:Name="SessionPath" Text="Aucune session démarrée." Style="{StaticResource TemhaloCaption}" IsTextSelectionEnabled="True"/>
+            <ListView x:Name="JournalList" SelectionMode="None" MaxHeight="480" HorizontalContentAlignment="Stretch">
+              <ListView.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}" Style="{StaticResource TemhaloMono}" FontSize="12" TextWrapping="Wrap"/>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+    <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource TemhaloRuleBrush}" Padding="20,10">
+      <local:WrapPanel Spacing="24">
+        <TextBlock x:Name="FooterInput" Text="OBS déconnecté" Style="{StaticResource TemhaloCaption}"/>
+        <TextBlock x:Name="FooterOutput" Text="Aucune sortie active" Style="{StaticResource TemhaloCaption}"/>
+      </local:WrapPanel>
+    </Border>
+  </Grid>
+</Page>

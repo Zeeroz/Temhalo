@@ -1,0 +1,36 @@
+# Temhalo local ingest. Twitch/YouTube/Kick credentials never belong here.
+logLevel: info
+logDestinations: [stdout]
+logStructured: true
+readTimeout: 10s
+writeTimeout: 10s
+writeQueueSize: 512
+
+authMethod: internal
+authInternalUsers:
+  - user: any
+    ips: [127.0.0.1]
+    permissions:
+      - action: publish
+        path: live/stream
+      - action: read
+        path: live/stream
+
+api: false
+metrics: false
+pprof: false
+playback: false
+rtsp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+
+rtmp: true
+rtmpAddress: 127.0.0.1:1935
+rtmpEncryption: "no"
+
+paths:
+  live/stream:
+    source: publisher
+    overridePublisher: false

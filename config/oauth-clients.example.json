@@ -1,0 +1,8 @@
+{
+  "TwitchClientId": "",
+  "YouTubeClientId": "",
+  "YouTubeDesktopClientSecret": "",
+  "KickClientId": "",
+  "KickBrokerUrl": "",
+  "KickCallbackPort": 18473
+}

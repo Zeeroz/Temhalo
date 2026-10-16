@@ -1,0 +1,35 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+artifacts/
+**/node_modules/
+**/__pycache__/
+**/.venv/
+*.user
+*.suo
+*.pfx
+*.p12
+*.secrets.json
+*.dpapi
+*.log
+# Personal destination overrides are never a place for plaintext stream keys.
+config/temhalo.local.json
+config/temhalo.launch.local.json
+Temhalo-Etape-*.zip
+Temhalo-Installer-Sources.zip
+# Local credentials, generated deliveries and personal validation snapshots.
+/Temhalo-*.zip
+/Temhalo-*.zip.sha256
+**/oauth-clients.json
+**/client_secret*.json
+**/credentials.json
+**/.env
+**/.env.*
+!**/.env.example
+*.key
+*.pem
+design/**/application-before.json
+design/**/validation.json
+design/validation.json
+assets/brand/render-jobs.json

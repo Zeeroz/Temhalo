@@ -1,0 +1,362 @@
+<style>
+/*@@FONT_FACES@@*/
+#temhalo-dashboard {
+  --th-night:#0D1218; --th-surface:#151D26; --th-raised:#1D2935;
+  --th-halo:#7CE8CD; --th-echo:#B9B2FF; --th-text:#F1F5F9;
+  --th-secondary:#B4C1CF; --th-muted:#96A7B9; --th-rule:#2C3C4C;
+  --th-control:#687E94; --th-ok:#75D8A5; --th-warning:#F6C66D; --th-error:#FF8D9A;
+  --th-hover:#9AEFD9; --th-pressed:#5DCEB2;
+  color:var(--th-text); font:400 14px/1.45 "Temhalo Inter","Segoe UI",sans-serif;
+  width:100%; background:transparent; box-sizing:border-box;
+}
+#temhalo-dashboard * { box-sizing:border-box; }
+#temhalo-dashboard [hidden] { display:none !important; }
+#temhalo-dashboard .th-window { background:var(--th-night); color-scheme:dark; }
+#temhalo-dashboard .th-titlebar { height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; background:var(--th-surface); }
+#temhalo-dashboard .th-appname { display:flex; align-items:center; gap:9px; font-weight:500; font-size:13px; }
+#temhalo-dashboard .th-appname svg { display:block; width:24px; height:24px; }
+#temhalo-dashboard .th-window-chrome { display:flex; align-items:center; gap:28px; color:var(--th-muted); font-size:14px; padding-right:2px; }
+#temhalo-dashboard .th-topnav { display:flex; gap:24px; padding:0 28px; border-bottom:1px solid var(--th-rule); flex-wrap:wrap; }
+#temhalo-dashboard button,#temhalo-dashboard input,#temhalo-dashboard select { font:inherit; }
+#temhalo-dashboard button { color:var(--th-text); background:var(--th-raised); border:1px solid var(--th-control); border-radius:8px; min-height:44px; padding:9px 16px; font-weight:500; transition:background-color 120ms; }
+#temhalo-dashboard button:not(:disabled):hover { background:var(--th-rule); }
+#temhalo-dashboard button:focus-visible,#temhalo-dashboard input:focus-visible,#temhalo-dashboard select:focus-visible { outline:2px solid var(--th-halo); outline-offset:2px; }
+#temhalo-dashboard button:disabled { color:var(--th-muted); background:var(--th-surface); border-color:var(--th-rule); }
+#temhalo-dashboard .th-topnav button { border:0; border-radius:0; background:transparent; position:relative; padding:12px 0; color:var(--th-secondary); }
+#temhalo-dashboard .th-topnav button[aria-selected="true"] { color:var(--th-text); }
+#temhalo-dashboard .th-topnav button[aria-selected="true"]::after { content:""; position:absolute; height:3px; left:0; right:0; bottom:0; background:var(--th-halo); border-radius:3px 3px 0 0; }
+#temhalo-dashboard .th-content { padding:24px 28px 28px; container-type:inline-size; container-name:th-content; }
+#temhalo-dashboard .th-heading { display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; }
+#temhalo-dashboard h1 { font:600 28px/36px "Temhalo Space","Segoe UI",sans-serif; margin:0; letter-spacing:-.02em; }
+#temhalo-dashboard h2 { font:600 18px/26px "Temhalo Space","Segoe UI",sans-serif; margin:0; }
+#temhalo-dashboard .th-description { color:var(--th-muted); margin:6px 0 0; }
+#temhalo-dashboard .th-session { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+#temhalo-dashboard .th-session-label { display:flex; gap:8px; align-items:center; font-size:12px; color:var(--th-secondary); }
+#temhalo-dashboard .th-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--th-ok); flex-shrink:0; }
+#temhalo-dashboard .th-main-grid { display:grid; grid-template-columns:1fr; gap:24px; align-items:start; }
+#temhalo-dashboard .th-panel { background:var(--th-surface); border-radius:12px; padding:24px; min-width:0; }
+#temhalo-dashboard .th-panel-heading { display:flex; align-items:center; gap:12px; justify-content:space-between; flex-wrap:wrap; }
+#temhalo-dashboard .th-state { color:var(--th-ok); display:inline-flex; gap:7px; align-items:center; font-size:12px; }
+#temhalo-dashboard .th-state::before { content:"✓"; font-weight:600; }
+#temhalo-dashboard .th-state[data-kind="warning"] { color:var(--th-warning); }
+#temhalo-dashboard .th-state[data-kind="warning"]::before { content:"◇"; }
+#temhalo-dashboard .th-state[data-kind="error"] { color:var(--th-error); }
+#temhalo-dashboard .th-state[data-kind="error"]::before { content:"!"; }
+#temhalo-dashboard .th-state[data-kind="idle"] { color:var(--th-muted); }
+#temhalo-dashboard .th-state[data-kind="idle"]::before { content:"—"; }
+#temhalo-dashboard .th-delay-values { display:grid; grid-template-columns:1.3fr 1fr; align-items:end; gap:16px; padding:26px 0 20px; }
+#temhalo-dashboard .th-label { color:var(--th-secondary); font-size:12px; }
+#temhalo-dashboard .th-mono { font-family:"Temhalo Mono",Consolas,monospace; font-variant-numeric:tabular-nums; font-feature-settings:"liga" 0; }
+#temhalo-dashboard .th-current { font:500 48px/56px "Temhalo Mono",Consolas,monospace; letter-spacing:-.035em; margin-top:4px; }
+#temhalo-dashboard .th-target { color:var(--th-echo); font:500 24px/32px "Temhalo Mono",Consolas,monospace; margin-top:4px; }
+#temhalo-dashboard .th-current-note { color:var(--th-muted); font-size:12px; padding-bottom:20px; border-bottom:1px solid var(--th-rule); }
+#temhalo-dashboard .th-presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
+#temhalo-dashboard .th-presets button { background:transparent; min-width:60px; padding:9px 12px; }
+#temhalo-dashboard .th-presets button[aria-pressed="true"] { background:var(--th-halo); border-color:var(--th-halo); color:var(--th-night); }
+#temhalo-dashboard .th-presets button:hover { background:var(--th-rule); }
+#temhalo-dashboard .th-presets button[aria-pressed="true"]:hover { background:var(--th-hover); }
+#temhalo-dashboard .th-editor { margin-top:20px; }
+#temhalo-dashboard .th-editor-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+#temhalo-dashboard .th-input-group { display:flex; align-items:center; gap:8px; }
+#temhalo-dashboard input[type="number"] { width:84px; min-height:44px; border:1px solid var(--th-control); background:var(--th-night); border-radius:8px; padding:8px 10px; color:var(--th-text); font:400 16px/24px "Temhalo Mono",Consolas,monospace; }
+#temhalo-dashboard input[aria-invalid="true"] { border-color:var(--th-error); }
+#temhalo-dashboard .th-unit { color:var(--th-muted); font-size:12px; }
+#temhalo-dashboard input[type="range"] { width:100%; height:44px; margin:8px 0 0; background:transparent; appearance:none; -webkit-appearance:none; }
+#temhalo-dashboard input[type="range"]::-webkit-slider-runnable-track { height:4px; border-radius:3px; background:linear-gradient(to right,var(--th-halo) 0,var(--th-halo) var(--range-fill,10%),var(--th-control) var(--range-fill,10%),var(--th-control) 100%); }
+#temhalo-dashboard input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; height:20px; width:20px; margin-top:-8px; border-radius:50%; background:var(--th-halo); border:3px solid var(--th-night); }
+#temhalo-dashboard input[type="range"]::-moz-range-track { height:4px; background:var(--th-control); }
+#temhalo-dashboard input[type="range"]::-moz-range-progress { height:4px; background:var(--th-halo); }
+#temhalo-dashboard input[type="range"]::-moz-range-thumb { height:16px; width:16px; border-radius:50%; background:var(--th-halo); border:3px solid var(--th-night); }
+#temhalo-dashboard .th-ticks { display:flex; justify-content:space-between; color:var(--th-muted); font:400 12px/18px "Temhalo Mono",Consolas,monospace; }
+#temhalo-dashboard .th-apply-row { margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+#temhalo-dashboard .th-helper { color:var(--th-muted); font-size:12px; }
+#temhalo-dashboard .th-primary { background:var(--th-halo); border-color:var(--th-halo); color:var(--th-night); }
+#temhalo-dashboard .th-primary:not(:disabled):hover { background:var(--th-hover); border-color:var(--th-hover); }
+#temhalo-dashboard .th-primary:not(:disabled):active { background:var(--th-pressed); border-color:var(--th-pressed); }
+#temhalo-dashboard .th-error-text { margin-top:8px; color:var(--th-error); font-size:12px; }
+#temhalo-dashboard .th-connections { margin-top:22px; }
+#temhalo-dashboard .th-connection { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; flex-wrap:wrap; }
+#temhalo-dashboard .th-connection-title { font-weight:500; }
+#temhalo-dashboard .th-connection-detail { color:var(--th-muted); font-size:12px; margin-top:3px; }
+#temhalo-dashboard .th-divider { border:0; border-top:1px solid var(--th-rule); margin:24px 0 20px; }
+#temhalo-dashboard .th-stat-line { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin-top:12px; flex-wrap:wrap; }
+#temhalo-dashboard .th-stat-line:first-child { margin-top:0; }
+#temhalo-dashboard .th-stat-line dt { color:var(--th-secondary); font-size:12px; }
+#temhalo-dashboard .th-stat-line dd { margin:0; font-size:13px; }
+#temhalo-dashboard .th-buffer-title { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+#temhalo-dashboard .th-buffer-track { height:4px; background:var(--th-rule); border-radius:2px; margin-top:12px; overflow:hidden; }
+#temhalo-dashboard .th-buffer-fill { height:100%; width:6.25%; background:var(--th-control); }
+#temhalo-dashboard .th-buffer-caption { margin-top:8px; color:var(--th-muted); font-size:12px; }
+#temhalo-dashboard .th-notice { padding:14px 16px; margin-bottom:20px; background:var(--th-raised); border-radius:8px; color:var(--th-warning); font-size:13px; }
+#temhalo-dashboard .th-notice strong { font-weight:500; }
+#temhalo-dashboard .th-notice p { margin:4px 0 0; color:var(--th-secondary); }
+#temhalo-dashboard .th-journal { margin-top:24px; padding:20px 0 0; border-top:1px solid var(--th-rule); }
+#temhalo-dashboard .th-link { background:transparent; border:0; padding:8px 0; color:var(--th-secondary); text-decoration:underline; text-underline-offset:3px; font-size:12px; }
+#temhalo-dashboard .th-link:hover { color:var(--th-text); background:transparent; }
+#temhalo-dashboard .th-log-list { margin-top:10px; padding:0; list-style:none; }
+#temhalo-dashboard .th-log-line { display:grid; grid-template-columns:78px 55px minmax(0,1fr); gap:12px; padding:8px 0; font-size:12px; align-items:baseline; }
+#temhalo-dashboard .th-log-time { color:var(--th-muted); font-family:"Temhalo Mono",Consolas,monospace; }
+#temhalo-dashboard .th-log-level { color:var(--th-secondary); font-size:11px; }
+#temhalo-dashboard .th-log-level[data-level="ATTN"] { color:var(--th-warning); }
+#temhalo-dashboard .th-log-message { color:var(--th-secondary); overflow-wrap:anywhere; }
+#temhalo-dashboard .th-form { max-width:640px; }
+#temhalo-dashboard .th-field { display:block; margin-top:20px; }
+#temhalo-dashboard .th-field > span { display:block; color:var(--th-secondary); font-size:12px; margin-bottom:8px; }
+#temhalo-dashboard .th-field input,#temhalo-dashboard .th-field select { width:100%; min-height:44px; background:var(--th-night); border:1px solid var(--th-control); border-radius:8px; color:var(--th-text); padding:10px 12px; font-size:16px; }
+#temhalo-dashboard .th-field input:disabled { color:var(--th-muted); }
+#temhalo-dashboard .th-hotkey-row { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:16px 0; border-bottom:1px solid var(--th-rule); }
+#temhalo-dashboard kbd { font:400 13px/20px "Temhalo Mono",Consolas,monospace; color:var(--th-secondary); background:var(--th-raised); padding:6px 10px; border-radius:6px; }
+#temhalo-dashboard .th-demo { background:transparent; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 0 0; font:400 12px/18px "Temhalo Inter","Segoe UI",sans-serif; color:var(--foreground,CanvasText); }
+#temhalo-dashboard .th-demo label { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+#temhalo-dashboard .th-demo select { background:var(--th-surface); color:var(--th-text); border:1px solid var(--th-control); border-radius:6px; padding:6px 8px; min-height:36px; font-size:12px; }
+#temhalo-dashboard .th-demo-note { color:var(--foreground,CanvasText); }
+#temhalo-dashboard .th-toast { color:var(--th-secondary); font-size:12px; margin-top:12px; }
+@container th-content (min-width:920px) {
+  #temhalo-dashboard .th-main-grid { grid-template-columns:minmax(0,1.9fr) minmax(0,1fr); }
+}
+@media (max-width:620px) {
+  #temhalo-dashboard .th-content { padding:20px; }
+  #temhalo-dashboard h1 { font-size:24px; line-height:32px; }
+  #temhalo-dashboard .th-topnav { gap:16px; padding:0 20px; }
+  #temhalo-dashboard .th-panel { padding:20px; }
+  #temhalo-dashboard .th-current { font-size:40px; line-height:48px; }
+  #temhalo-dashboard .th-target { font-size:22px; }
+  #temhalo-dashboard .th-delay-values { grid-template-columns:1fr 1fr; gap:12px; }
+  #temhalo-dashboard .th-state { font-size:12px; }
+  #temhalo-dashboard .th-log-line { grid-template-columns:72px minmax(0,1fr); gap:6px 10px; }
+  #temhalo-dashboard .th-log-message { grid-column:1/-1; }
+  #temhalo-dashboard .th-apply-row .th-primary { width:100%; }
+  #temhalo-dashboard .th-window-chrome { gap:20px; }
+}
+@media (max-width:360px) {
+  #temhalo-dashboard .th-topnav { gap:0; display:grid; grid-template-columns:1fr 1fr; }
+  #temhalo-dashboard .th-topnav button { text-align:left; }
+  #temhalo-dashboard .th-delay-values { grid-template-columns:1fr; }
+  #temhalo-dashboard .th-heading { gap:12px; }
+}
+@media (prefers-reduced-motion:reduce) { #temhalo-dashboard * { transition:none !important; } }
+@media (forced-colors:active) {
+  #temhalo-dashboard .th-window,#temhalo-dashboard .th-panel { background:Canvas; color:CanvasText; }
+  #temhalo-dashboard button,#temhalo-dashboard input,#temhalo-dashboard select { border-color:ButtonText; }
+  #temhalo-dashboard .th-primary,#temhalo-dashboard .th-presets button[aria-pressed="true"] { forced-color-adjust:auto; }
+}
+</style>
+<section id="temhalo-dashboard" aria-label="Maquette interactive Temhalo, données simulées">
+  <div class="th-window" data-shell aria-label="États de la diffusion Temhalo">
+    <div class="th-titlebar">
+      <div class="th-appname">@@SYMBOL@@<span>Temhalo</span></div>
+      <div class="th-window-chrome" aria-hidden="true"><span>−</span><span>□</span><span>×</span></div>
+    </div>
+    <nav class="th-topnav" role="tablist" aria-label="Navigation principale">
+      <button type="button" class="cursor-interaction" role="tab" id="th-tab-live" aria-controls="th-view-live" aria-selected="true" data-tab="live">Tableau de bord</button>
+      <button type="button" class="cursor-interaction" role="tab" id="th-tab-destination" aria-controls="th-view-destination" aria-selected="false" data-tab="destination">Destination</button>
+      <button type="button" class="cursor-interaction" role="tab" id="th-tab-shortcuts" aria-controls="th-view-shortcuts" aria-selected="false" data-tab="shortcuts">Raccourcis</button>
+      <button type="button" class="cursor-interaction" role="tab" id="th-tab-logs" aria-controls="th-view-logs" aria-selected="false" data-tab="logs">Journal</button>
+    </nav>
+    <div class="th-content">
+      <section id="th-view-live" role="tabpanel" aria-labelledby="th-tab-live">
+        <header class="th-heading">
+          <div><h1>Tableau de bord</h1><p class="th-description">Contrôlez le délai ajouté à votre diffusion.</p></div>
+          <div class="th-session"><span class="th-session-label"><span class="th-dot" aria-hidden="true" data-session-dot></span><span data-session-label>Relais actif</span></span><button type="button" class="cursor-interaction" data-stop>Arrêter le relais</button></div>
+        </header>
+        <div class="th-notice" data-notice hidden role="status"><strong data-notice-title></strong><p data-notice-body></p></div>
+        <div class="th-main-grid">
+          <section class="th-panel" aria-labelledby="th-delay-heading">
+            <div class="th-panel-heading"><h2 id="th-delay-heading">Délai de diffusion</h2><span class="th-state" data-delay-state data-kind="ok">Délai atteint</span></div>
+            <div class="th-delay-values">
+              <div><div class="th-label">Délai actuel</div><div class="th-current" data-current>00:30</div></div>
+              <div><div class="th-label">Cible appliquée</div><div class="th-target" data-target>00:30</div></div>
+            </div>
+            <div class="th-current-note">Délai local · La latence de la plateforme s'ajoute.</div>
+            <div class="th-presets" aria-label="Presets de délai">
+              <button type="button" class="cursor-interaction" data-preset="0" aria-pressed="false">0 s</button>
+              <button type="button" class="cursor-interaction" data-preset="15" aria-pressed="false">15 s</button>
+              <button type="button" class="cursor-interaction" data-preset="30" aria-pressed="true">30 s</button>
+              <button type="button" class="cursor-interaction" data-preset="60" aria-pressed="false">60 s</button>
+              <button type="button" class="cursor-interaction" data-custom>Personnalisé</button>
+            </div>
+            <div class="th-editor">
+              <div class="th-editor-heading"><label for="th-delay-number">Nouvelle cible</label><div class="th-input-group"><input type="number" id="th-delay-number" min="0" max="300" step="1" value="30" inputmode="numeric" aria-label="Nouvelle cible, en secondes" aria-describedby="th-delay-error"><span class="th-unit">secondes</span></div></div>
+              <input type="range" id="th-delay-range" min="0" max="300" step="1" value="30" aria-label="Nouvelle cible, de 0 à 300 secondes" aria-valuetext="30 secondes">
+              <div class="th-ticks" aria-hidden="true"><span>0</span><span>60</span><span>120</span><span>180</span><span>240</span><span>300 s</span></div>
+              <div id="th-delay-error" class="th-error-text" role="alert" hidden>Saisissez un entier entre 0 et 300 secondes.</div>
+              <div class="th-apply-row"><span class="th-helper" data-draft-note>Aucun changement en attente</span><button type="button" class="th-primary cursor-interaction" data-apply disabled>Appliquer 30 s</button></div>
+            </div>
+          </section>
+          <aside class="th-panel" aria-label="Connexions et ressources">
+            <h2>Votre diffusion</h2>
+            <div class="th-connections">
+              <div class="th-connection"><div><div class="th-connection-title">OBS</div><div class="th-connection-detail">Entrée locale</div></div><span class="th-state" data-ingest-state data-kind="ok">Flux reçu</span></div>
+              <div class="th-connection"><div><div class="th-connection-title" data-platform-name>Twitch</div><div class="th-connection-detail">Destination principale</div></div><span class="th-state" data-output-state data-kind="ok">Connectée</span></div>
+            </div>
+            <hr class="th-divider">
+            <dl>
+              <div class="th-stat-line"><dt>Débit entrant</dt><dd class="th-mono" data-rate-in>8,2 Mb/s</dd></div>
+              <div class="th-stat-line"><dt>Débit sortant</dt><dd class="th-mono" data-rate-out>8,1 Mb/s</dd></div>
+              <div class="th-stat-line"><dt>Durée du live</dt><dd class="th-mono" data-live-time>01:24:18</dd></div>
+            </dl>
+            <hr class="th-divider">
+            <div class="th-buffer-title"><span class="th-label">Buffer en RAM</span><span class="th-mono" style="font-size:13px" data-buffer>32 / 512 MiB</span></div>
+            <div class="th-buffer-track" role="meter" aria-label="Mémoire du buffer en MiB" aria-valuemin="0" aria-valuemax="512" aria-valuenow="32" data-buffer-meter><div class="th-buffer-fill" data-buffer-fill></div></div>
+            <div class="th-buffer-caption" data-buffer-caption>Réserve disponible</div>
+          </aside>
+        </div>
+        <section class="th-journal" aria-label="Derniers événements">
+          <div class="th-panel-heading"><h2>Derniers événements</h2><button type="button" class="th-link cursor-interaction" data-open-logs>Ouvrir le journal</button></div>
+          <ul class="th-log-list" data-recent-logs></ul>
+        </section>
+      </section>
+      <section id="th-view-destination" role="tabpanel" aria-labelledby="th-tab-destination" hidden>
+        <header class="th-heading"><div><h1>Destination</h1><p class="th-description">La plateforme qui reçoit votre diffusion.</p></div></header>
+        <form class="th-panel th-form" data-destination-form>
+          <h2>Destination principale</h2>
+          <label class="th-field"><span>Plateforme</span><select data-platform-select><option>Twitch</option><option>YouTube</option><option>Kick</option><option>Personnalisée</option></select></label>
+          <label class="th-field"><span>URL du serveur RTMP</span><input type="url" data-server value="rtmp://serveur.exemple.invalid/live" required></label>
+          <label class="th-field"><span>Clé de stream</span><input type="password" value="exemple-visuel" disabled aria-label="Clé de stream fictive et masquée"></label>
+          <p class="th-helper">Aucun secret réel n'est nécessaire pour cette maquette.</p>
+          <div class="th-apply-row"><button type="submit" class="th-primary cursor-interaction">Enregistrer l'aperçu</button></div>
+          <div class="th-toast" data-destination-feedback role="status"></div>
+        </form>
+      </section>
+      <section id="th-view-shortcuts" role="tabpanel" aria-labelledby="th-tab-shortcuts" hidden>
+        <header class="th-heading"><div><h1>Raccourcis</h1><p class="th-description">Vos commandes de délai, accessibles pendant une partie.</p></div></header>
+        <div class="th-panel th-form"><h2>Associations proposées</h2><div class="th-hotkey-row"><span>Appliquer le preset de protection</span><kbd>Ctrl + Alt + D</kbd></div><div class="th-hotkey-row"><span>Revenir à 0 s</span><kbd>Ctrl + Alt + 0</kbd></div><div class="th-hotkey-row"><span>Ajouter 10 s</span><kbd>Ctrl + Alt + ↑</kbd></div><div class="th-hotkey-row"><span>Retirer 10 s</span><kbd>Ctrl + Alt + ↓</kbd></div><p class="th-helper">Présentation visuelle : aucun raccourci global n'est enregistré.</p></div>
+      </section>
+      <section id="th-view-logs" role="tabpanel" aria-labelledby="th-tab-logs" hidden>
+        <header class="th-heading"><div><h1>Journal</h1><p class="th-description">Les derniers événements de votre diffusion.</p></div></header>
+        <div class="th-panel"><h2>Événements récents</h2><ul class="th-log-list" data-all-logs></ul></div>
+      </section>
+      <div class="th-toast" data-announcement role="status" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="th-demo" data-demo-controls>
+    <label>Scénario <select data-scenario aria-label="Scénario de la maquette"><option value="stable">Diffusion stable</option><option value="increase">Ajout de délai</option><option value="reconnect">Sortie en reconnexion</option><option value="obs">OBS déconnecté</option><option value="memory">Alerte mémoire</option></select></label>
+    <span class="th-demo-note">Maquette interactive · Données simulées</span>
+  </div>
+</section>
+<script>
+(() => {
+  const root = document.getElementById('temhalo-dashboard');
+  const $ = selector => root.querySelector(selector);
+  const $$ = selector => [...root.querySelectorAll(selector)];
+  const state = {scenario:'stable', current:30, target:30, draft:30, running:true, platform:'Twitch', tab:'live'};
+  const logs = [{time:'01:24:18',level:'INFO',message:'Délai de 30 s atteint.'},{time:'01:23:48',level:'INFO',message:'Connexion à la plateforme établie.'}];
+  let timer = null;
+  let announcement = '';
+  const format = seconds => `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+  function setText(selector,value) { const el=$(selector); if(el.textContent!==value) el.textContent=value; }
+  function status(selector,text,kind='ok') { const el=$(selector); el.textContent=text; el.dataset.kind=kind; }
+  function addLog(message,level='INFO') { logs.unshift({time:'01:24:18',level,message}); if(logs.length>30) logs.pop(); }
+  function showNotice(title='',body='') { $('[data-notice]').hidden=!title; setText('[data-notice-title]',title); setText('[data-notice-body]',body); }
+  function renderLogs(selector,limit) {
+    const list=$(selector); list.replaceChildren();
+    logs.slice(0,limit).forEach(log=>{
+      const line=document.createElement('li'); line.className='th-log-line';
+      for(const [className,value] of [['th-log-time',log.time],['th-log-level',log.level],['th-log-message',log.message]]) {
+        const span=document.createElement('span'); span.className=className; span.textContent=value;
+        if(className==='th-log-level') span.dataset.level=log.level;
+        line.append(span);
+      }
+      list.append(line);
+    });
+  }
+  function render() {
+    setText('[data-current]',state.running?format(state.current):'—');
+    setText('[data-target]',format(state.target));
+    setText('[data-platform-name]',state.platform);
+    const valid=Number.isInteger(state.draft)&&state.draft>=0&&state.draft<=300;
+    $('#th-delay-error').hidden=valid;
+    $('#th-delay-number').setAttribute('aria-invalid',String(!valid));
+    $('[data-apply]').disabled=!valid||!state.running||state.draft===state.target;
+    setText('[data-apply]',valid?`Appliquer ${state.draft} s`:'Appliquer');
+    setText('[data-draft-note]',!state.running?'Relais arrêté':!valid?'Valeur à corriger':state.draft!==state.target?`Nouvelle cible : ${format(state.draft)}`:'Aucun changement en attente');
+    if(valid) {
+      $('#th-delay-range').value=state.draft;
+      $('#th-delay-range').style.setProperty('--range-fill',`${state.draft/3}%`);
+      $('#th-delay-range').setAttribute('aria-valuetext',`${state.draft} secondes`);
+    }
+    if(document.activeElement!==$('#th-delay-number')) $('#th-delay-number').value=Number.isFinite(state.draft)?state.draft:'';
+    $$('.th-presets [data-preset]').forEach(button=>{button.setAttribute('aria-pressed',String(Number(button.dataset.preset)===state.target)); button.disabled=!state.running;});
+    $('[data-custom]').disabled=!state.running;
+    $('#th-delay-range').disabled=!state.running; $('#th-delay-number').disabled=!state.running;
+    setText('[data-stop]',state.running?'Arrêter le relais':'Démarrer le relais');
+    setText('[data-session-label]',state.running?'Relais actif':'Relais arrêté');
+    $('[data-session-dot]').style.background=state.running?'var(--th-ok)':'var(--th-muted)';
+    status('[data-ingest-state]',state.running?'Flux reçu':'En attente',state.running?'ok':'idle');
+    status('[data-output-state]',state.running?'Connectée':'Arrêtée',state.running?'ok':'idle');
+    status('[data-delay-state]',state.running?'Délai atteint':'En attente',state.running?'ok':'idle');
+    setText('[data-rate-in]',state.running?'8,2 Mb/s':'—');
+    setText('[data-rate-out]',state.running?'8,1 Mb/s':'—');
+    setText('[data-live-time]',state.running?'01:24:18':'—');
+    let buffer=state.running?Math.max(2,Math.round(state.current*1.03)):0;
+    showNotice();
+    if(state.running&&state.current<state.target) {
+      status('[data-delay-state]','Ajout en cours','warning');
+      setText('[data-rate-out]','0,0 Mb/s');
+      showNotice('Ajout du délai en cours',`Actuel : ${format(state.current)} · Cible : ${format(state.target)}. La libération du flux est temporairement suspendue.`);
+    }
+    if(state.running&&state.scenario==='reconnect') {
+      status('[data-output-state]','Reconnexion','warning'); setText('[data-rate-out]','0,0 Mb/s'); buffer=78;
+      showNotice('Connexion à la plateforme interrompue','Reconnexion en cours. Les données reçues restent en mémoire dans la limite disponible.');
+    } else if(state.running&&state.scenario==='obs') {
+      status('[data-ingest-state]','Déconnecté','warning'); setText('[data-rate-in]','0,0 Mb/s'); buffer=18;
+      showNotice('OBS déconnecté','Le buffer continue de se vider. En attente du retour du flux OBS.');
+    } else if(state.running&&state.scenario==='memory') {
+      buffer=476; showNotice('Buffer proche de la limite mémoire','476 MiB utilisés sur 512 MiB. Vérifiez le délai et la connexion à la plateforme.');
+    }
+    setText('[data-buffer]',`${buffer} / 512 MiB`);
+    $('[data-buffer-meter]').setAttribute('aria-valuenow',String(buffer));
+    $('[data-buffer-fill]').style.width=`${buffer/512*100}%`;
+    $('[data-buffer-fill]').style.background=buffer>460?'var(--th-warning)':'var(--th-control)';
+    setText('[data-buffer-caption]',buffer>460?'Limite mémoire proche':'Réserve disponible');
+    setText('[data-announcement]',announcement);
+    renderLogs('[data-recent-logs]',2); renderLogs('[data-all-logs]',30);
+  }
+  function changeTab(tab) {
+    state.tab=tab;
+    $$('[data-tab]').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===tab)));
+    $$('[role="tabpanel"]').forEach(panel=>panel.hidden=panel.id!==`th-view-${tab}`);
+  }
+  function clearTimer() { if(timer) clearInterval(timer); timer=null; }
+  function applyDelay(value) {
+    if(!state.running||!Number.isInteger(value)||value<0||value>300) return;
+    clearTimer(); state.scenario='stable'; $('[data-scenario]').value='stable'; state.target=value; state.draft=value;
+    if(value<=state.current) { state.current=value; addLog(`Cible de ${value} s appliquée.`); }
+    else {
+      addLog(`Ajout du délai vers ${value} s.`, 'ATTN');
+      timer=setInterval(()=>{if(!root.isConnected) return clearTimer(); state.current=Math.min(state.target,state.current+1); if(state.current===state.target){clearTimer(); addLog(`Délai de ${state.target} s atteint.`);} render();},1000);
+    }
+    announcement=`Cible de ${value} secondes appliquée à l'aperçu.`; render();
+  }
+  function scenario(name) {
+    clearTimer(); state.scenario=name; state.running=true; state.current=30; state.target=name==='increase'?60:30; state.draft=state.target;
+    announcement=''; $('[data-scenario]').value=name;
+    if(name==='reconnect') addLog('Connexion à la plateforme interrompue. Reconnexion en cours.','ATTN');
+    if(name==='obs') addLog('OBS déconnecté. Le buffer continue de se vider.','ATTN');
+    if(name==='memory') addLog('Buffer proche de la limite mémoire.','ATTN');
+    render();
+  }
+  $('#th-delay-range').addEventListener('input',event=>{state.draft=Number(event.target.value); $('#th-delay-number').value=state.draft; render();});
+  $('#th-delay-number').addEventListener('input',event=>{state.draft=event.target.value===''?NaN:Number(event.target.value); render();});
+  $('[data-apply]').addEventListener('click',()=>applyDelay(state.draft));
+  $$('[data-preset]').forEach(button=>button.addEventListener('click',()=>applyDelay(Number(button.dataset.preset))));
+  $('[data-custom]').addEventListener('click',()=>{ $('#th-delay-number').focus(); $('#th-delay-number').select(); });
+  $$('[data-tab]').forEach(button=>button.addEventListener('click',()=>changeTab(button.dataset.tab)));
+  $('[role="tablist"]').addEventListener('keydown',event=>{
+    const tabs=$$('[data-tab]'); const index=tabs.indexOf(document.activeElement);
+    if(index<0||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault(); const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+    tabs[next].focus(); changeTab(tabs[next].dataset.tab);
+  });
+  $('[data-open-logs]').addEventListener('click',()=>changeTab('logs'));
+  $('[data-stop]').addEventListener('click',()=>{clearTimer(); state.running=!state.running; state.scenario='stable'; $('[data-scenario]').value='stable'; if(state.running){state.current=0;state.target=0;state.draft=0;} addLog(state.running?'Relais démarré.':'Relais arrêté.'); announcement=state.running?'Relais démarré dans l’aperçu.':'Relais arrêté dans l’aperçu.'; render();});
+  $('[data-scenario]').addEventListener('change',event=>scenario(event.target.value));
+  $('[data-destination-form]').addEventListener('submit',event=>{event.preventDefault(); state.platform=$('[data-platform-select]').value; setText('[data-destination-feedback]','Aperçu actualisé. Aucune connexion réseau ni sauvegarde de clé.'); render();});
+  render();
+  if(globalThis.Tweak) {
+    const tweak=new Tweak({container:$('[data-shell]'),onChange:()=>scenario(state.scenario)});
+    tweak.addSelect(state,'scenario',{label:'État de diffusion',options:[{label:'Diffusion stable',value:'stable'},{label:'Ajout de délai',value:'increase'},{label:'Sortie en reconnexion',value:'reconnect'},{label:'OBS déconnecté',value:'obs'},{label:'Alerte mémoire',value:'memory'}]});
+    if(tweak.supported) { $('[data-demo-controls]').querySelector('label').hidden=true; }
+  }
+})();
+</script>

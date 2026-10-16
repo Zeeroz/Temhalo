@@ -1,0 +1,74 @@
+{
+  "SchemaVersion": 1,
+  "Stage": "5bis-services",
+  "Status": "implemented-awaiting-user-validation",
+  "CheckedUtc": "2026-10-16T10:23:00Z",
+  "Build": {
+    "Configuration": "Debug",
+    "Platform": "x64",
+    "LockedRestorePassed": true,
+    "Errors": 0,
+    "Warnings": 0,
+    "AdditionalRuntime": "Microsoft.AspNetCore.App 8 x64"
+  },
+  "UnitTests": {
+    "Passed": 72,
+    "Failed": 0,
+    "Skipped": 0,
+    "Core": 40,
+    "Infrastructure": 25,
+    "Presentation": 7,
+    "TrxDirectory": "artifacts/validation/stage5bis-services-tests"
+  },
+  "NativeMedia": {
+    "Status": "passed",
+    "Report": "artifacts/validation/stage5-66de8c71ebce4933b388933d84417ed3/multistream-result.json",
+    "SimultaneousFileOutputs": 2,
+    "SimultaneousLocalRtmpOutputs": 2,
+    "HealthyOutputPidPreservedOnOtherEmitterCrash": true,
+    "HealthyConnectionsPreservedOnZeroCatchUp": true,
+    "DelaySequenceSeconds": [2, 4, 0],
+    "FlvHeadersAndIdrVerified": true,
+    "MonotoneDtsVerified": true,
+    "H264AndAacDecodingPassed": true,
+    "FinalSharedBufferBytes": 0,
+    "PublicPlatformPublished": false,
+    "ProductionMediaEncoding": "streamcopy"
+  },
+  "LocalHttpTests": [
+    "Real Kestrel loopback listener with isolated random test port",
+    "Separate read and control capabilities",
+    "Foreign Host and Origin rejected",
+    "Invalid, out-of-range and non-JSON commands rejected",
+    "Fonts and pages served from embedded resources",
+    "Private capabilities absent from HTML and state JSON",
+    "Occupied HTTP port leaves existing listener intact",
+    "Multiple stream keys and stable capability links round-trip through DPAPI"
+  ],
+  "BrowserAndNativeBridge": {
+    "SettingsIsolated": true,
+    "WindowsSettingsOrPersonalObsProfilesModified": false,
+    "DockPreset15ReflectedInWinUi": true,
+    "DockPlus10ReflectedInWinUi": true,
+    "Draft42KeptTarget25UntilApply": true,
+    "Applied42ReflectedInWinUi": true,
+    "DisconnectedDockCommandsDisabled": true,
+    "ReconnectWithSamePrivateLink": true,
+    "DockWidth320Verified": true,
+    "OverlayRootAndBodyTransparentCssVerified": true,
+    "OverlayActualStoppedStateVerified": true,
+    "TemporaryBrowserViewportReset": true,
+    "TestInstanceAndTabsClosed": true,
+    "CapturesDirectory": "design/native-etape-5bis-services"
+  },
+  "NotTested": [
+    "Final insertion and compositing in a personal OBS scene",
+    "Final embedding in OBS custom browser dock",
+    "Full native destination CRUD visual walkthrough",
+    "30-minute public stream or Twitch/YouTube/Kick timeout policy",
+    "Four outputs at 8 Mbps CPU and working-set benchmark",
+    "Installer, release distribution and runtime bundling"
+  ],
+  "Guide": "docs/ETAPE-5BIS-SERVICES.md",
+  "NextStageStarted": false
+}

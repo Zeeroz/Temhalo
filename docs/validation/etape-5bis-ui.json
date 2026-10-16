@@ -1,0 +1,59 @@
+{
+  "SchemaVersion": 1,
+  "Stage": "5bis-ui",
+  "Status": "implemented-awaiting-user-validation",
+  "CheckedUtc": "2026-10-16T01:51:32.9248078Z",
+  "Build": {
+    "Warnings": 0,
+    "Platform": "x64",
+    "LockedRestorePassed": true,
+    "Configuration": "Debug",
+    "Errors": 0
+  },
+  "UnitTests": {
+    "Core": 36,
+    "Passed": 65,
+    "Presentation": 7,
+    "Failed": 0,
+    "Infrastructure": 22
+  },
+  "CoreSourceUnchanged": true,
+  "NativeUi": {
+    "Views": [
+      "Direct",
+      "Diffusion",
+      "Overlay",
+      "Réglages"
+    ],
+    "Checks": [
+      "Top navigation and compact overflow",
+      "No sidebar or duplicate brand header",
+      "Preset addition and encrypted persistence after restart",
+      "Four independent overlay compositions and restoration after restart",
+      "301-second input rejected",
+      "Port-1935 conflict reported without stopping existing listener",
+      "OBS guide opens and closes at 320px",
+      "Semantic theme colors and keyboard focus retained",
+      "Local RTMP form prefill, masked key and provider state"
+    ],
+    "WindowWidths": [
+      320,
+      720,
+      1280,
+      1920
+    ],
+    "SettingsIsolated": true
+  },
+  "MediaIntegration": {
+    "Reason": "Port 1935 occupied by DynamicDelay; existing process left intact.",
+    "Status": "not-run"
+  },
+  "NotTested": [
+    "30-minute stream",
+    "Twitch/YouTube/Kick session",
+    "Manual high-contrast switch",
+    "Full fault-injection campaign"
+  ],
+  "NextStageStarted": false,
+  "CapturesDirectory": "design/native-etape-5bis"
+}

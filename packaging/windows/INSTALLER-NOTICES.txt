@@ -1,0 +1,12 @@
+Installeur Temhalo — Windows x64
+
+Produit avec NSIS 3.13, sans modification du moteur NSIS.
+Notices du moteur, des plug-ins et du compresseur : Licenses/NSIS-COPYING.txt.
+Sources NSIS : https://sourceforge.net/projects/nsis/files/NSIS%203/3.13/nsis-3.13-src.tar.bz2
+Sources de l'installeur Temhalo : packaging/windows/ et tools/Build-Installer.ps1
+dans l'archive de sources livrée avec cette préversion.
+
+Cette installation est propre au compte Windows courant. Aucun service,
+pilote, tâche planifiée ou règle de pare-feu n'est créé.
+Les licences des composants de l'application sont conservées séparément dans
+THIRD-PARTY-NOTICES.md, Licenses/ et Assets/Fonts/Licenses/.

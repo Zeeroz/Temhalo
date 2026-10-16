@@ -1,0 +1,268 @@
+{
+  "Stage": 6,
+  "Status": "passed",
+  "RequestedSeconds": 1800,
+  "ElapsedSeconds": 1800.0058639,
+  "CheckedUtc": "2026-10-16T10:57:28.1012794Z",
+  "SourceMbps": 8.652608,
+  "Destinations": 4,
+  "InitialDelaySeconds": 300,
+  "FiveMinuteBufferBytes": 329727743,
+  "PeakLogicalBufferBytes": 329726620,
+  "FinalBufferBytes": 0,
+  "LogicalProcessors": 16,
+  "CpuMeanPercent": 0.3137753748842224,
+  "CpuP95Percent": 1.355978036366719,
+  "PeakWorkingSetBytes": 756469760,
+  "CpuScope": "Validation host plus ingest MediaMTX, FFmpeg reader and four emitters; synthetic publisher, receiver and capture excluded",
+  "Checks": [
+    {
+      "Name": "300 secondes en RAM puis quatre sorties actives",
+      "Status": "passed",
+      "Seconds": 305.4
+    },
+    {
+      "Name": "rattrapage depuis cinq minutes",
+      "Status": "passed",
+      "Seconds": 306.2
+    },
+    {
+      "Name": "augmentation par paliers",
+      "Status": "passed",
+      "Seconds": 346.5
+    },
+    {
+      "Name": "reconnexion d\u0027un \u00E9metteur",
+      "Status": "passed",
+      "Seconds": 350
+    },
+    {
+      "Name": "reconnexion du lecteur",
+      "Status": "passed",
+      "Seconds": 351.4
+    },
+    {
+      "Name": "OBS absent : vidange puis attente",
+      "Status": "passed",
+      "Seconds": 381.6
+    },
+    {
+      "Name": "republication OBS",
+      "Status": "passed",
+      "Seconds": 383.2
+    },
+    {
+      "Name": "red\u00E9marrage MediaMTX",
+      "Status": "passed",
+      "Seconds": 383.6
+    },
+    {
+      "Name": "reprise apr\u00E8s panne ingest",
+      "Status": "passed",
+      "Seconds": 385.3
+    },
+    {
+      "Name": "quatre destinations indisponibles",
+      "Status": "passed",
+      "Seconds": 416.5
+    },
+    {
+      "Name": "retour des quatre destinations",
+      "Status": "passed",
+      "Seconds": 453.4
+    },
+    {
+      "Name": "suppression du retard apr\u00E8s panne",
+      "Status": "passed",
+      "Seconds": 453.6
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 473.5
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 522.6
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 594.7
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 624.9
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 654.9
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 684.9
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 755.1
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 785.3
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 815.3
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 845.3
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 875.3
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 905.6
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 935.6
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 985.3
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1056.2
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 1086.2
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 1116.3
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 1166.4
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1196.4
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 1226.6
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 1256.6
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 1307.3
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1377.8
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 1408
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 1438
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 1468
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1498
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 1528.2
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 1558.2
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 1588.2
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1618.3
+    },
+    {
+      "Name": "cible 0 s",
+      "Status": "passed",
+      "Seconds": 1648.5
+    },
+    {
+      "Name": "cible 15 s",
+      "Status": "passed",
+      "Seconds": 1678.5
+    },
+    {
+      "Name": "cible 30 s",
+      "Status": "passed",
+      "Seconds": 1708.5
+    },
+    {
+      "Name": "cible 60 s",
+      "Status": "passed",
+      "Seconds": 1778.8
+    },
+    {
+      "Name": "fin au minimum local",
+      "Status": "passed",
+      "Seconds": 1788.2
+    }
+  ],
+  "FinalFilesDecoded": [
+    "final-1.flv",
+    "final-2.flv",
+    "final-3.flv",
+    "final-4.flv"
+  ],
+  "PublicPlatformsTested": false,
+  "AudioVisualLipSyncManuallyChecked": false
+}

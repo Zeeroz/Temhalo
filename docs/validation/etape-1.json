@@ -1,0 +1,44 @@
+{
+  "Stage": 1,
+  "Build": {
+    "Warnings": 0,
+    "Configuration": "Debug",
+    "Platform": "x64",
+    "Errors": 0
+  },
+  "UnitTests": {
+    "Passed": 7,
+    "Skipped": 0,
+    "Failed": 0
+  },
+  "MediaIntegration": {
+    "Events": [
+      "EmitterCrashRecovered",
+      "ReaderCrashRecovered",
+      "PublisherReconnectRecovered",
+      "MediaMtxCrashRecovered",
+      "GracefulStopNoOrphans",
+      "PacketPayloadsPreservedAndDecodable",
+      "HardHostCrashNoOrphans"
+    ],
+    "CheckedAtUtc": "2026-10-15T21:48:59.3457797Z",
+    "SourceReport": "artifacts/validation/stage1-c9f13aa04e344afe9cdaa8a0f525b851/result.json",
+    "Status": "passed",
+    "RelayedBytes": 2397235,
+    "AvEndDifferenceSeconds": 0.0129999999999999,
+    "VideoSliceHashesVerified": 85,
+    "PacketsVerified": 261
+  },
+  "StartupIntegration": {
+    "OccupiedPortRejected": true,
+    "OnlyLoopbackRtmpListener": true,
+    "InheritedOverridesBlocked": true,
+    "IdleShutdown": true,
+    "UnfilteredReportBlocked": true,
+    "CheckedAtUtc": "2026-10-15T21:53:04.0630681Z",
+    "Status": "passed"
+  },
+  "RealObsTest": "Pending user procedure",
+  "PlatformPublishingTest": "Outside stage 1 local-file scope",
+  "RemainingOwnedNativeProcesses": 0
+}

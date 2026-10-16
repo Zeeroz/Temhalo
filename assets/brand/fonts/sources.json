@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/google/fonts",
+  "commit": "1d0e46c7933245c8180fe83e47917961c913bbdb",
+  "fonts": [
+    {
+      "family": "SpaceGrotesk",
+      "source": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf",
+      "license": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/spacegrotesk/OFL.txt",
+      "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72"
+    },
+    {
+      "family": "Inter",
+      "source": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+      "license": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/inter/OFL.txt",
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031"
+    },
+    {
+      "family": "JetBrainsMono",
+      "source": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf",
+      "license": "https://raw.githubusercontent.com/google/fonts/1d0e46c7933245c8180fe83e47917961c913bbdb/ofl/jetbrainsmono/OFL.txt",
+      "sha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda"
+    }
+  ]
+}

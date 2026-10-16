@@ -1,0 +1,780 @@
+{
+  "version": "1.0-review",
+  "files": [
+    {
+      "path": "assets/brand/fonts/Inter-400-Preview.woff2",
+      "bytes": 33072,
+      "sha256": "4835990058995a6df00d24d8b8543984030d4fd25925b10a455b6118fecc09b6"
+    },
+    {
+      "path": "assets/brand/fonts/Inter-500-Preview.woff2",
+      "bytes": 33748,
+      "sha256": "ea5376bf89885e6f69e5d3e40783cd744e9373b4131f0f6f67a5ccaf2e145114"
+    },
+    {
+      "path": "assets/brand/fonts/Inter-600-Preview.woff2",
+      "bytes": 33940,
+      "sha256": "b3319f5dc10bcbedaf10053da6f806c8fb112eaed304450fd7210cb08d0f9f68"
+    },
+    {
+      "path": "assets/brand/fonts/Inter-Variable.ttf",
+      "bytes": 876576,
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031"
+    },
+    {
+      "path": "assets/brand/fonts/JetBrainsMono-400-Preview.woff2",
+      "bytes": 22144,
+      "sha256": "1000f4566710c7bef8be6988e4bd5cacd348746db65f7155ff3ac2d845389e65"
+    },
+    {
+      "path": "assets/brand/fonts/JetBrainsMono-500-Preview.woff2",
+      "bytes": 22900,
+      "sha256": "d08801c7de48105e69f830109eb0d7893dadb45da762db0c3cde4f593aea702e"
+    },
+    {
+      "path": "assets/brand/fonts/JetBrainsMono-Variable.ttf",
+      "bytes": 187208,
+      "sha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda"
+    },
+    {
+      "path": "assets/brand/fonts/licenses/Inter-OFL.txt",
+      "bytes": 4377,
+      "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+    },
+    {
+      "path": "assets/brand/fonts/licenses/JetBrainsMono-OFL.txt",
+      "bytes": 4399,
+      "sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d"
+    },
+    {
+      "path": "assets/brand/fonts/licenses/SpaceGrotesk-OFL.txt",
+      "bytes": 4495,
+      "sha256": "564ce565c371c5e5bbf286006565a7c9aa55a9f56e7ca58d56e05d649dd61a72"
+    },
+    {
+      "path": "assets/brand/fonts/sources.json",
+      "bytes": 1346,
+      "sha256": "9afb6ab93f4bee3e750b6e6c5934e83e73bc50061bee871b2fd7ce744ef532e5"
+    },
+    {
+      "path": "assets/brand/fonts/SpaceGrotesk-500-Preview.woff2",
+      "bytes": 18816,
+      "sha256": "987f1469797e31c468563a02785bc860b68d9d81d524cac9b65293ae37a14a15"
+    },
+    {
+      "path": "assets/brand/fonts/SpaceGrotesk-600-Preview.woff2",
+      "bytes": 18572,
+      "sha256": "39925bd29e45bf398cf9cf69cf86c07c8eab3ddd449adb45a651060931fa8fcc"
+    },
+    {
+      "path": "assets/brand/fonts/SpaceGrotesk-Variable.ttf",
+      "bytes": 136676,
+      "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-128.png",
+      "bytes": 2401,
+      "sha256": "f646bbac52e7fcd0fc7e76318e8369692af5693fc4b94524b22364108fe526d1"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-128.svg",
+      "bytes": 362,
+      "sha256": "ebeec1f8c1b6db119f4e2fc886bdce19d8717eb232cc7d5877b12bd006b6c81d"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-16.png",
+      "bytes": 355,
+      "sha256": "8ae3ae5910aeaac022467cd48b50cbbd8b0933dd837f357a4ef975b6473e93b4"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-16.svg",
+      "bytes": 360,
+      "sha256": "bf96d7c7f8fc4a12b71afcbf3f2ee8e3202c03dc056bd1124dfba30261a51d0d"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-20.png",
+      "bytes": 470,
+      "sha256": "70be6cc5629dd79d1e590cf57339ef7da4d2bd7e83ff61c93086fd8b8a6a6c4f"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-20.svg",
+      "bytes": 360,
+      "sha256": "c58df9ba59a9a3f7a1cc41524b3619c08c1e28fe3b5fe4f1c7cdc6f889319609"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-24.png",
+      "bytes": 544,
+      "sha256": "637e8933684352ca897804aee0b6750a5c9ec3395c3037f1548f20df543b57d4"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-24.svg",
+      "bytes": 360,
+      "sha256": "1fe7737b75ae09963dc9c56d3c6d759e9750104521aaa6a07626b295e9232aee"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-256.png",
+      "bytes": 5624,
+      "sha256": "75084959f258a4188c116a03a799197d42e0adbb13abdf2d21bad48283aba0a5"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-256.svg",
+      "bytes": 362,
+      "sha256": "cf6ce7b36999d612d94c6ec3cf366b6ac09498db899f88fb08d8cf62648c8b8d"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-32.png",
+      "bytes": 699,
+      "sha256": "3ae7d9092d4d80632495300fa140168535679e3d664927c112b55597b5ec9ebf"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-32.svg",
+      "bytes": 360,
+      "sha256": "0c998c740e47386c32192eac239adda267ff57d92afae8dacd5f4838bf3cae76"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-40.png",
+      "bytes": 791,
+      "sha256": "4e6d46e5294f16a569756b153ed7a8ecb04b588eb74c71881d018ef3707efa16"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-40.svg",
+      "bytes": 360,
+      "sha256": "f135446bbc576ec6b741c6e2bfc55c10346a287f29e7be9926ebab81e5bb9f71"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-48.png",
+      "bytes": 995,
+      "sha256": "6f59392bec0e73930bbdfb5788096461b346ccfa459f9702b5dc3d2d1447768e"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-48.svg",
+      "bytes": 360,
+      "sha256": "4e3998308df31622207eb0695ac0fcda2626404ddb3ca42e31f61026e5665275"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-64.png",
+      "bytes": 1211,
+      "sha256": "ffadfbcacc2fdbfb11d24fdc890c59ab9d1402910c402078dc46a76f3e365992"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-64.svg",
+      "bytes": 360,
+      "sha256": "92ced88a3b6c4e12e2f4ca8f3667f9746118fd4f65649ebeaad7775e78c4f03a"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-96.png",
+      "bytes": 1891,
+      "sha256": "d530e7b247355d3ce5b2b1ddaf8377d77bb28ccf2b5d6f61b3077a3b43cbd90b"
+    },
+    {
+      "path": "assets/brand/icons/app/temhalo-96.svg",
+      "bytes": 360,
+      "sha256": "7b58a05c44a78f7a0a0af650cb1eba92f35cf27372360fa7974c43fed4c181ed"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-128.png",
+      "bytes": 2401,
+      "sha256": "f646bbac52e7fcd0fc7e76318e8369692af5693fc4b94524b22364108fe526d1"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-128.svg",
+      "bytes": 362,
+      "sha256": "ebeec1f8c1b6db119f4e2fc886bdce19d8717eb232cc7d5877b12bd006b6c81d"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-16.png",
+      "bytes": 355,
+      "sha256": "8ae3ae5910aeaac022467cd48b50cbbd8b0933dd837f357a4ef975b6473e93b4"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-16.svg",
+      "bytes": 360,
+      "sha256": "bf96d7c7f8fc4a12b71afcbf3f2ee8e3202c03dc056bd1124dfba30261a51d0d"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-20.png",
+      "bytes": 470,
+      "sha256": "70be6cc5629dd79d1e590cf57339ef7da4d2bd7e83ff61c93086fd8b8a6a6c4f"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-20.svg",
+      "bytes": 360,
+      "sha256": "c58df9ba59a9a3f7a1cc41524b3619c08c1e28fe3b5fe4f1c7cdc6f889319609"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-24.png",
+      "bytes": 544,
+      "sha256": "637e8933684352ca897804aee0b6750a5c9ec3395c3037f1548f20df543b57d4"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-24.svg",
+      "bytes": 360,
+      "sha256": "1fe7737b75ae09963dc9c56d3c6d759e9750104521aaa6a07626b295e9232aee"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-256.png",
+      "bytes": 5624,
+      "sha256": "75084959f258a4188c116a03a799197d42e0adbb13abdf2d21bad48283aba0a5"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-256.svg",
+      "bytes": 362,
+      "sha256": "cf6ce7b36999d612d94c6ec3cf366b6ac09498db899f88fb08d8cf62648c8b8d"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-32.png",
+      "bytes": 699,
+      "sha256": "3ae7d9092d4d80632495300fa140168535679e3d664927c112b55597b5ec9ebf"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-32.svg",
+      "bytes": 360,
+      "sha256": "0c998c740e47386c32192eac239adda267ff57d92afae8dacd5f4838bf3cae76"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-40.png",
+      "bytes": 791,
+      "sha256": "4e6d46e5294f16a569756b153ed7a8ecb04b588eb74c71881d018ef3707efa16"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-40.svg",
+      "bytes": 360,
+      "sha256": "f135446bbc576ec6b741c6e2bfc55c10346a287f29e7be9926ebab81e5bb9f71"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-48.png",
+      "bytes": 995,
+      "sha256": "6f59392bec0e73930bbdfb5788096461b346ccfa459f9702b5dc3d2d1447768e"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-48.svg",
+      "bytes": 360,
+      "sha256": "4e3998308df31622207eb0695ac0fcda2626404ddb3ca42e31f61026e5665275"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-64.png",
+      "bytes": 1211,
+      "sha256": "ffadfbcacc2fdbfb11d24fdc890c59ab9d1402910c402078dc46a76f3e365992"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-64.svg",
+      "bytes": 360,
+      "sha256": "92ced88a3b6c4e12e2f4ca8f3667f9746118fd4f65649ebeaad7775e78c4f03a"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-96.png",
+      "bytes": 1891,
+      "sha256": "d530e7b247355d3ce5b2b1ddaf8377d77bb28ccf2b5d6f61b3077a3b43cbd90b"
+    },
+    {
+      "path": "assets/brand/icons/taskbar/temhalo-96.svg",
+      "bytes": 360,
+      "sha256": "7b58a05c44a78f7a0a0af650cb1eba92f35cf27372360fa7974c43fed4c181ed"
+    },
+    {
+      "path": "assets/brand/icons/temhalo-tray-black.ico",
+      "bytes": 11197,
+      "sha256": "33cd893de61b95ff1acbb86b786221f0fbded9e9000d09625b2ce156674ae30a"
+    },
+    {
+      "path": "assets/brand/icons/temhalo-tray-white.ico",
+      "bytes": 11424,
+      "sha256": "c7932838fd4b1062f069170254b0bdc55b2c366d3fa68299adab95cbc17d44eb"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-128.png",
+      "bytes": 1817,
+      "sha256": "bb48fb64f2ba219fba70ee49c9a8d36445a71a3fcf91f3e3d743c20a15c0f2cf"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-128.svg",
+      "bytes": 362,
+      "sha256": "a6cc61233de1d8499f59ab61564bad81f77f8401c68db0fb9b1b1091123791fb"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-16.png",
+      "bytes": 252,
+      "sha256": "2c2f10a60069a75fcc36791504fab5a166fef68aca69882f823e659d65e79e00"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-16.svg",
+      "bytes": 360,
+      "sha256": "88b91a05bf8e2ebddc4e320009c582cd768643bfef167ba88eca8bd69d388414"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-20.png",
+      "bytes": 328,
+      "sha256": "e20b8aed5d4bb810d7cdd31f41ea7e6232ecb4c4f7abce8a374e24760ebd9e3f"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-20.svg",
+      "bytes": 360,
+      "sha256": "bee7ff30b40bd9d4abedb0c4e06a55569336ccee3bbf9b1ef499d024b75721b3"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-24.png",
+      "bytes": 387,
+      "sha256": "c88860bda299becad2442c2d16e4fac0e0558aa12b486fdc2267db9dce35e830"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-24.svg",
+      "bytes": 360,
+      "sha256": "262506e432563f83d4f5060318babfcfe96ced3148ee052ee51ec050d284731d"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-256.png",
+      "bytes": 4133,
+      "sha256": "2d4d0079672dae341c153b149890d8f3c3180aa8188a337d5df4aa2f89eb0ed5"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-256.svg",
+      "bytes": 362,
+      "sha256": "e927fc452326c9d79522e0c7b93d26503afe751f42a8b8a999db74e0bc277d91"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-32.png",
+      "bytes": 497,
+      "sha256": "46bf8eb8b9165db936c9b2a6a2268054978240c92fef5afdb7bc1aecdbd2d246"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-32.svg",
+      "bytes": 360,
+      "sha256": "0a93dbde50b27331dcdfbf3d7257dc8e06705419c6256addc299be3abe6323b9"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-40.png",
+      "bytes": 575,
+      "sha256": "6d79a58dc0d7fd7ff6a4b300205e07a100a43fc8e32b02491e6c915da0e763a6"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-40.svg",
+      "bytes": 360,
+      "sha256": "11a1c2c9b6f57dfbc287f7526a06064ec2b526384ae6507457a3299a66dc7f3e"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-48.png",
+      "bytes": 733,
+      "sha256": "30e12fa0d6d9369246fa10892c4b609baf30e88881ba191c5c21fa6c7d056d8c"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-48.svg",
+      "bytes": 360,
+      "sha256": "c0a57c687f1858fa712894bddc7cebb35a875de69c00f2eba155967cda47a1fe"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-64.png",
+      "bytes": 896,
+      "sha256": "26b24de9a1e73e43eb39fd769bef3d016d7c4571236be4abc5eebd852d6deede"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-64.svg",
+      "bytes": 360,
+      "sha256": "d8df37ba8783c6681609fda8f2f6390f5c59e5d0b7bb181fa928d195a1c13d0c"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-96.png",
+      "bytes": 1413,
+      "sha256": "092e10531adc6723d0b41ad9224bdb621383529bf5843604d76ef4c225844a7c"
+    },
+    {
+      "path": "assets/brand/icons/tray-black/temhalo-96.svg",
+      "bytes": 360,
+      "sha256": "48226f8a4f6575fa92a15092f41da9cfdf993a0dcf5287ba40e9f241004ee699"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-128.png",
+      "bytes": 1855,
+      "sha256": "f694d806f7ffebdbd68e22092b3fc2e24a325a4e2414f7c4cfc65417e4fa02d2"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-128.svg",
+      "bytes": 362,
+      "sha256": "b4428d176473e82ef533433a8c8f4ff5cb04b71b22345151be7b88215df2cd53"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-16.png",
+      "bytes": 254,
+      "sha256": "7b03420fc534034c59aac65c8d07af21dad3310a25185312f555c4183413f0da"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-16.svg",
+      "bytes": 360,
+      "sha256": "07eed5aae341cc210e11d82181410ffb49f51ba02c1645075f72162e267222f7"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-20.png",
+      "bytes": 331,
+      "sha256": "3f9e307760eb9fedd5ff9d68356f2b58f54b49525ed93913aaab4ed77b21845b"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-20.svg",
+      "bytes": 360,
+      "sha256": "c41e4ee9e8f2a3df27ccba63d947363251d112a1e769c39693cfada818fe0735"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-24.png",
+      "bytes": 391,
+      "sha256": "6f18f504d26006672ed4361ef34a03a70a4fae87b7a59b5913656edbe49aca4e"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-24.svg",
+      "bytes": 360,
+      "sha256": "c7cfa59c05c622b30e81bf29a1e23db3cd5c4f1f426a3042c20b1f3864cc1252"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-256.png",
+      "bytes": 4274,
+      "sha256": "ab803ad60bdf4fedf4e75e22c47d72b32ced143c0c3097bcf31462d5b3499865"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-256.svg",
+      "bytes": 362,
+      "sha256": "d7d8647eab7558fe79b1755acfade8e605c68f6c3b239b48482578e5bf538d5d"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-32.png",
+      "bytes": 506,
+      "sha256": "fdccc344c0c7fb8f98ca63838db537b6bb4a9dac2a632eae9a5e78eb378041c8"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-32.svg",
+      "bytes": 360,
+      "sha256": "cb4ebba229366930281233abc4770fbca4128d174c769bfcb1e0223e861e0c15"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-40.png",
+      "bytes": 585,
+      "sha256": "0093250fe1c4fe577d3eec86c9234b1bf348bad465db22045864ceaf0703e50b"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-40.svg",
+      "bytes": 360,
+      "sha256": "4dd348da670580120a756e9d73df4b8ec2842aa5bd3ddef3f9da24414baf8c6f"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-48.png",
+      "bytes": 732,
+      "sha256": "6b859e9abd493280b3f7b29bbd05cba181dd19c74ee85228d41400c85f498a82"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-48.svg",
+      "bytes": 360,
+      "sha256": "b625136af580fad52adc52d8f9805c70f62544ab9eaa27bdf71005f49e59cedf"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-64.png",
+      "bytes": 902,
+      "sha256": "2041067fade3964ecbdebb972f4644168a7981e14257ee4ad552d6b58a3d7ba6"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-64.svg",
+      "bytes": 360,
+      "sha256": "13768f89631fb711a0d08818dc31a52b4035e9af6bbd26bc590c24fdf9255cf2"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-96.png",
+      "bytes": 1428,
+      "sha256": "bd306cb890e0474968045f7a06296d233d0d749a8e7aaf0fd02cf86a2bbede7a"
+    },
+    {
+      "path": "assets/brand/icons/tray-white/temhalo-96.svg",
+      "bytes": 360,
+      "sha256": "b5e6430e75b145e2a55bd5a676bb114a82bb32122cf374bd8cdeb0fa4a1bea17"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-icon-proof.png",
+      "bytes": 31467,
+      "sha256": "335f76b801aafbcb7a51b62423720b7680442f584d61adcb7e38a142a0e0f631"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-black.png",
+      "bytes": 15350,
+      "sha256": "4f72abb3d8b3fc6a590934d7f19cfc7406dd79fcb118392ed2022cae03bf89a4"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-black.svg",
+      "bytes": 4000,
+      "sha256": "bc586e8bdfb727969ac0c20ed503479204901c04c340ea2d14acd067736d089a"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-color.png",
+      "bytes": 16116,
+      "sha256": "98dd626479534ce090bca33eecb39d0c085b5ab5a5515eb261d7767cdc749dbc"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-color.svg",
+      "bytes": 4000,
+      "sha256": "56d58c960cc6b8ebfdf4669c9e39c6e0149318abb51f3b17b0cfb221559aba24"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-white.png",
+      "bytes": 15245,
+      "sha256": "f527634ea9a975fa6ad3910bf24190cc562f1f53510c9f59daf920b169f306cf"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-horizontal-white.svg",
+      "bytes": 4000,
+      "sha256": "3e3440acfae4cba955ccd974117a7ff67ca8dd0f7600146e7f73ebc28bc9489b"
+    },
+    {
+      "path": "assets/brand/previews/temhalo-logo-sheet.png",
+      "bytes": 89756,
+      "sha256": "b4db8cd86ad508c276f9097312799e421be953151e39b62fd7dbd5f514fe310b"
+    },
+    {
+      "path": "assets/brand/render-jobs.json",
+      "bytes": 10414,
+      "sha256": "32a1b9a04c12412e354f18d7a1de06bb69ee346f1bdcb227252649025f261902"
+    },
+    {
+      "path": "assets/brand/splash/temhalo-splash-dark.png",
+      "bytes": 15069,
+      "sha256": "bd2b76b072660099faa2a6c09feba5a7e9cac5373b20635d4a8937bfba622a23"
+    },
+    {
+      "path": "assets/brand/splash/temhalo-splash-dark.svg",
+      "bytes": 4079,
+      "sha256": "e9c9b2f66bf43e09935703dfaa03451e7e9b2cc0a3493add3636cb0d719daf0f"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-logo-horizontal-black.svg",
+      "bytes": 3951,
+      "sha256": "e9df933967ff8cf2136ca1e5635996c430da6fabb91f6aaa2bc28932500e1a62"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-logo-horizontal-color.svg",
+      "bytes": 3951,
+      "sha256": "a50b4cdc2adf0a2bf65eb9f1c5db8d8866cfc05756f0e6e1efba6be986f2f78f"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-logo-horizontal-white.svg",
+      "bytes": 3951,
+      "sha256": "7a306675d42f1195b9bcd91137929e045e0456c88e2bdbb57d6faeb645b736b7"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-symbol-black.svg",
+      "bytes": 380,
+      "sha256": "7e7131e4b473f1bda474e7388fe056d987a76fabae1ac8f7676b1e5345a6261a"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-symbol-color.svg",
+      "bytes": 380,
+      "sha256": "7f109b0eea0ceaa17a8767e29e97b6d9a2005480a1e863e28f8004c68f8f501e"
+    },
+    {
+      "path": "assets/brand/svg/temhalo-symbol-white.svg",
+      "bytes": 380,
+      "sha256": "5239aba0fa0e6d54e0f7167b8b89e91d3302b14be4e307a99054493c2f58e806"
+    },
+    {
+      "path": "assets/brand/temhalo.ico",
+      "bytes": 15147,
+      "sha256": "ff0094edc9446c6409e4e4f60432744ee4b2a12463a5af320336d6eb9df46bee"
+    },
+    {
+      "path": "assets/brand/validation.json",
+      "bytes": 1618,
+      "sha256": "a3877096081e10856e1837c14549aad08282318fbf9eafe1d0d5751c4379669d"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-100.png",
+      "bytes": 5705,
+      "sha256": "093836c8b87f9f47b0f6f2307cadc5df22d117cd4d3d4ffcc9f733215bcd9dca"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-100.svg",
+      "bytes": 4041,
+      "sha256": "d26ffa3d2e71734fb161f70173ad779095a087143fd6603d2e76f9d37d1bf0b1"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-125.png",
+      "bytes": 7510,
+      "sha256": "2dbe101e9886c7cfcbca22a81c4a0fee1c0f2b4174acc71d96746d6d38cfa241"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-125.svg",
+      "bytes": 4042,
+      "sha256": "5e36a080186909a184f3dd517060714a72af4cab70f4ef5b4056fae27495a1be"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-150.png",
+      "bytes": 9211,
+      "sha256": "a44cc6ea16400faf11962635d951bd675b74cd98c886ff8edc569da10923a0c0"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-150.svg",
+      "bytes": 4042,
+      "sha256": "eeabbadb42ecd594746bc165bd798cd0d08ee888e48cd60b77a2a78d845151a0"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-200.png",
+      "bytes": 13170,
+      "sha256": "1ab0e307c23d8bc3b0b3eb9999c6ad1e38c9d0551e02e3c0746e3d2eb62dd4cd"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-200.svg",
+      "bytes": 4044,
+      "sha256": "e37c8566dc9433520f6e4779b63905033dad394df6d5363bd2055fc0f24c4946"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-400.png",
+      "bytes": 33532,
+      "sha256": "ead5340af9fd500d2b927634e1e5f332d4d51cba425c094fc86ca97f15e30bd6"
+    },
+    {
+      "path": "assets/brand/windows/SplashScreen.scale-400.svg",
+      "bytes": 4046,
+      "sha256": "588a84b53df04d158c2eda22809514c3c3a169b1ae00f2c81d18917724e1b981"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-100.png",
+      "bytes": 3020,
+      "sha256": "ae9d23daa70e5024931df569d51b9ca7542ce5de5af5f89c337839f567bc49c8"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-100.svg",
+      "bytes": 362,
+      "sha256": "267a93adc4544189d4b3575e6e856a5bf112f34f2fd9c9f60d6b6e5ed94b7626"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-125.png",
+      "bytes": 4034,
+      "sha256": "6f97bbc2b50b2feb22cc46a6175dfb145228acb495792f37ee4e0cdf9d91268b"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-125.svg",
+      "bytes": 362,
+      "sha256": "cf39f763a30b1c6e16a0112a7d43f08d650faa51469e1f65135e88da87991a75"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-150.png",
+      "bytes": 4881,
+      "sha256": "cda96e9f42214ca5ac635a4f0b45e18d579ffcd59f17544a514bfd7fb24ddc3c"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-150.svg",
+      "bytes": 362,
+      "sha256": "2c272978112c6b250aa894746d93826f53223de9ad558e60b15f13a71de5bbea"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-200.png",
+      "bytes": 6748,
+      "sha256": "80df2acc57b7094805d59ba0cd082162c96e2b7ea5e153bb07358c9716691aa5"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-200.svg",
+      "bytes": 362,
+      "sha256": "0a19f56f20e04598217e60a4a8ae45fdb979856251a2638a8be81a014a7b35b7"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-400.png",
+      "bytes": 15491,
+      "sha256": "a52542d326721066d1e53c8c37701c52832526ff23567437769813395d43c272"
+    },
+    {
+      "path": "assets/brand/windows/Square150x150Logo.scale-400.svg",
+      "bytes": 362,
+      "sha256": "68cf0a38092c949a617f4209df7ad480f61b20c71d9108c77d2deeb3f9a0db78"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-100.png",
+      "bytes": 898,
+      "sha256": "5c002494b0d9113fa8c1370e31d4f5b00276b621d1332100167a5e4ab23cdcaa"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-100.svg",
+      "bytes": 360,
+      "sha256": "3972539374abdf952f54f7c437d1acb8e728b714ada967055b642913fbb09d73"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-125.png",
+      "bytes": 1128,
+      "sha256": "ae4939262c9387c1bae148f6b5cf433f617e75d4f3682115b70cc381e7e86bdc"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-125.svg",
+      "bytes": 360,
+      "sha256": "351ef08dbe71a1462a74862e43788da87fccdec9f0045d3fa4f3890c2e453223"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-150.png",
+      "bytes": 1287,
+      "sha256": "f9826c4abf73460ce269972f77a8137de8568440626c40e456efb90d5fe76d0c"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-150.svg",
+      "bytes": 360,
+      "sha256": "dee06598b3bc291f6cfe0199b0f83e08eeb8371784ec0dd414d712241e0818c6"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-200.png",
+      "bytes": 1725,
+      "sha256": "40ac7a08a761c769ea50b8be998055512561fca7096ad63ec5c80f7ee5621570"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-200.svg",
+      "bytes": 360,
+      "sha256": "c97f8710eb17191205a7dfe56d85fe11999c08db58d5a59685370d3ae2c7655c"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-400.png",
+      "bytes": 3742,
+      "sha256": "165dd25851a086eceb20f8295e371ebadb705f7d64a51146484442668f0790a3"
+    },
+    {
+      "path": "assets/brand/windows/Square44x44Logo.scale-400.svg",
+      "bytes": 362,
+      "sha256": "30d62da182761caf84bfb3c7a4e3e02694544db3dfbddaac2d3a726c6d2be3ba"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-100.png",
+      "bytes": 982,
+      "sha256": "85b6392f87526e6598648749f323d4ee928c26c02a5597876f380c6b7188b098"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-100.svg",
+      "bytes": 360,
+      "sha256": "b3ac80c10354c468e9189848e292c91c7413f38eb83f841058a8bc7ab863dbe8"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-125.png",
+      "bytes": 1217,
+      "sha256": "37129f3d2df6a60f09c319e6c224d9f8efa9fa4cbc9e815bdb349294ab44fc61"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-125.svg",
+      "bytes": 360,
+      "sha256": "22fe601218c162f82a0da7afe525b94f34f6048a019f15893b433115f041f7c5"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-150.png",
+      "bytes": 1474,
+      "sha256": "aa7300e08f1cd45a623163f576e6f030ed673b9ef39ad71ab901a6b1acb64e2a"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-150.svg",
+      "bytes": 360,
+      "sha256": "50ae2708265ab8c9c6562305e1daf2b5463943d6ee512ef0660f0aa6b72ca025"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-200.png",
+      "bytes": 1926,
+      "sha256": "beb6338457c90010a4c90bad23c429138d11ec824d86c73b563d5eec2e15a3ac"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-200.svg",
+      "bytes": 362,
+      "sha256": "95688b91f25d06f9938e7a698f73ed61f339617e64d3768431346fe10c8ebfcf"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-400.png",
+      "bytes": 4255,
+      "sha256": "35c54bf4a36c1564ef5009cfa66d8f897c06350e10d9520d0abe157bfdf7077c"
+    },
+    {
+      "path": "assets/brand/windows/StoreLogo.scale-400.svg",
+      "bytes": 362,
+      "sha256": "697589309260696e8e56a96b3d787ac6c82f45ca32f124ec1b930f58471c2c3e"
+    }
+  ]
+}

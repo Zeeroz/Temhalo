@@ -1,0 +1,132 @@
+{
+  "SchemaVersion": 1,
+  "Stage": 5,
+  "Status": "implemented-awaiting-user-validation",
+  "CheckedUtc": "2026-10-16T00:33:36.1309439Z",
+  "Build": {
+    "Errors": 0,
+    "Warnings": 0,
+    "Configuration": "Debug",
+    "Platform": "x64",
+    "Projects": 9,
+    "LockedRestorePassed": true
+  },
+  "UnitTests": {
+    "Infrastructure": 20,
+    "Passed": 60,
+    "Presentation": 4,
+    "Core": 36,
+    "Failed": 0
+  },
+  "NativeValidation": {
+    "Stage": 5,
+    "Status": "passed",
+    "CheckedUtc": "2026-10-16T00:28:25.6897238Z",
+    "Checks": [
+      {
+        "Name": "IndependentNativeLifetimes",
+        "Status": "passed",
+        "SameEmitterAcrossInputFailures": true,
+        "SameReaderAcrossOutputFailure": true,
+        "InputSessions": 4,
+        "OutputReconnections": 1,
+        "FinalBufferBytes": 0,
+        "DecodedFile": "C:\\Temhalo\\artifacts\\validation\\stage5-d0408b1d1d014e3dad152a6421cdb06d\\file\\relay-0002.flv"
+      },
+      {
+        "Name": "NetworkOutage",
+        "Status": "passed",
+        "RetainedBufferBytes": 1411218,
+        "RecoveryDelayMilliseconds": 311,
+        "SameReader": true,
+        "KeyOccurrencesInLogs": 0,
+        "ZeroRecovered": true,
+        "DecodedFile": "C:\\Temhalo\\artifacts\\validation\\stage5-d0408b1d1d014e3dad152a6421cdb06d\\network-recovered.flv"
+      }
+    ],
+    "OwnedProcessesRemaining": 0
+  },
+  "NativeValidationReport": "artifacts/validation/stage5-d0408b1d1d014e3dad152a6421cdb06d/result.json",
+  "NativeValidationCaptureProbe": {
+    "Reason": "The RTMP test receiver can join mid-GOP; its original 500 ms probe was shorter than the 1 s keyframe interval and intermittently failed to find video dimensions.",
+    "ProbeBytes": 4194304,
+    "AnalysisMilliseconds": 2000
+  },
+  "DynamicRegression": {
+    "Stage": 3,
+    "Status": "passed",
+    "CheckedAtUtc": "2026-10-16T00:03:07.2247716Z",
+    "SameNativePidsThroughout": true,
+    "SameOutputFile": true,
+    "InvalidCommandRejected": true,
+    "SixSecondAgeMs": 6002,
+    "ThreeSecondAgeMs": 3010,
+    "ZeroAgeMs": 0,
+    "SixSecondPauseSteps": 3,
+    "CompletedSeeks": 5,
+    "MaximumPauseMilliseconds": 2011,
+    "PeakBufferBytes": 1858889,
+    "FinalBufferBytes": 0,
+    "PacketsVerified": 974,
+    "VideoSliceHashesVerified": 380,
+    "AvEndDifferenceSeconds": 0.017999999999998906,
+    "DecodedWithoutError": true,
+    "OutputDirectory": "C:\\Temhalo\\artifacts\\validation\\stage3-fd66ff8e181e47c1887c9d208f8c5209",
+    "File": "C:\\Temhalo\\artifacts\\validation\\stage3-fd66ff8e181e47c1887c9d208f8c5209\\relay\\run-20261016-000241-72f15f3ea3e644cea98c4962f5cf1f24\\relay-0001.flv"
+  },
+  "DynamicRegressionReport": "artifacts/validation/stage3-fd66ff8e181e47c1887c9d208f8c5209/result.json",
+  "UI": {
+    "UiRecording": "artifacts/relay-ui/run-20261016-000650-90ec11c6269b451b8fe2e745d137ddef/relay-0001.flv",
+    "DpapiSaveAndRestartRestore": true,
+    "EquivalentHotkeyDuplicatesRejected": true,
+    "ConflictWindowsErrorCode": 1409,
+    "PlaintextCanaryOccurrencesInApplicationLogs": 0,
+    "FinalizedUiRecordingDecoded": true,
+    "InitialPersonalSettingsFileExisted": false,
+    "CompactOverflowMenuAndWrappedSaveButton": true,
+    "FinalPersonalSettingsFileExists": false,
+    "PlaintextCanaryOccurrencesInSettings": 0,
+    "SyntheticSettingsRemovedAfterCheck": true,
+    "DpapiCiphertextBytesInSyntheticUiTest": 554,
+    "SmallToMaximizedLayout": true,
+    "WindowSizesObserved": [
+      "1280x820",
+      "720x640",
+      "320x640",
+      "maximized 1920x1080"
+    ],
+    "GlobalCommandsWhileOtherInstanceHasFocus": [
+      10,
+      0,
+      7,
+      0
+    ],
+    "SecondInstanceConflictReported": true,
+    "GlobalCommandsTestContext": "First relay session remains active after a 90 s synthetic source has drained; key events are sent to the second inactive instance, and the first receives +10, -10, configured preset 7, zero."
+  },
+  "Logging": {
+    "RecentUiEventsLimit": 200,
+    "RotationTestRetainedFiles": 3,
+    "ProductionFileLimitBytes": 10485760,
+    "PropertiesAndExceptionsRedacted": true,
+    "ProductionRetainedFiles": 7,
+    "RotationTestFileLimitBytes": 1024
+  },
+  "Screenshots": [
+    "design/native/Temhalo-etape5-raccourcis-large.png",
+    "design/native/Temhalo-etape5-raccourcis-320-haut.png",
+    "design/native/Temhalo-etape5-raccourcis-320.png"
+  ],
+  "RemainingProjectNativeProcesses": 0,
+  "NotRun": [
+    "Twitch, YouTube or Kick publishing",
+    "TLS/RTMPS validation",
+    "Physical Internet disconnection",
+    "OBS 30-minute session",
+    "CPU less than 5 percent on target hardware",
+    "DPI 125/150/200 percent, Windows high contrast and Narrator",
+    "Real second Windows account trying to decrypt the DPAPI file",
+    "Holding a hotkey for OS repeat in UI; MOD_NOREPEAT is registered and manual verification is documented",
+    "Installer, standalone distribution or stage 6"
+  ]
+}

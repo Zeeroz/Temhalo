@@ -1,0 +1,9 @@
+{
+  "name": "temhalo-branding-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Outillage de génération des images de marque Temhalo, indépendant de l'application .NET.",
+  "dependencies": {
+    "sharp": "0.35.5"
+  }
+}

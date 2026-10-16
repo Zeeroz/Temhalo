@@ -1,0 +1,104 @@
+{
+  "Stage": 4,
+  "CheckedOnLocalDate": "2026-10-16",
+  "Build": {
+    "Configuration": "Debug",
+    "Platform": "x64",
+    "Warnings": 0,
+    "Errors": 0,
+    "LockedRestore": "passed"
+  },
+  "UnitTests": {
+    "Core": 31,
+    "Infrastructure": 11,
+    "Presentation": 3,
+    "Passed": 45,
+    "Failed": 0,
+    "Skipped": 0
+  },
+  "DynamicRelayRegression": {
+    "Stage": 3,
+    "Status": "passed",
+    "CheckedAtUtc": "2026-10-15T23:24:59.1989477Z",
+    "SameNativePidsThroughout": true,
+    "SameOutputFile": true,
+    "InvalidCommandRejected": true,
+    "SixSecondAgeMs": 6016,
+    "ThreeSecondAgeMs": 3009,
+    "ZeroAgeMs": 0,
+    "SixSecondPauseSteps": 3,
+    "CompletedSeeks": 5,
+    "MaximumPauseMilliseconds": 2012,
+    "PeakBufferBytes": 1858889,
+    "FinalBufferBytes": 0,
+    "PacketsVerified": 966,
+    "VideoSliceHashesVerified": 377,
+    "AvEndDifferenceSeconds": 0.004999999999999005,
+    "DecodedWithoutError": true,
+    "SourceReport": "artifacts/validation/stage3-874a86298f454e3289e9c541573b2b24/result.json"
+  },
+  "NativeUi": {
+    "Framework": "WinUI 3",
+    "Data": "Real synthetic H.264/AAC source through MediaMTX and two streamcopy FFmpeg processes",
+    "LiveTransitions": "0 -> 15 -> 0",
+    "PidsUnchangedDuringLiveTransitions": true,
+    "Invalid301SecondDraftRejected": true,
+    "DraftAndAppliedTargetDistinct": true,
+    "FileOutputDecodedWithoutError": true,
+    "FileOutputBytes": 32762055,
+    "FileOutputDurationSeconds": 157.448,
+    "SourceFile": "artifacts/relay-ui/run-20261015-225848-f42d2061f7a2475f827d7597d4ef62d0/relay-0004.flv",
+    "LayoutsObserved": [
+      "1280x820",
+      "720x640",
+      "1920x1080 maximized",
+      "720x640 restored",
+      "320x640"
+    ],
+    "ShutdownWithFilledBuffer": {
+      "TargetSeconds": 15,
+      "DisplayedBufferMiB": 3.6,
+      "ControlsDisabledWhileDraining": true,
+      "DrainToEmitterExitSeconds": 15.251,
+      "ReaderExitCode": 0,
+      "EmitterExitCode": 0,
+      "DecodedWithoutError": true,
+      "OutputBytes": 13473863,
+      "OutputDurationSeconds": 64.668,
+      "SourceFile": "artifacts/relay-ui/run-20261015-231756-4c69e7d1eea8462cabf7aedf80cddf1a/relay-0002.flv",
+      "TestSourceConnectionResetAfterRelayStop": "Expected: MediaMTX closes only after relay drain"
+    },
+    "ContrastEventStartupFailure": "Fixed: replaced unsupported unpackaged event subscription; final native startup and shutdown passed",
+    "EmptyNetworkDestinationRejectedWithoutNativeStartup": true
+  },
+  "LocalRtmpDestination": {
+    "Endpoint": "127.0.0.1:1936",
+    "RealPlatformUsed": false,
+    "UiOutputConfirmed": true,
+    "TargetSecondsReached": 5,
+    "DecodedWithoutError": true,
+    "OutputBytes": 18111669,
+    "DurationSeconds": 86.997,
+    "ClearTestKeyOccurrencesInTemhaloLogs": 0,
+    "SourceFile": "artifacts/validation/stage4-loopback/received-191037229b4c4cf0a8fe5860b29b8012.flv"
+  },
+  "Captures": [
+    "design/native/Temhalo-dashboard-1280.png",
+    "design/native/Temhalo-drain.png",
+    "design/native/Temhalo-320.png",
+    "design/native/Temhalo-dashboard-720.png",
+    "design/native/Temhalo-destination.png"
+  ],
+  "RemainingOwnedNativeProcessesAfterTests": 0,
+  "Secrets": "Session memory only; no settings persistence; DPAPI stage 5",
+  "NotPerformed": [
+    "Real OBS publication",
+    "Thirty-minute streaming soak",
+    "Twitch/YouTube/Kick ingest and viewer checks",
+    "TLS/RTMPS receiver validation",
+    "CPU target measurement",
+    "Windows contrast theme and 125/150/200 percent scaling visual tests",
+    "Narrator verification"
+  ],
+  "NextStage": "5, pending user approval"
+}
