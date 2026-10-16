@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Temhalo · Intégration Stream Deck — maquette</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="key-artwork.js" defer></script>
+  <script src="interactions.js" defer></script>
+</head>
+<body>
+  <main class="review">
+    <header class="review-header">
+      <div><p class="eyebrow">TEMHALO</p><h1>Touches Stream Deck</h1></div>
+      <span class="prototype-label">Maquette interactive</span>
+    </header>
+
+    <section class="artwork-showcase" aria-label="Nouvelle direction graphique des touches Temhalo">
+      <div class="artwork-caption"><span>Aperçu des touches</span></div>
+      <div class="showcase-keys">
+        <figure><img data-art-preview="preset" src="keys/preset.svg" width="144" height="144" alt="Touche de délai prédéfini"><figcaption>Délai favori</figcaption></figure>
+        <figure><img data-art-preview="increase" src="keys/increase.svg" width="144" height="144" alt="Touche ajouter du délai"><figcaption>Ajouter du temps</figcaption></figure>
+        <figure><img data-art-preview="decrease" src="keys/decrease.svg" width="144" height="144" alt="Touche retirer du délai"><figcaption>Réduire le délai</figcaption></figure>
+        <figure><img data-art-preview="direct" src="keys/direct.svg" width="144" height="144" alt="Touche retour au direct"><figcaption>Revenir au direct</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="host" aria-label="Simulation de l’application Stream Deck">
+      <div class="window-title"><span>Stream Deck</span><span aria-hidden="true">─ &nbsp; □ &nbsp; ×</span></div>
+      <div class="host-layout">
+        <div class="workspace">
+          <div class="device-bar"><div><strong>Stream Deck 8 <span aria-hidden="true">⌄</span></strong><p>Temhalo - Test <span aria-hidden="true">⌄</span></p></div><span aria-hidden="true">⚙</span></div>
+          <div class="deck" role="group" aria-label="Choisir la touche à configurer, sans commander Temhalo">
+            <button class="key selected" data-action="preset" aria-pressed="true" aria-label="Configurer la touche 15 secondes"><img src="keys/preset.svg" alt="15 s"></button>
+            <button class="key" data-action="increase" aria-pressed="false" aria-label="Configurer la touche plus 10 secondes"><img src="keys/increase.svg" alt="+10 s"></button>
+            <button class="key" data-action="decrease" aria-pressed="false" aria-label="Configurer la touche moins 10 secondes"><img src="keys/decrease.svg" alt="−10 s"></button>
+            <button class="key" data-action="direct" aria-pressed="false" aria-label="Configurer la touche retour à zéro"><img src="keys/direct.svg" alt="0 s"></button>
+            <span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span><span class="empty-key"></span>
+          </div>
+          <p class="deck-caption">Sélectionnez une touche pour voir ses réglages.</p>
+
+          <div class="inspector-shell">
+            <img id="selected-key" class="selected-key" src="keys/preset.svg" alt="Aperçu de la touche sélectionnée">
+            <section class="property-pane" aria-labelledby="action-title">
+              <div class="action-heading"><h2 id="action-title">Délai prédéfini</h2><span>Temhalo</span></div>
+              <div id="value-controls">
+                <div class="field-row"><label id="value-label" for="value">Délai</label><div class="number-control"><input id="value" type="number" min="0" max="300" step="1" value="15"><span>s</span><span id="save-status" role="status" aria-live="polite">Enregistré</span></div></div>
+                <div class="field-row slider-row"><span></span><input id="range" aria-label="Délai de la touche, en secondes" type="range" min="0" max="300" step="1" value="15"></div>
+                <div class="field-row"><span></span><div id="quick-values" class="quick-values" role="group" aria-label="Valeurs rapides"></div></div>
+              </div>
+              <div id="direct-controls" hidden><p class="direct-value">Retour au direct <strong>0 s</strong></p><p class="direct-help">Aucun réglage nécessaire pour cette touche.</p></div>
+              <p id="action-help" class="action-help">À l’appui : appliquer ce délai à la cible.</p>
+
+              <details id="connection">
+                <summary><span id="connection-state" class="connection-state"><i></i>Temhalo relié</span><span class="connection-toggle">Connexion <b aria-hidden="true">⌄</b></span></summary>
+                <div class="connection-body">
+                  <p>Une connexion commune à toutes vos touches.</p>
+                  <label for="dock-link">Lien privé du dock OBS</label>
+                  <div class="link-row"><input id="dock-link" type="password" placeholder="Collez le lien copié dans Temhalo" autocomplete="off"><button id="connect" type="button">Relier</button></div>
+                  <p id="connection-feedback" role="status"></p>
+                  <details class="help"><summary>Où trouver le lien ?</summary><p>Dans Temhalo : Diffusion → Options → Dock OBS → Copier le lien privé du dock.</p></details>
+                </div>
+              </details>
+            </section>
+          </div>
+        </div>
+
+        <aside class="action-library" aria-label="Liste illustrative des actions disponibles">
+          <div class="search-placeholder">Rechercher une action</div>
+          <h2><img src="../../assets/brand/svg/temhalo-symbol-color.svg" alt="">Temhalo <span aria-hidden="true">⌃</span></h2>
+          <ul><li><span>◯</span>Protection</li><li><span>▷</span>Retour au direct</li><li class="library-selected"><span>◷</span>Délai prédéfini</li><li><span>＋</span>Ajouter du délai</li><li><span>−</span>Retirer du délai</li><li><span>◴</span>Délai actuel</li><li><span>▥</span>État du flux</li><li><span>↻</span>Régler à la molette</li></ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="readability" aria-labelledby="readability-title">
+      <div class="readability-heading"><h2 id="readability-title">Vérifier la lisibilité</h2><p>Images de 72 × 72 px · taille en pixels, sans agrandissement</p></div>
+      <div class="actual-size-keys">
+        <figure><img data-size-preview="preset" src="keys/preset.svg" width="72" height="72" alt="Aperçu 72 pixels du délai prédéfini"><figcaption>Délai choisi</figcaption></figure>
+        <figure><img data-size-preview="increase" src="keys/increase.svg" width="72" height="72" alt="Aperçu 72 pixels de la commande ajouter"><figcaption>Ajouter</figcaption></figure>
+        <figure><img data-size-preview="decrease" src="keys/decrease.svg" width="72" height="72" alt="Aperçu 72 pixels de la commande retirer"><figcaption>Retirer</figcaption></figure>
+        <figure><img data-size-preview="direct" src="keys/direct.svg" width="72" height="72" alt="Aperçu 72 pixels du retour au direct"><figcaption>Retour à 0</figcaption></figure>
+      </div>
+    </section>
+
+    <footer class="review-footer">
+      <p><strong>Réglez la touche ici. Appuyez sur votre Stream Deck pour piloter le live.</strong><br>Le curseur prépare la commande ; il ne change pas le délai pendant que vous le réglez.</p>
+      <label class="scenario">État simulé <select id="scenario"><option value="connected">Temhalo relié</option><option value="offline">Temhalo fermé</option><option value="unpaired">À relier</option></select></label>
+    </footer>
+    <p class="simulation-note">Prototype uniquement : aucun accès à Temhalo, à Stream Deck ou au presse-papiers. La connexion et l’enregistrement sont simulés, en mémoire.</p>
+  </main>
+</body>
+</html>

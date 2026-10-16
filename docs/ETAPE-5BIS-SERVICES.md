@@ -1,5 +1,7 @@
 # Temhalo — étape 5 bis : multistream, overlay et dock OBS
 
+> Archive de l'étape 5 bis. L'overlay est retiré des sources actuelles et Stream Deck se connecte directement à l'application. Consultez le [guide actuel](CONTROLES-LOCAUX.md) ; les instructions d'overlay ci-dessous ne s'appliquent plus.
+
 Les trois raccordements sont implémentés sur l'interface validée : un délai commun, jusqu'à quatre destinations, une source navigateur d'overlay et un dock de commande. Navigation supérieure et identité Temhalo conservées. **L'étape 6 n'est pas commencée.**
 
 ## Préparer et lancer

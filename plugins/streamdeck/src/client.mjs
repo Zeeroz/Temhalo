@@ -1,151 +1,148 @@
-import { readConnection, readState, validateCommand } from './model.mjs';
+import { createConnection } from 'node:net';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { join } from 'node:path';
+import { randomUUID } from 'node:crypto';
+import { readState, validateCommand } from './model.mjs';
 
-const OFFLINE = 'Temhalo indisponible. Ouvrez Temhalo et vérifiez son serveur local.';
+/** The Windows SID scopes the channel; .NET restricts its ACL to that user. */
+export async function userPipePath() {
+  const { stdout } = await promisify(execFile)(join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'whoami.exe'),
+    ['/user', '/fo', 'csv', '/nh'], { windowsHide: true, timeout: 3000, maxBuffer: 16384 });
+  const sid = stdout.match(/\bS-1-(?:\d+-)*\d+\b/)?.[0];
+  if (!sid) throw new Error('Compte Windows indisponible.');
+  return `\\\\.\\pipe\\Temhalo.StreamDeck.v1.${sid}`;
+}
 
-/** One shared poller for every key. Failed POSTs are never retried or replayed. */
+const OFFLINE = 'Ouvrez Temhalo pour connecter automatiquement le Stream Deck.';
+const UNCONFIRMED = 'Commande non confirmée. Vérifiez la cible dans Temhalo avant de réessayer.';
+
+/** One shared, push-based IPC connection. No HTTP poller and no command replay. */
 export class TemhaloClient {
-  #connection = null;
-  #generation = 0;
-  #listeners = new Set();
-  #controllers = new Set();
-  #queue = [];
-  #processing = false;
-  #refresh = null;
-  #timer = null;
-  #active = false;
-  #updatedAt = 0;
-  #stateRevision = 0;
-  #fetch;
-  #now;
-  #interval;
-  #requestTimeout;
+  #path; #resolvePath; #socket = null; #active = false; #generation = 0;
+  #timer = null; #handshake = null; #listeners = new Set(); #connecting = null;
+  #queue = []; #pending = null; #lastSeen = 0; #now; #retry; #timeout; #heartbeat;
   state = null;
-  status = 'unconfigured';
-  message = 'Collez le lien privé du dock pour relier Temhalo.';
-
-  constructor({ fetchImpl = fetch, now = () => performance.now(), interval = 500, requestTimeout = 2000 } = {}) {
-    this.#fetch = fetchImpl; this.#now = now; this.#interval = interval; this.#requestTimeout = requestTimeout;
+  status = 'offline';
+  message = OFFLINE;
+  constructor({ pipePath, resolvePipePath = userPipePath, now = () => performance.now(),
+    reconnectDelay = 1000, commandTimeout = 2500, heartbeatTimeout = 12000 } = {}) {
+    this.#path = pipePath; this.#resolvePath = resolvePipePath; this.#now = now;
+    this.#retry = reconnectDelay; this.#timeout = commandTimeout; this.#heartbeat = heartbeatTimeout;
   }
-  get configured() { return this.#connection !== null; }
+  get configured() { return true; } // Windows handles the connection; no pairing secret.
   subscribe(listener) { this.#listeners.add(listener); return () => this.#listeners.delete(listener); }
   #emit() { for (const listener of this.#listeners) listener(); }
-  #dropQueue() {
-    for (const job of this.#queue.splice(0)) job.reject(new Error('Commande abandonnée ; vérifiez la cible dans Temhalo.'));
+  #drop() {
+    clearTimeout(this.#pending?.timer);
+    this.#pending?.reject(new Error(UNCONFIRMED)); this.#pending = null;
+    for (const job of this.#queue.splice(0)) job.reject(new Error('Commande abandonnée. Vérifiez la cible dans Temhalo.'));
   }
-  configure(value) {
-    const next = readConnection(value);
-    if (next?.port === this.#connection?.port && next?.token === this.#connection?.token) return;
-    this.#generation++;
-    for (const controller of this.#controllers) controller.abort();
-    this.#dropQueue();
-    this.#connection = next; this.state = null; this.#updatedAt = 0;
-    this.status = this.configured ? 'connecting' : 'unconfigured';
-    this.message = this.configured ? 'Connexion à Temhalo…' : 'Collez le lien privé du dock pour relier Temhalo.';
-    this.#emit(); this.#schedule(0);
-  }
-  setActive(active) { this.#active = active; this.#schedule(active ? 0 : null); }
-  #schedule(delay) {
+  #schedule() {
     clearTimeout(this.#timer); this.#timer = null;
-    if (delay === null || !this.#active || !this.configured) return;
-    this.#timer = setTimeout(async () => { await this.refresh(); this.#schedule(this.#interval); }, delay);
-    this.#timer.unref?.();
+    if (this.#active) { this.#timer = setTimeout(() => void this.#connect(), this.#retry); this.#timer.unref?.(); }
   }
-  #offline(generation, unauthorized = false) {
-    if (generation !== this.#generation) return;
-    this.#generation++; this.state = null; this.#updatedAt = 0; this.#dropQueue();
-    for (const controller of this.#controllers) controller.abort();
-    this.status = unauthorized ? 'unauthorized' : 'offline';
-    this.message = unauthorized ? 'Accès refusé. Recopiez le lien privé du dock depuis Temhalo.' : OFFLINE;
-    this.#emit();
+  #disconnect(socket, denied = false) {
+    if (socket && socket !== this.#socket) return;
+    const previous = this.#socket; this.#socket = null;
+    this.#generation++; clearTimeout(this.#handshake); this.#handshake = null;
+    previous?.destroy(); this.#drop(); this.state = null;
+    this.status = denied ? 'unauthorized' : 'offline';
+    this.message = denied ? 'Lancez Temhalo et Stream Deck avec le même compte Windows et le même niveau de droits.' : OFFLINE;
+    this.#emit(); this.#schedule();
   }
-  async #request(path, command, generation) {
-    const connection = this.#connection;
-    if (!connection || generation !== this.#generation) throw new Error(OFFLINE);
-    const controller = new AbortController(); this.#controllers.add(controller);
-    const timeout = setTimeout(() => controller.abort(), command ? 4000 : this.#requestTimeout);
-    try {
-      const response = await this.#fetch(`http://127.0.0.1:${connection.port}${path}`, {
-        method: command ? 'POST' : 'GET', redirect: 'error', cache: 'no-store', signal: controller.signal,
-        headers: { Authorization: `Bearer ${connection.token}`, ...(command ? { 'Content-Type': 'application/json' } : {}) },
-        ...(command ? { body: JSON.stringify(command) } : {}),
-      });
-      if (response.status === 401) { this.#offline(generation, true); throw new Error('Accès refusé.'); }
-      if (!response.ok && response.status !== 409) throw new Error(OFFLINE);
-      if (!response.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new Error(OFFLINE);
-      const reader = response.body.getReader(); const chunks = []; let bytes = 0;
-      try {
-        for (;;) {
-          const chunk = await reader.read(); if (chunk.done) break;
-          bytes += chunk.value.byteLength; if (bytes > 65536) throw new Error('Réponse locale trop volumineuse.');
-          chunks.push(Buffer.from(chunk.value));
-        }
-      } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
-      if (generation !== this.#generation) throw new Error(OFFLINE);
-      return { status: response.status, value: JSON.parse(Buffer.concat(chunks).toString('utf8')) };
-    } finally { clearTimeout(timeout); this.#controllers.delete(controller); }
+  setActive(active) {
+    if (this.#active === active) return;
+    this.#active = active;
+    if (active) void this.#connect();
+    else { clearTimeout(this.#timer); this.#timer = null; this.#disconnect(this.#socket); }
   }
-  refresh() {
-    if (this.#refresh) return this.#refresh;
-    if (!this.configured) return Promise.resolve(null);
-    const generation = this.#generation, revision = this.#stateRevision;
-    this.#refresh = (async () => {
-      try {
-        const response = await this.#request('/api/state', null, generation);
-        if (response.status !== 200) throw new Error(OFFLINE);
-        const state = readState(response.value);
-        if (generation === this.#generation && revision === this.#stateRevision) {
-          this.state = state; this.#updatedAt = this.#now(); this.status = 'ready';
-          this.message = state.running ? 'Temhalo relié · relais actif.' : 'Temhalo relié · relais arrêté. Vous pouvez préparer la cible.';
-          this.#emit();
-        }
-        return this.state;
-      } catch { this.#offline(generation); return null; }
-      finally { this.#refresh = null; }
-    })();
-    return this.#refresh;
-  }
-  async send(value) {
-    const command = validateCommand(value);
+  async #connect() {
+    if (!this.#active || this.#socket || this.#connecting) return;
     const generation = this.#generation;
-    await this.refresh();
-    if (generation !== this.#generation || !this.state?.canControl || this.#now() - this.#updatedAt > 2000) {
-      throw new Error(this.state ? 'Temhalo est occupé. Réessayez après cette opération.' : this.message);
+    const connecting = (async () => {
+      try {
+        this.#path ??= await this.#resolvePath();
+        if (!this.#active || generation !== this.#generation) return;
+        // An internal test-only pipe is always local, never a remote endpoint.
+        if (!/^\\\\\.\\pipe\\Temhalo\.StreamDeck\.(?:v1\.S-1-[0-9-]+|test\.[a-f0-9-]+)$/i.test(this.#path)) throw new Error(OFFLINE);
+        const socket = createConnection(this.#path); this.#socket = socket;
+        this.status = 'connecting'; this.message = 'Connexion directe à Temhalo…'; this.#emit();
+        let partial = Buffer.alloc(0);
+        socket.setTimeout(this.#heartbeat, () => this.#disconnect(socket));
+        socket.on('error', error => this.#disconnect(socket, error.code === 'EACCES'));
+        socket.on('close', () => this.#disconnect(socket));
+        socket.on('connect', () => {
+          if (socket !== this.#socket) return;
+          socket.write(JSON.stringify({ type: 'hello', protocol: 1 }) + '\n');
+          this.#handshake = setTimeout(() => this.#disconnect(socket), 3000); this.#handshake.unref?.();
+        });
+        socket.on('data', chunk => {
+          if (socket !== this.#socket) return;
+          try {
+            for (let start = 0; start < chunk.length;) {
+              const newline = chunk.indexOf(10, start), end = newline < 0 ? chunk.length : newline;
+              if (partial.length + end - start > 65535) throw new Error(OFFLINE);
+              partial = Buffer.concat([partial, chunk.subarray(start, end)]);
+              if (newline < 0) break;
+              const frame = JSON.parse(partial.toString('utf8')); partial = Buffer.alloc(0); start = newline + 1;
+              this.#receive(frame);
+              if (socket !== this.#socket) break;
+            }
+          } catch { this.#disconnect(socket); }
+        });
+      } catch { if (generation === this.#generation) this.#disconnect(null); }
+    })();
+    this.#connecting = connecting;
+    try { await connecting; } finally { if (this.#connecting === connecting) this.#connecting = null; }
+  }
+  #receive(frame) {
+    if (frame.type === 'state') {
+      if (frame.protocol !== 1) throw new Error(OFFLINE);
+      this.state = readState(frame.state); this.#lastSeen = this.#now();
+      clearTimeout(this.#handshake); this.#handshake = null;
+      this.status = 'ready'; this.message = this.state.running ? 'Connexion directe à Temhalo · relais actif.' : 'Connexion directe à Temhalo · relais arrêté.';
+      this.#emit(); return;
     }
-    if (this.#queue.length >= 8) throw new Error('Trop de commandes en attente. Vérifiez la cible.');
+    if (frame.type === 'heartbeat' && frame.protocol === 1 && this.state) { this.#lastSeen = this.#now(); return; }
+    if (frame.type !== 'result') throw new Error(OFFLINE);
+    const job = this.#pending;
+    if (!job || frame.id !== job.id) return;
+    const result = frame.result;
+    if (typeof result?.accepted !== 'boolean' || !Number.isInteger(result.targetSeconds) || result.targetSeconds < 0 || result.targetSeconds > 300) throw new Error(OFFLINE);
+    clearTimeout(job.timer); this.#pending = null; this.#lastSeen = this.#now();
+    if (result.accepted) {
+      this.state = { ...this.state, targetSeconds: result.targetSeconds }; this.#emit(); job.resolve(result);
+    } else job.reject(new Error('Temhalo ne peut pas appliquer cette commande. Vérifiez la cible.'));
+    this.#pump();
+  }
+  async refresh() {
+    if (this.state && this.#now() - this.#lastSeen > this.#heartbeat) this.#disconnect(this.#socket);
+    if (this.#active && !this.#socket) await this.#connect();
+    return this.state;
+  }
+  send(value) {
+    const command = validateCommand(value);
+    if (!this.state?.canControl || !this.#socket || this.#now() - this.#lastSeen > this.#heartbeat)
+      return Promise.reject(new Error(this.state ? 'Temhalo est occupé ou indisponible.' : this.message));
+    if (this.#queue.length >= 8) return Promise.reject(new Error('Trop de commandes en attente. Vérifiez la cible.'));
     return new Promise((resolve, reject) => {
-      this.#queue.push({ command, generation, createdAt: this.#now(), resolve, reject });
-      void this.#pump();
+      this.#queue.push({ command, createdAt: this.#now(), generation: this.#generation, resolve, reject }); this.#pump();
     });
   }
-  async #pump() {
-    if (this.#processing) return;
-    this.#processing = true;
-    try {
-      while (this.#queue.length) {
-        const job = this.#queue.shift();
-        if (job.generation !== this.#generation || this.#now() - job.createdAt > 1500 || !this.state?.canControl) {
-          job.reject(new Error('Commande expirée. Vérifiez la cible.')); continue;
-        }
-        try {
-          const response = await this.#request('/api/delay', job.command, job.generation), result = response.value;
-          if (typeof result?.accepted !== 'boolean' || !Number.isInteger(result.targetSeconds) || result.targetSeconds < 0 || result.targetSeconds > 300) throw new Error(OFFLINE);
-          if (response.status === 409 && !result.accepted) {
-            job.reject(new Error('Temhalo est occupé. Commande non appliquée.')); continue;
-          }
-          if (response.status !== 200 || !result.accepted) throw new Error(OFFLINE);
-          this.#stateRevision++;
-          this.state = { ...this.state, targetSeconds: result.targetSeconds }; this.#updatedAt = this.#now(); this.#emit();
-          job.resolve(result);
-        } catch {
-          this.#offline(job.generation);
-          job.reject(new Error('Commande non confirmée. Vérifiez la cible dans Temhalo avant de réessayer.'));
-        }
+  #pump() {
+    if (this.#pending) return;
+    while (this.#queue.length) {
+      const job = this.#queue.shift();
+      if (!this.#socket || !this.state?.canControl || job.generation !== this.#generation || this.#now() - job.createdAt > 1500) {
+        job.reject(new Error('Commande expirée. Vérifiez la cible.')); continue;
       }
-    } finally { this.#processing = false; }
+      job.id = randomUUID(); this.#pending = job;
+      job.timer = setTimeout(() => this.#disconnect(this.#socket), this.#timeout); job.timer.unref?.();
+      try { this.#socket.write(JSON.stringify({ type: 'command', id: job.id, command: job.command, expiresAt: Date.now() + 1500 }) + '\n'); }
+      catch { this.#disconnect(this.#socket); }
+      return;
+    }
   }
-  dispose() {
-    this.setActive(false); this.#generation++; this.#dropQueue();
-    for (const controller of this.#controllers) controller.abort();
-    this.#listeners.clear();
-  }
+  dispose() { this.setActive(false); this.#drop(); clearTimeout(this.#timer); this.#listeners.clear(); }
 }

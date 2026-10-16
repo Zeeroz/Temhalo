@@ -1,6 +1,6 @@
 'use strict';
 (() => {
- const $ = id => document.getElementById(id), overlay = document.body.dataset.view === 'overlay';
+ const $ = id => document.getElementById(id);
  const token = location.hash.slice(1), headers = {Authorization: 'Bearer ' + token};
  let state = null, available = false, posting = false, dirty = false, presetKey = '';
  const time = milliseconds => milliseconds === null || milliseconds === undefined ? '—' : `${Math.floor(milliseconds/60000).toString().padStart(2,'0')}:${Math.floor(milliseconds/1000)%60}`.replace(/:(\d)$/,':0$1');
@@ -8,8 +8,6 @@
  function fail(message) {
   available = false; controls(false); $('connection').textContent = message;
   $('current').textContent = '—'; $('phase').textContent = 'Mesures suspendues · dernière cible connue affichée.';
-  $('badge').hidden = false; $('badge').dataset.unavailable = 'true';
-  $('badge-label').textContent = 'État indisponible'; $('badge-time').textContent = '—';
  }
  function draw(value) {
   state = value; available = true; controls(value.canControl && !posting);
@@ -30,13 +28,6 @@
   $('outputs').replaceChildren(); value.outputs.forEach(output => {
    const item = document.createElement('li'); item.textContent = output.name+' · '+(output.ready?'Émission active':output.reconnecting?'Reconnexion':'En attente')+(output.extraDelayMilliseconds>=1000?' · retard de sortie +'+time(output.extraDelayMilliseconds):''); $('outputs').append(item);
   });
-  const styles = ['signature','repere','fil','chrono'], appearance = value.overlay[styles[value.overlay.overlayStyle]];
-  const badge=$('badge'); badge.dataset.style=value.overlay.overlayStyle;badge.dataset.position=appearance.position;
-  badge.dataset.unavailable='false';badge.style.setProperty('--scale',appearance.scalePercent/100);badge.style.setProperty('--accent',appearance.accent);
-  const live=value.running&&value.ingestConnected&&value.targetSeconds===0&&value.currentDelayMilliseconds!==null&&value.currentDelayMilliseconds<1000&&!adding&&!backlog;
-  badge.hidden=live&&!appearance.visibleWhenLive;
-  $('badge-label').textContent=!value.running?'Relais arrêté':value.currentDelayMilliseconds===null?'En attente du média':adding?'Ajout du délai':backlog?'Retard de sortie':live?'En direct':appearance.label;
-  $('badge-time').textContent=time(value.currentDelayMilliseconds);
  }
  async function poll() {
   try {

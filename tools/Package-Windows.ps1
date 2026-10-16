@@ -47,7 +47,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\MISES-A-JOUR.md') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\ETAPE-6.md') -Destination (Join-Path $package 'GUIDE-DE-TEST.md')
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\ETAPE-5BIS-SERVICES.md') -Destination (Join-Path $package 'GUIDE-OBS.md')
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\CONTROLES-LOCAUX.md') -Destination (Join-Path $package 'GUIDE-OBS.md')
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\LISEZ-MOI.txt') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\THIRD-PARTY-NOTICES.md') -Destination $package
     $streamDeckDirectory = Join-Path $package 'plugins\streamdeck'

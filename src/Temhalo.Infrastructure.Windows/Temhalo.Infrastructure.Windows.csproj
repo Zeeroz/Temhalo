@@ -18,6 +18,5 @@
     <EmbeddedResource Include="../../assets/brand/fonts/Inter-Variable.ttf" LogicalName="Temhalo.LocalWeb.Inter.ttf" />
     <EmbeddedResource Include="../../assets/brand/fonts/JetBrainsMono-Variable.ttf" LogicalName="Temhalo.LocalWeb.Mono.ttf" />
     <EmbeddedResource Include="../../assets/brand/fonts/SpaceGrotesk-Variable.ttf" LogicalName="Temhalo.LocalWeb.Space.ttf" />
-    <EmbeddedResource Include="../../assets/brand/svg/temhalo-symbol-color.svg" LogicalName="Temhalo.LocalWeb.halo.svg" />
   </ItemGroup>
 </Project>

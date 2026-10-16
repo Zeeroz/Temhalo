@@ -15,6 +15,7 @@ public sealed record AppSettings
     public HotkeySettings Hotkeys { get; init; } = new();
     public InterfacePreferences? Interface { get; init; }
     public DestinationSettings[]? Destinations { get; init; }
+    public bool ObsDockEnabled { get; init; }
     public LocalAccessSettings? LocalAccess { get; init; }
     public bool ObsInstructionsAcknowledged { get; init; }
     public bool CheckUpdatesOnStartup { get; init; } = true;

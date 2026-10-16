@@ -10,12 +10,15 @@ public sealed partial class DashboardPage
 {
     private LocalControlServer? _localServer;
     private readonly CancellationTokenSource _localLifetime = new();
-    private LocalViewState _localState = new(false, false, 0, null, "Stopped", false, [0, 15, 30, 60], 300, new(), []);
+    private LocalViewState _localState = new(false, false, 0, null, "Stopped", false, [0, 15, 30, 60], 300, []);
     private bool _localShuttingDown;
 
     private async Task InitializeLocalServerAsync()
     {
         if (_localShuttingDown) return;
+        ObsDockEnabled.IsOn = _settings.ObsDockEnabled;
+        LocalServerPort.Value = _settings.LocalAccess?.Port ?? 43120;
+        if (!_settings.ObsDockEnabled) { LocalServerStatus.Text = "Désactivé · indépendant du Stream Deck"; DockAddress.Text = "Dock OBS désactivé"; return; }
         try
         {
             if (_settings.LocalAccess is null)
@@ -25,13 +28,12 @@ public sealed partial class DashboardPage
             }
             if (_localShuttingDown) return;
             var access = _settings.LocalAccess!;
-            SecretRedactor.Shared.Remember(access.OverlayToken); SecretRedactor.Shared.Remember(access.DockToken);
+            SecretRedactor.Shared.Remember(access.DockToken);
             LocalServerPort.Value = access.Port;
             var server = new LocalControlServer(access, () => Volatile.Read(ref _localState), ApplyLocalCommandAsync);
             _localServer = server;
             await server.StartAsync(_localLifetime.Token);
-            LocalServerStatus.Text = $"Actif · 127.0.0.1:{access.Port} · lecture et commandes séparées";
-            OverlayAddress.Text = $"http://127.0.0.1:{access.Port}/overlay · accès privé";
+            LocalServerStatus.Text = $"Actif · 127.0.0.1:{access.Port} · dock OBS";
             DockAddress.Text = $"http://127.0.0.1:{access.Port}/dock · accès privé";
             _session.RecordControlEvent("Serveur navigateur local démarré ; liens privés exclus du journal.");
         }
@@ -40,7 +42,7 @@ public sealed partial class DashboardPage
         {
             if (_localServer is not null) await _localServer.DisposeAsync();
             _localServer = null; LocalServerStatus.Text = "Serveur local indisponible. Choisissez un port libre dans Confidentialité.";
-            OverlayAddress.Text = DockAddress.Text = "Serveur indisponible";
+            DockAddress.Text = "Serveur indisponible";
             ShowError("L’accès navigateur n’a pas démarré. Le relais média reste disponible. Vérifiez le port local.");
         }
     }
@@ -56,8 +58,9 @@ public sealed partial class DashboardPage
         Volatile.Write(ref _localState, new(_session.Running, !_settingsBusy && !_starting && !_session.Stopping && !_localShuttingDown,
             Vm.TargetSeconds, _session.Running ? snapshot?.Delay?.LastMediaAgeMilliseconds : null,
             snapshot?.Delay?.Control.Phase ?? "Stopped", _session.Running && snapshot?.IngestConnected == true,
-            _preferences.Presets, _settings.Hotkeys.ProtectionSeconds, _settings.Interface ?? new(),
+            _preferences.Presets, _settings.Hotkeys.ProtectionSeconds,
             publicOutputs));
+        _streamDeck?.PublishState();
     }
     private async Task<DelayCommandResult> ApplyLocalCommandAsync(DelayCommand command, CancellationToken token)
     {
@@ -75,12 +78,11 @@ public sealed partial class DashboardPage
                 case "protect": Vm.RequestTarget(_settings.Hotkeys.ProtectionSeconds); break;
                 default: completion.TrySetResult(new(false, Vm.TargetSeconds, "Commande inconnue.")); return;
             }
-            _session.RecordControlEvent($"Dock local : cible demandée {Vm.TargetSeconds} s."); Refresh();
+            _session.RecordControlEvent($"Contrôle local : cible demandée {Vm.TargetSeconds} s."); Refresh();
             completion.TrySetResult(new(true, Vm.TargetSeconds, $"Cible appliquée : {Vm.TargetSeconds} s."));
         })) return new(false, 0, "L’interface n’est plus disponible.");
         return await completion.Task.ConfigureAwait(false);
     }
-    private void CopyOverlayClicked(object sender, RoutedEventArgs e) => CopyPrivateLink(_localServer?.OverlayUrl);
     private void CopyDockClicked(object sender, RoutedEventArgs e) => CopyPrivateLink(_localServer?.DockUrl);
     private void CopyPrivateLink(string? value)
     {
@@ -95,7 +97,7 @@ public sealed partial class DashboardPage
         try
         {
             var access = (_settings.LocalAccess ?? new()) with { Port = ReadInteger(LocalServerPort.Value, 1024, 65535, "Choisissez un port entier entre 1024 et 65535.") };
-            access.Validate(); var updated = _settings with { LocalAccess = access };
+            access.Validate(); var updated = _settings with { LocalAccess = access, ObsDockEnabled = ObsDockEnabled.IsOn };
             await _settingsStore.SaveAsync(updated); _settings = updated;
             if (_localServer is not null) await _localServer.DisposeAsync();
             _localServer = null; await InitializeLocalServerAsync();
@@ -106,6 +108,7 @@ public sealed partial class DashboardPage
     private async Task StopLocalServerAsync()
     {
         _localShuttingDown = true; await _localLifetime.CancelAsync();
+        if (_streamDeck is not null) { await _streamDeck.DisposeAsync(); _streamDeck = null; }
         if (_localServer is not null) { await _localServer.DisposeAsync(); _localServer = null; }
         _localLifetime.Dispose();
     }

@@ -1,5 +1,15 @@
 # Historique
 
+## 0.7.0-preview.4
+
+- Connexion automatique et directe du plugin Stream Deck à Temhalo par un canal Windows réservé au compte courant ; une seule connexion partagée, états poussés et reconnexion sans rejeu des commandes.
+- Nouveau dessin des touches preset, ajout, retrait et retour à 0 : pictogrammes lisibles, valeurs sur une ligne et couleurs Temhalo. Panneau de réglages compact avec enregistrement des valeurs et état de connexion.
+- Conservation des actions et des valeurs des touches ; suppression de l'ancienne association par lien privé du dock.
+- Retrait de l'overlay : onglet, aperçu, personnalisation et source navigateur. Navigation Direct / Diffusion / Réglages ; lecture des anciens réglages DPAPI conservée.
+- Dock OBS facultatif et désactivé par défaut, indépendant du plugin Stream Deck. Le trajet média passthrough et les destinations restent inchangés.
+
+Pour migrer depuis preview.3, mettez aussi à jour le plugin Stream Deck avec le fichier `plugins/streamdeck/Temhalo.streamDeckPlugin` livré dans le dossier de Temhalo ou le ZIP portable. Les anciennes copies du plugin utilisant le dock doivent être remplacées pour communiquer avec cette version de l'application.
+
 ## 0.7.0-preview.3
 
 - Plugin Stream Deck facultatif : protection, retour direct, preset, ajout/retrait, délai mesuré, état OBS/sorties et réglage à la molette du Stream Deck +.

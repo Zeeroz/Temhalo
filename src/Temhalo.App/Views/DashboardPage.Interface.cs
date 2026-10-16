@@ -12,13 +12,11 @@ namespace Temhalo.App.Views;
 public sealed partial class DashboardPage
 {
     private InterfacePreferences _preferences = new();
-    private int _overlayStyle, _previewState = 2;
-    private bool _loadingOverlay, _selectingSettings, _dialogOpen, _uiReady;
+    private bool _selectingSettings, _dialogOpen;
     private nint _windowHandle;
 
     private void Navigate(string tag)
         => Navigation.SelectedItem = Navigation.MenuItems.OfType<NavigationViewItem>().Single(item => (string)item.Tag == tag);
-    private void ShowOverlayClicked(object sender, RoutedEventArgs e) => Navigate("overlay");
     private void ShowJournalClicked(object sender, RoutedEventArgs e) { Navigate("settings"); SelectSettings(3); }
     private void SettingsNavigationChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     { if (!_selectingSettings && sender.SelectedItem is not null) SelectSettings(sender.Items.IndexOf(sender.SelectedItem)); }
@@ -84,78 +82,21 @@ public sealed partial class DashboardPage
     {
         if (_settingsBusy) return;
         var updated = _preferences with { Presets = values };
-        if (await SavePreferencesAsync(updated, includeOverlay: false)) { RenderPresets(); PresetError.Text = ""; }
+        if (await SavePreferencesAsync(updated)) { RenderPresets(); PresetError.Text = ""; }
     }
-    private async Task<bool> SavePreferencesAsync(InterfacePreferences preferences, bool includeOverlay = true)
+    private async Task<bool> SavePreferencesAsync(InterfacePreferences preferences)
     {
         if (_settingsBusy) return false;
         _settingsBusy = true; Refresh();
         try
         {
-            var updated = _settings with { Interface = includeOverlay ? preferences :
-                (_settings.Interface ?? new()) with { Presets = preferences.Presets } };
+            var updated = _settings with { Interface = preferences };
             await _settingsStore.SaveAsync(updated); _settings = updated; _preferences = preferences;
             _session.RecordControlEvent("Préférences d’interface enregistrées."); return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
         { ShowError(SecretRedactor.Shared.Redact(ex.Message)); return false; }
         finally { _settingsBusy = false; Refresh(); }
-    }
-
-    private OverlayAppearance ReadOverlay() => new() { Position = OverlayPosition.SelectedIndex,
-        ScalePercent = (int)Math.Round(OverlayScale.Value), Accent = OverlayAccent.Text.Trim(),
-        Label = OverlayLabel.Text, VisibleWhenLive = OverlayVisibleLive.IsOn };
-    private void LoadOverlayAppearance()
-    {
-        if (!_uiReady || OverlayStage is null) return;
-        _loadingOverlay = true;
-        var value = _preferences.Appearance(_overlayStyle);
-        OverlayStyle.SelectedIndex = _overlayStyle; OverlayPosition.SelectedIndex = value.Position;
-        SignatureChoice.IsChecked = _overlayStyle == 0; RepereChoice.IsChecked = _overlayStyle == 1;
-        FilChoice.IsChecked = _overlayStyle == 2; ChronoChoice.IsChecked = _overlayStyle == 3;
-        OverlayScale.Value = value.ScalePercent; OverlayAccent.Text = value.Accent;
-        OverlayLabel.Text = value.Label; OverlayVisibleLive.IsOn = value.VisibleWhenLive;
-        _loadingOverlay = false; UpdateOverlay();
-    }
-    private bool UpdateOverlay()
-    {
-        if (!_uiReady || _loadingOverlay || OverlayStage is null || OverlayLabel is null || OverlayVisibleLive is null) return false;
-        try
-        {
-            var value = ReadOverlay(); value.Validate();
-            _preferences = (_preferences.WithAppearance(_overlayStyle, value)) with { OverlayStyle = _overlayStyle };
-            OverlayStage.Render(value, _overlayStyle, _previewState); OverlayError.Text = ""; return true;
-        }
-        catch (ArgumentException ex) { OverlayError.Text = ex.Message; return false; }
-    }
-    private void OverlayStyleChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_uiReady || _loadingOverlay || OverlayStage is null || OverlayStyle.SelectedIndex < 0) return;
-        _overlayStyle = OverlayStyle.SelectedIndex; LoadOverlayAppearance();
-    }
-    private void OverlayChoiceClicked(object sender, RoutedEventArgs e)
-    {
-        if (_settingsBusy) return;
-        _overlayStyle = int.Parse((string)((FrameworkElement)sender).Tag); LoadOverlayAppearance();
-    }
-    private void OverlaySelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateOverlay();
-    private void OverlayTextChanged(object sender, TextChangedEventArgs e) => UpdateOverlay();
-    private void OverlayVisibilityChanged(object sender, RoutedEventArgs e) => UpdateOverlay();
-    private void OverlayScaleChanged(object sender, RangeBaseValueChangedEventArgs e) => UpdateOverlay();
-    private void PreviewStateClicked(object sender, RoutedEventArgs e)
-    {
-        _previewState = int.Parse((string)((FrameworkElement)sender).Tag);
-        PreviewLive.IsChecked = _previewState == 0; PreviewAdding.IsChecked = _previewState == 1;
-        PreviewDelayed.IsChecked = _previewState == 2; UpdateOverlay();
-    }
-    private async void SaveOverlayClicked(object sender, RoutedEventArgs e)
-    { if (!_settingsBusy && UpdateOverlay() && await SavePreferencesAsync(_preferences)) ShowInfo("Habillage enregistré", "Les réglages des quatre compositions sont conservés sur cet ordinateur."); }
-    private void ResetOverlayClicked(object sender, RoutedEventArgs e)
-    {
-        if (_settingsBusy) return;
-        _preferences = new InterfacePreferences { Presets = _preferences.Presets }; _overlayStyle = 0;
-        _previewState = 2; PreviewLive.IsChecked = false; PreviewAdding.IsChecked = false; PreviewDelayed.IsChecked = true;
-        LoadOverlayAppearance();
     }
 
     private async void SaveMemoryClicked(object sender, RoutedEventArgs e)

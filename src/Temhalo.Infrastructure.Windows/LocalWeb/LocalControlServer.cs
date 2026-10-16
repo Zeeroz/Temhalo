@@ -16,7 +16,7 @@ namespace Temhalo.Infrastructure.Windows.LocalWeb;
 
 public sealed record PublicOutputState(string Id, string Name, bool Ready, bool Reconnecting, long ExtraDelayMilliseconds);
 public sealed record LocalViewState(bool Running, bool CanControl, int TargetSeconds, long? CurrentDelayMilliseconds,
-    string Phase, bool IngestConnected, int[] Presets, int ProtectionSeconds, InterfacePreferences Overlay,
+    string Phase, bool IngestConnected, int[] Presets, int ProtectionSeconds,
     PublicOutputState[] Outputs);
 public sealed record DelayCommand(string Action, int? Seconds = null);
 public sealed record DelayCommandResult(bool Accepted, int TargetSeconds, string Message);
@@ -29,7 +29,6 @@ public sealed class LocalControlServer : IAsyncDisposable
     private readonly Func<LocalViewState> _readState;
     private readonly Func<DelayCommand, CancellationToken, Task<DelayCommandResult>> _command;
     public Uri? Address { get; private set; }
-    public string OverlayUrl => Address is null ? "" : new Uri(Address, "overlay").AbsoluteUri + "#" + _access.OverlayToken;
     public string DockUrl => Address is null ? "" : new Uri(Address, "dock").AbsoluteUri + "#" + _access.DockToken;
 
     public LocalControlServer(LocalAccessSettings access, Func<LocalViewState> readState,
@@ -68,18 +67,13 @@ public sealed class LocalControlServer : IAsyncDisposable
             context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
             await next(context).ConfigureAwait(false);
         });
-        foreach (var view in new[] { "overlay", "dock" })
+        app.MapGet("/dock", async context =>
         {
-            string selected = view;
-            app.MapGet("/" + view, async context =>
-            {
-                string html = Encoding.UTF8.GetString(Resource("page.html")).Replace("@@VIEW@@", selected, StringComparison.Ordinal);
-                context.Response.ContentType = "text/html; charset=utf-8";
-                await context.Response.WriteAsync(html, context.RequestAborted).ConfigureAwait(false);
-            });
-        }
+            context.Response.ContentType = "text/html; charset=utf-8";
+            await context.Response.Body.WriteAsync(Resource("page.html"), context.RequestAborted).ConfigureAwait(false);
+        });
         foreach (var (name, type) in new[] { ("app.css", "text/css"), ("app.js", "text/javascript"),
-            ("Inter.ttf", "font/ttf"), ("Space.ttf", "font/ttf"), ("Mono.ttf", "font/ttf"), ("halo.svg", "image/svg+xml") })
+            ("Inter.ttf", "font/ttf"), ("Space.ttf", "font/ttf"), ("Mono.ttf", "font/ttf") })
         {
             byte[] bytes = Resource(name);
             app.MapGet("/assets/" + name, async context =>
@@ -87,12 +81,12 @@ public sealed class LocalControlServer : IAsyncDisposable
         }
         app.MapGet("/api/state", async context =>
         {
-            if (!Authorized(context, control: false)) { context.Response.StatusCode = 401; return; }
+            if (!Authorized(context)) { context.Response.StatusCode = 401; return; }
             await context.Response.WriteAsJsonAsync(_readState(), context.RequestAborted).ConfigureAwait(false);
         });
         app.MapPost("/api/delay", async context =>
         {
-            if (!Authorized(context, control: true)) { context.Response.StatusCode = 401; return; }
+            if (!Authorized(context)) { context.Response.StatusCode = 401; return; }
             if (!context.Request.HasJsonContentType()) { context.Response.StatusCode = 415; return; }
             DelayCommand? command;
             try { command = await context.Request.ReadFromJsonAsync<DelayCommand>(context.RequestAborted).ConfigureAwait(false); }
@@ -122,13 +116,12 @@ public sealed class LocalControlServer : IAsyncDisposable
         catch { await app.DisposeAsync().ConfigureAwait(false); throw; }
     }
 
-    private bool Authorized(HttpContext context, bool control)
+    private bool Authorized(HttpContext context)
     {
         string authorization = context.Request.Headers.Authorization.ToString();
         if (!authorization.StartsWith("Bearer ", StringComparison.Ordinal) || authorization.Length != 71) return false;
         byte[] candidate = Encoding.ASCII.GetBytes(authorization[7..]);
-        return CryptographicOperations.FixedTimeEquals(candidate, Encoding.ASCII.GetBytes(_access.DockToken)) ||
-            !control && CryptographicOperations.FixedTimeEquals(candidate, Encoding.ASCII.GetBytes(_access.OverlayToken));
+        return CryptographicOperations.FixedTimeEquals(candidate, Encoding.ASCII.GetBytes(_access.DockToken));
     }
     private static byte[] Resource(string name)
     {

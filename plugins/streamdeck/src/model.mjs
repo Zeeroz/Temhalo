@@ -26,20 +26,6 @@ export function integer(value, fallback, min, max) {
   return result;
 }
 
-export function parseDockLink(value) {
-  if (typeof value !== 'string' || value.length > 160) throw new Error('Lien privé du dock invalide.');
-  // Exact loopback address and path: never forward the capability to a remote host.
-  const match = /^http:\/\/127\.0\.0\.1:([1-9][0-9]{3,4})\/dock#([a-fA-F0-9]{64})$/.exec(value.trim());
-  if (!match) throw new Error('Copiez le lien privé du dock depuis Temhalo.');
-  return { port: integer(Number(match[1]), 43120, 1024, 65535), token: match[2] };
-}
-
-export function readConnection(value) {
-  if (!value || typeof value !== 'object' || !Number.isInteger(value.port) || value.port < 1024 || value.port > 65535 ||
-      typeof value.token !== 'string' || !/^[a-fA-F0-9]{64}$/.test(value.token)) return null;
-  return { port: value.port, token: value.token };
-}
-
 export function readState(value) {
   if (!value || typeof value !== 'object' || typeof value.running !== 'boolean' || typeof value.canControl !== 'boolean' ||
       typeof value.ingestConnected !== 'boolean' || typeof value.phase !== 'string' || value.phase.length > 60 ||

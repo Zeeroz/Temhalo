@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { randomBytes } from 'node:crypto';
-import { actionSettings, clock, commandFor, parseDockLink, readState, streamDeckVersion } from '../src/model.mjs';
+import { actionSettings, clock, commandFor, readState, streamDeckVersion } from '../src/model.mjs';
 import { COLORS, keySvg, keyView } from '../src/render.mjs';
 
 export const state = (extra = {}) => ({ running:true,canControl:true,targetSeconds:30,currentDelayMilliseconds:15230,
@@ -12,13 +11,6 @@ test('la version du plugin suit le seul numéro choisi pour Temhalo',()=>{
   for(const value of ['v0.7.0','01.2.3','1.2.3-preview.65535','65536.0.0','1.2.3\n'])assert.throws(()=>streamDeckVersion(value));
 });
 
-test('le lien ne peut envoyer la capacité qu’au dock IPv4 local', () => {
-  const token=randomBytes(32).toString('hex');
-  assert.deepEqual(parseDockLink(`http://127.0.0.1:43120/dock#${token}`),{port:43120,token});
-  for(const url of [`https://127.0.0.1:43120/dock#${token}`,`http://localhost:43120/dock#${token}`,`http://example.com:43120/dock#${token}`,
-    `http://127.0.0.1:43120/overlay#${token}`,`http://user@127.0.0.1:43120/dock#${token}`,`http://127.0.0.1:99999/dock#${token}`,
-    `http://127.0.0.1:43120/dock?key=x#${token}`,`http://127.0.0.1:43120/dock#${token}x`])assert.throws(()=>parseDockLink(url));
-});
 test('commandes distinctes et limites du délai et des pas', () => {
   assert.deepEqual(commandFor('protection',{}),{action:'protect'});
   assert.deepEqual(commandFor('direct',{}),{action:'set',seconds:0});

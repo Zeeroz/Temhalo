@@ -1,55 +1,141 @@
 'use strict';
 (() => {
   const $ = id => document.getElementById(id);
-  let socket, uuid, action, kind, settings = {}, connecting = false;
-  const names = { protection: ['Protection', 'Applique le délai de protection enregistré dans Temhalo.'], direct: ['Direct · 0 s', 'Demande le retour au minimum local sur une image clé.'],
-    preset: ['Appliquer un délai', 'Une touche par délai favori : 15 s, 30 s, 60 s…'], increase: ['Ajouter du délai', 'Ajoute le pas choisi à la cible actuelle.'],
-    decrease: ['Retirer du délai', 'Retire le pas choisi, sans descendre sous 0 s.'], delay: ['Délai actuel', 'Lecture seule : le délai mesuré et la cible restent distincts. Appuyer actualise l’état.'],
-    status: ['État du flux', 'OBS reçu ou absent et nombre de sorties prêtes. Appuyer actualise l’état.'], dial: ['Régler à la molette', 'Tourner : ajuster la cible. Appuyer ou toucher brièvement : appliquer la protection.'] };
+  const names = {
+    protection: ['Protection', 'À l’appui : appliquer la protection réglée dans Temhalo.'],
+    direct: ['Retour au direct · 0 s', 'Aucun réglage. Reprise sur une image clé, au plus près du direct.'],
+    preset: ['Délai prédéfini', 'À l’appui : appliquer ce délai à la cible.'],
+    increase: ['Ajouter du délai', 'À l’appui : ajouter ce pas à la cible.'],
+    decrease: ['Retirer du délai', 'À l’appui : retirer ce pas, jusqu’à 0 s minimum.'],
+    delay: ['Délai actuel', 'Lecture seule : délai mesuré et cible distincts. Appuyer pour actualiser.'],
+    status: ['État du flux', 'Lecture seule : entrée OBS et sorties prêtes. Appuyer pour actualiser.'],
+    dial: ['Régler à la molette', 'Tourner : ajuster la cible. Appuyer : appliquer la protection.'],
+  };
+  let socket, uuid, action, actionContext, kind, settings = {};
+  let lastSaved, requestId = 0, pending = null, editing = false, saveTimer;
+  const session = crypto.randomUUID();
+  const configurable = () => ['preset', 'increase', 'decrease', 'dial'].includes(kind);
+  const key = () => kind === 'preset' ? 'seconds' : 'step';
+  const limits = () => kind === 'preset' ? [0, 300] : [1, 60];
+  const fallback = () => kind === 'preset' ? 30 : kind === 'dial' ? 5 : 10;
+  const ready = () => socket?.readyState === WebSocket.OPEN;
+  const setText = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+  function savedStatus(text, error = false) {
+    setText($('settings-status'), text); $('settings-status').dataset.error = String(error);
+  }
   function send(event, payload) {
-    if (socket?.readyState !== WebSocket.OPEN) return false;
-    socket.send(JSON.stringify({ event, context: uuid, ...(event === 'sendToPlugin' ? { action } : {}), payload })); return true;
+    if (!ready()) return false;
+    socket.send(JSON.stringify({ event, context: uuid, ...(event === 'sendToPlugin' ? { action } : {}), payload }));
+    return true;
+  }
+  function shortcuts() {
+    $('quick-values').replaceChildren(...(kind === 'preset' ? [0, 15, 30, 60] : [5, 10, 15, 30]).map(value => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.textContent = `${value} s`; button.disabled = !ready();
+      button.dataset.value = String(value);
+      button.addEventListener('click', () => commit(value));
+      return button;
+    }));
+  }
+  function highlight(value) {
+    for (const button of $('quick-values').children) button.setAttribute('aria-pressed', String(Number(button.dataset.value) === value));
+  }
+  function displayValue(value) {
+    $('value').value = String(value); $('range').value = String(value); highlight(value);
   }
   function controls() {
-    const options = ['preset','increase','decrease','dial'].includes(kind);
-    $('options').hidden = !options;
-    $('action-name').textContent = names[kind]?.[0] ?? 'Temhalo'; $('description').textContent = names[kind]?.[1] ?? '';
-    $('value-label').textContent = kind === 'preset' ? 'Délai · secondes' : 'Pas · secondes';
-    $('value').min = kind === 'preset' ? '0' : '1'; $('value').max = kind === 'preset' ? '300' : '60';
-    $('value').value = kind === 'preset' ? settings.seconds ?? 30 : settings.step ?? (kind === 'dial' ? 5 : 10);
+    $('options').hidden = !configurable();
+    setText($('action-name'), names[kind]?.[0] ?? 'Temhalo');
+    setText($('description'), names[kind]?.[1] ?? 'Choisissez une action Temhalo.');
+    if (!configurable()) return;
+    const [min, max] = limits();
+    for (const id of ['value', 'range']) { $(id).min = String(min); $(id).max = String(max); $(id).disabled = !ready(); }
+    const label = kind === 'preset' ? 'Délai' : 'Pas';
+    setText($('value-label'), label); $('range').setAttribute('aria-label', `${label} de la touche, en secondes`);
+    const remote = settings[key()] ?? fallback();
+    if (Number.isInteger(remote) && remote >= min && remote <= max) lastSaved = remote;
+    if (pending === null && !editing) {
+      displayValue(lastSaved ?? fallback()); $('value').removeAttribute('aria-invalid'); savedStatus('Enregistré');
+    }
+    shortcuts(); highlight(Number($('value').value));
   }
-  function status(value, state) { $('status').textContent=value; $('status').dataset.state=state; }
+  function commit(raw) {
+    if (!configurable()) return;
+    const [min, max] = limits(), value = Number(raw);
+    if (String(raw).trim() === '' || !Number.isInteger(value) || value < min || value > max) {
+      editing = true; $('value').setAttribute('aria-invalid', 'true'); savedStatus(`${min}–${max} s`, true); return;
+    }
+    editing = false; displayValue(value); $('value').removeAttribute('aria-invalid');
+    if (value === lastSaved && pending === null) { savedStatus('Enregistré'); return; }
+    if (pending?.value === value) return;
+    const id = `${session}:${++requestId}`;
+    pending = { id, value };
+    savedStatus('Enregistrement…');
+    clearTimeout(saveTimer);
+    // Configuration only; never sends /api/delay or a keyDown command.
+    if (!send('sendToPlugin', { type: 'settings', values: { [key()]: value }, requestId: id })) {
+      pending = null; savedStatus('Non enregistré', true);
+    } else {
+      saveTimer = setTimeout(() => {
+        if (pending?.id === id) { pending = null; savedStatus('À vérifier', true); }
+      }, 4000);
+    }
+  }
+  function connectionStatus(message, state, label) {
+    setText($('status'), message); $('status').dataset.state = state;
+    setText($('connection-label'), label); $('connection-state').dataset.state = state;
+  }
+  function unavailable() {
+    connectionStatus('Stream Deck indisponible. Rouvrez les propriétés de cette touche.', 'error', 'Stream Deck indisponible');
+    $('value').disabled = $('range').disabled = $('refresh').disabled = true;
+    $('status').hidden = false;
+    for (const button of $('quick-values').children) button.disabled = true;
+    clearTimeout(saveTimer);
+    if (pending) { pending = null; savedStatus('À vérifier', true); }
+  }
+  function receiveStatus(data) {
+    if (data.type !== 'status') return;
+    const ownReply = !data.settingsContext || data.settingsContext === actionContext;
+    if (ownReply && pending && data.requestId === pending.id && (data.settingsSaved || data.inputError)) {
+      clearTimeout(saveTimer);
+      if (data.settingsSaved) { lastSaved = pending.value; savedStatus('Enregistré'); }
+      else savedStatus('Non enregistré', true);
+      pending = null;
+    }
+    const state = data.status === 'unauthorized' ? 'error' : data.status;
+    const label = state === 'ready' ? 'Temhalo connecté directement' : state === 'offline' ? 'Temhalo fermé ou indisponible' : state === 'error' ? 'Accès Windows à vérifier' : 'Connexion à Temhalo…';
+    connectionStatus(data.message || 'Vérifiez la connexion à Temhalo.', state, label);
+    $('status').hidden = state === 'ready' || state === 'connecting';
+    $('refresh').hidden = state === 'ready' || state === 'connecting';
+  }
   window.connectElgatoStreamDeckSocket = (port, propertyInspectorUUID, registerEvent, _info, actionInfo) => {
-    if (!/^[0-9]+$/.test(port) || Number(port)<1 || Number(port)>65535) return;
-    const details=JSON.parse(actionInfo); uuid=propertyInspectorUUID;action=details.action; kind=action.split('.').pop();settings=details.payload?.settings??{};controls();
-    socket=new WebSocket(`ws://127.0.0.1:${port}`);
-    socket.onopen=()=>{socket.send(JSON.stringify({event:registerEvent,uuid}));send('getSettings',{});send('sendToPlugin',{type:'getStatus'});};
-    socket.onclose=()=>status('Stream Deck indisponible. Rouvrez les propriétés de cette touche.','error');
-    socket.onerror=()=>status('Impossible de joindre Stream Deck.','error');
-    socket.onmessage=event=>{
-      let message;try{message=JSON.parse(event.data);}catch{return;}
-      if(message.event==='didReceiveSettings'){settings=message.payload?.settings??{};controls();}
-      if(message.event==='sendToPropertyInspector'&&message.payload?.type==='status'){
-        const data=message.payload;
-        if(connecting&&!data.connectionSaved&&!data.inputError)return;
-        if(data.connectionSaved){connecting=false;$('dock-link').value='';$('dock-link').placeholder='Connexion enregistrée sur ce PC';}
-        if(data.inputError)connecting=false;
-        $('connect').disabled=false;
-        status(data.message,data.inputError||['offline','unauthorized'].includes(data.status)?'error':data.status);
-        if(data.settingsSaved)$('settings-status').textContent='Commande enregistrée.';
+    if (!/^[0-9]+$/.test(port) || Number(port) < 1 || Number(port) > 65535) return;
+    let details; try { details = JSON.parse(actionInfo); } catch { return; }
+    uuid = propertyInspectorUUID; action = details.action; actionContext = details.context;
+    kind = String(action).split('.').pop(); settings = details.payload?.settings ?? {}; controls();
+    socket = new WebSocket(`ws://127.0.0.1:${port}`);
+    socket.onopen = () => {
+      socket.send(JSON.stringify({ event: registerEvent, uuid })); controls();
+      $('refresh').disabled = false;
+      send('getSettings', {}); send('sendToPlugin', { type: 'getStatus' });
+    };
+    socket.onclose = unavailable; socket.onerror = unavailable;
+    socket.onmessage = event => {
+      let message; try { message = JSON.parse(event.data); } catch { return; }
+      if (message.event === 'didReceiveSettings') {
+        settings = message.payload?.settings ?? {};
+        // Earlier save echoes must not replace a number being typed or a drag.
+        if (pending === null && !editing) controls();
       }
+      if (message.event === 'sendToPropertyInspector') receiveStatus(message.payload ?? {});
     };
   };
-  $('connect').addEventListener('click',()=>{
-    const link=$('dock-link').value.trim();
-    if(!/^http:\/\/127\.0\.0\.1:[1-9][0-9]{3,4}\/dock#[a-fA-F0-9]{64}$/.test(link)){status('Collez le lien privé du dock complet depuis Temhalo.','error');return;}
-    connecting=true;$('connect').disabled=true;
-    if(!send('sendToPlugin',{type:'connect',link})){connecting=false;$('connect').disabled=false;status('Stream Deck indisponible.','error');}
+  $('value').addEventListener('input', () => { editing = true; });
+  $('value').addEventListener('change', () => commit($('value').value));
+  $('value').addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); commit($('value').value); }
   });
-  $('refresh').addEventListener('click',()=>send('sendToPlugin',{type:'refresh'}));
-  $('save').addEventListener('click',()=>{
-    const value=$('value').valueAsNumber;
-    if(!Number.isInteger(value)||value<Number($('value').min)||value>Number($('value').max)){$('settings-status').textContent='Choisissez un entier dans les limites indiquées.';return;}
-    settings=kind==='preset'?{seconds:value}:{step:value};$('settings-status').textContent='Enregistrement…';send('sendToPlugin',{type:'settings',values:settings});
-  });
+  $('range').addEventListener('input', () => { editing = true; $('value').value = $('range').value; highlight(Number($('range').value)); });
+  $('range').addEventListener('change', () => commit($('range').value));
+  $('refresh').addEventListener('click', () => send('sendToPlugin', { type: 'refresh' }));
 })();

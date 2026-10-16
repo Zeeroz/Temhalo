@@ -16,7 +16,7 @@ if (args.Length == 2 && args[1] == "--ui-fixture")
 {
     var store = new DpapiSettingsStore(Path.Combine(Path.GetFullPath(args[0]), "artifacts", "validation", "stage5bis-ui-settings"));
     await store.SaveAsync(new AppSettings { OutputMode = 1, Hotkeys = new() { Enabled = false },
-        LocalAccess = new() { Port = 43121, OverlayToken = new string('A', 64), DockToken = new string('B', 64) },
+        ObsDockEnabled = true, LocalAccess = new() { Port = 43121, DockToken = new string('B', 64) },
         Destinations = [new() { Name = "Aperçu local A", ServerUrl = "rtmp://127.0.0.1:1936/live", StreamKey = "preview-a" },
             new() { Name = "Aperçu local B", ServerUrl = "rtmp://127.0.0.1:1936/live", StreamKey = "preview-b" }] });
     Console.WriteLine("Configuration fictive chiffrée créée dans " + Path.GetDirectoryName(store.FilePath)); return 0;
@@ -37,7 +37,7 @@ if (args.Length == 2 && args[1] == "--conflict-fixtures")
     {
         string directory = Path.Combine(Path.GetFullPath(args[0]), "artifacts", "validation", "stage6", "conflict-" + i);
         await new DpapiSettingsStore(directory).SaveAsync(new AppSettings { Hotkeys = new() { Enabled = true },
-            LocalAccess = new() { Port = 43122 + i, OverlayToken = new string('A', 64), DockToken = new string('B', 64) } });
+            ObsDockEnabled = true, LocalAccess = new() { Port = 43122 + i, DockToken = new string('B', 64) } });
         Console.WriteLine("Configuration fictive de conflit : " + directory);
     }
     return 0;

@@ -1,67 +1,46 @@
 # Temhalo pour Stream Deck
 
-Des commandes de délai et un suivi lisible pendant le live, avec le halo, la menthe et la lavande de Temhalo. Windows 10/11, logiciel Stream Deck **6.6 ou plus récent**, Temhalo **0.7.0-preview.1 ou plus récent**. Le logiciel Stream Deck fournit Node.js 20 ; aucun runtime supplémentaire n'est demandé aux utilisateurs du plugin.
+Contrôlez le délai directement dans Temhalo : aucun dock OBS, lien privé ou port à configurer. Windows 10/11 et Stream Deck 6.6 ou ultérieur sont requis. Le plugin utilise le runtime Node fourni par Stream Deck ; aucun runtime supplémentaire n'est demandé à l'utilisateur.
 
-## Installation et connexion
+**Compatibilité : Temhalo et le plugin doivent être en version `0.7.0-preview.4` ou ultérieure. La version `0.7.0-preview.3` utilise encore la liaison HTTP.** Mettez à jour les deux composants ; les UUID d'actions et les valeurs des touches sont conservés.
 
-1. Installez Temhalo. Double-cliquez sur **Temhalo.streamDeckPlugin**, puis acceptez l'installation dans Stream Deck. Le fichier est livré dans `plugins/streamdeck` du dossier de Temhalo et dans le ZIP portable. Il peut aussi être distribué seul.
-2. Dans Temhalo : **Diffusion → Options : test local, overlay et dock OBS → Piloter depuis OBS → Copier le lien privé du dock**. Le serveur navigateur doit être actif ; son port est réglable dans Réglages → Confidentialité.
-3. Dans Stream Deck, glissez une action du groupe **Temhalo** sur une touche. Collez le lien dans ses propriétés et cliquez sur **Relier**. La connexion est commune à toutes les touches ; le champ est ensuite effacé.
-4. Configurez vos délais et vos pas si nécessaire. Lancez le relais et OBS depuis leurs applications habituelles.
+## Installation
 
-Le numéro du plugin suit automatiquement celui de Temhalo (par exemple `0.7.0-preview.3` devient `0.7.0.3` pour Stream Deck). Lors d'une nouvelle livraison, rouvrez le fichier `.streamDeckPlugin` fourni pour mettre à jour la copie installée dans Stream Deck ; la mise à jour de Temhalo remplace le fichier distribué dans son propre dossier. Il n'y a pas de second numéro à choisir dans le script de publication.
+1. Installez l'application et le fichier `Temhalo.streamDeckPlugin` de la même construction. Le plugin est distribué dans `plugins/streamdeck` de Temhalo et dans le ZIP portable.
+2. Ouvrez Temhalo. Ajoutez une action du groupe **Temhalo** sur votre Stream Deck : la connexion est automatique pour le compte Windows courant, sur ce PC.
+3. Réglez la valeur avec le champ, le curseur ou les choix rapides. Le nombre s'enregistre avec Entrée ou en quittant le champ ; le curseur au relâchement. **Enregistré** confirme la réponse du plugin. Ces réglages n'appliquent aucune commande au live.
+4. Appuyez sur une touche pour appliquer sa commande. Temhalo reste responsable du moteur et du trajet du flux.
 
-Temhalo et Stream Deck doivent fonctionner sur le **même PC**. Le lien de l'overlay permet seulement la lecture et ne convient pas : utilisez bien celui du **dock**. Ne partagez jamais ce lien. Il ne s'agit pas de la clé Twitch/YouTube/Kick.
+Toutes les touches partagent une seule connexion. Les mesures sont envoyées par Temhalo lorsqu'elles changent ; aucun polling HTTP. La fermeture de l'application affiche l'indisponibilité, puis la connexion reprend automatiquement à sa réouverture. Une commande non confirmée n'est jamais rejouée.
 
-## Les actions
+Les touches preset, ajout, retrait et retour à 0 reprennent le dessin validé : horloge, signe +, signe − lavande et retour au direct, avec la valeur et son unité sur une même ligne. Un contour ambre signale une transition ou une indisponibilité du flux ; « HORS LIGNE » ou « OCCUPÉ » remplace la valeur lorsqu'une commande ne peut pas être utilisée.
+
+## Actions
 
 | Action | Effet |
 |---|---|
-| Protection | Applique le délai de protection enregistré dans les raccourcis de Temhalo. La valeur est lue dans Temhalo. |
-| Direct · 0 s | Demande le retour au minimum local sur une image clé. |
-| Appliquer un délai | Preset de 0 à 300 s ; ajoutez plusieurs touches pour 15, 30, 60 s… |
-| Ajouter du délai | +10 s par défaut ; pas personnalisable de 1 à 60 s. |
-| Retirer du délai | −10 s par défaut ; pas personnalisable de 1 à 60 s. |
-| Délai actuel | Lecture seule : mesure réelle et cible distinctes. Une pression actualise l'état. |
-| État du flux | OBS reçu/absent et nombre de sorties prêtes. Une pression actualise l'état. |
-| Régler à la molette | Stream Deck + : tourner ajoute/retire 5 s par cran, pas réglable. Appuyer ou toucher brièvement applique la protection. |
+| Protection | Applique le délai de protection enregistré dans les raccourcis de Temhalo. |
+| Direct · 0 s | Demande le minimum local et la reprise sur une image clé. |
+| Appliquer un délai | Preset de 0 à 300 s ; plusieurs touches peuvent avoir des valeurs différentes. |
+| Ajouter / retirer | ±10 s par défaut ; pas réglable de 1 à 60 s. |
+| Délai actuel | Mesure réelle et cible distinctes, sans commande au live. |
+| État du flux | Entrée OBS et nombre de sorties prêtes, sans commande au live. |
+| Régler à la molette | Stream Deck + : tourner ajoute/retire le pas ; appuyer ou toucher applique la protection. |
 
-Exemple de disposition à huit touches : **Protection · Direct · +10 · −10**, puis **15 s · 30 s · Délai actuel · État du flux**. Les touches lecture seule restent utiles à côté du jeu. La molette évite de multiplier les presets.
+« 0 s » signifie le minimum local : OBS, le réseau, la plateforme et le lecteur ajoutent leur latence. Une mesure absente affiche « — ». Les touches peuvent préparer une cible lorsque le relais est arrêté ; elles ne démarrent ni n'arrêtent le relais ou OBS.
 
-Les touches reflètent aussi les modifications faites dans Temhalo, le dock OBS ou les raccourcis clavier. Une mesure absente apparaît « — », jamais comme un délai nul. La couleur ambre signale une transition, une entrée absente ou une sortie indisponible. Une cible appliquée n'est pas une promesse que la construction du délai est terminée. « Sortie prête » ne certifie pas la lecture chez les viewers.
+## Développement
 
-L'augmentation conserve les paliers du moteur ; elle doit accumuler le média nécessaire. La réduction reprend sur image clé. « 0 s » signifie le minimum local réalisable : OBS, le réseau, la plateforme et le lecteur ajoutent leur latence. Les touches peuvent préparer une cible lorsque le relais est arrêté ; elles ne démarrent ni n'arrêtent le relais ou OBS.
-
-## Fiabilité et accès privé
-
-Un seul poller HTTP est partagé par les touches visibles, toutes les 500 ms. Temhalo publie ses mesures environ une fois par seconde ; l'affichage n'est pas une mesure à la milliseconde. La disparition de toutes les actions arrête l'interrogation.
-
-Les commandes sont sérialisées, bornées et expirent rapidement ; elles sont abandonnées si la connexion tombe. Un POST dont la réponse est perdue peut avoir été appliqué : le plugin ne le répète pas et invite à vérifier la cible. La reprise automatique ne rejoue aucune commande. Les touches lecture seule n'envoient jamais de modification.
-
-Seul `http://127.0.0.1:<port>/dock#<capacité>` est accepté. Aucune redirection HTTP ni serveur distant n'est suivi. Les requêtes ne transportent que la capacité d'accès local, jamais les comptes ou les clés de diffusion. Les valeurs et pas appartiennent aux réglages de chaque touche ; la capacité appartient aux **réglages globaux locaux** Stream Deck, exclus des profils exportés. Cela ne constitue pas une protection contre les autres logiciels exécutés sous le même compte Windows. Les traces de protocole du SDK sont désactivées.
-
-## Développement et tests
-
-Node.js 24 et pnpm 11.25.0 sont nécessaires pour construire, pas pour utiliser le plugin. Versions et empreintes des dépendances sont verrouillées dans `pnpm-lock.yaml`. Le runtime officiel `@elgato/streamdeck` 2.1.2 conserve la compatibilité avec Stream Deck 6.6/6.8 et son Node 20 ; le bundle est ciblé Node 20.
+Node.js 24 et pnpm 11.25.0 sont nécessaires uniquement à la construction. Les dépendances sont verrouillées ; le bundle cible Node 20 pour Stream Deck 6.6/6.8. Depuis la racine du dépôt :
 
 ```powershell
 ./tools/Build-StreamDeck.ps1
 ```
 
-Le script restaure sans scripts d'installation, teste, construit, fait valider le manifeste par l'outil officiel Elgato, puis produit `artifacts/streamdeck/packages/Temhalo.streamDeckPlugin` et son SHA-256. Il n'installe rien dans les profils Stream Deck. Les anciens builds sont conservés sous `artifacts/streamdeck/previous-*`.
+Le script restaure sans scripts d'installation, construit, teste, valide avec l'outil officiel Elgato et produit `artifacts/streamdeck/packages/Temhalo.streamDeckPlugin` avec son SHA-256. Il ne modifie pas les profils installés. La version suit celle de Temhalo.
 
-Les tests contrôlent les liens, commandes, limites, affichages, refus d'accès, redirections, pertes de connexion, concurrence et absence de rejeu. Un hôte Stream Deck simulé vérifie le protocole du bundle officiel avec l'API locale réelle simulée. Une validation matérielle reste nécessaire pour les écrans, molettes, écrans tactiles et profils de chaque modèle.
+Les tests Node utilisent un vrai canal Windows et un hôte Stream Deck simulé. Les tests .NET connectent aussi le vrai client Node au vrai serveur de l'application. Ils vérifient commandes, bornes, expirations, données envoyées, coupures et reprise sans rejeu. Avec Playwright disponible : `node tools/check-inspector.mjs <node_modules-de-playwright>` vérifie les huit panneaux à 320–460 px, l'enregistrement et l'état de connexion. Une validation matérielle reste nécessaire, notamment pour les molettes et écrans tactiles.
 
-### Procédure de validation avec un appareil
+La connexion utilise un canal Windows limité au compte courant. Les clés de diffusion et jetons OAuth ne sont jamais communiqués au plugin. Les anciennes capacités de liaison sont effacées des réglages globaux lors de la migration. Les valeurs de chaque touche restent dans le profil Stream Deck. Ce mécanisme ne protège pas contre un autre programme exécuté sous le même compte Windows.
 
-1. Reliez le plugin au dock, ajoutez les huit actions adaptées à votre appareil et vérifiez la lecture des presets/pas.
-2. Avec un chrono OBS et une sortie locale VLC, appliquez 0 → 15 → 30 → 0 s. Vérifiez cible, transition et délai réel dans Temhalo et sur la touche.
-3. Appuyez rapidement plusieurs fois sur +10/−10 ; la cible doit suivre, bornée à 0–300. Sur Stream Deck +, tournez dans les deux sens et appuyez pour appliquer la protection.
-4. Modifiez le délai depuis Temhalo : les touches doivent suivre sans nouvelle association.
-5. Fermez Temhalo, appuyez sur une touche, puis rouvrez-le. Le plugin doit afficher l'indisponibilité, se reconnecter et ne rejouer aucune commande. Vérifiez la cible avant de reprendre.
-6. Essayez un lien d'overlay ou un accès invalide : aucune commande ne doit être appliquée.
-7. Exportez un profil de test et recherchez la capacité utilisée pour ce test : elle ne doit pas y figurer. La connexion doit être refaite sur un autre PC.
-
-Ce plugin est indépendant d'Elgato. Il n'est pas publié sur Marketplace ; une soumission au catalogue nécessitera sa procédure de validation. Le code Temhalo reste sous MIT ; les notices des dépendances utilisées sont livrées dans le plugin.
-
-Références : [SDK officiel](https://docs.elgato.com/streamdeck/sdk/), [réglages globaux et profils](https://docs.elgato.com/streamdeck/sdk/guides/settings/), [distribution](https://docs.elgato.com/streamdeck/sdk/introduction/distribution/).
+[Procédure de test et transport direct](../../docs/CONTROLES-LOCAUX.md). Plugin indépendant d'Elgato, non publié sur Marketplace. Code MIT et notices de dépendances incluses. [SDK officiel](https://docs.elgato.com/streamdeck/sdk/).

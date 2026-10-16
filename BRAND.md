@@ -1,6 +1,6 @@
 # Temhalo — Mini brand book
 
-Version 1.10 · 16 octobre 2026 · Installeur Windows
+Version 1.11 · 17 octobre 2026 · Stream Deck direct et retrait de l'overlay
 
 **Statut : identité visuelle, étapes 0 à 6 et étape 5 bis (interface et services) validées par l'utilisateur. Installeur Windows 0.6.0-preview.1 autorisé, avec raccourcis Bureau/menu Démarrer et désinstallation conservant les données du profil.**
 
@@ -403,27 +403,32 @@ Le téléchargement des polices se produit uniquement si leurs fichiers sources 
 
 ## 13. Interface native de l'étape 5 bis
 
-Les maquettes R3 sont la référence approuvée pour cette évolution. La navigation **Direct / Diffusion / Overlay / Réglages** reste en haut à toutes les tailles ; le menu de débordement natif prend le relais à très petite largeur. Aucune barre latérale. Le nom et l'icône de l'application figurent seulement dans la barre de titre Windows : aucun bloc logo, nom ou signature supplémentaire dans l'en-tête.
+Les maquettes R3 fondent cette évolution. Depuis la simplification du 17 octobre 2026, la navigation **Direct / Diffusion / Réglages** reste en haut à toutes les tailles ; l'overlay est retiré à la demande de l'utilisateur. Le menu de débordement natif prend le relais à très petite largeur. Aucune barre latérale. Le nom et l'icône de l'application figurent seulement dans la barre de titre Windows : aucun bloc logo, nom ou signature supplémentaire dans l'en-tête.
 
-Le symbole reste autorisé lorsqu'il porte un sens dans le produit : point de temporisation du trajet OBS → sortie, et composition « Signature » de l'overlay. Cet usage fonctionnel ne constitue pas un second en-tête de marque.
+Le symbole reste autorisé lorsqu'il porte un sens dans le produit : point de temporisation du trajet OBS → sortie. Cet usage fonctionnel ne constitue pas un second en-tête de marque.
 
 - **Direct** : le délai réellement observé et la cible appliquée restent distincts du brouillon. La frise représente leur position dans le temps ; le slider prépare une commande. Les courbes de débit utilisent les compteurs réels des 60 dernières secondes. Un flux absent reste explicitement en attente.
 - **Diffusion** : trajet du flux avant les cartes et champs des destinations. Jusqu'à quatre destinations réelles, dont les états proviennent des émetteurs ; aucune sortie ni détection automatique du profil OBS simulée.
-- **Overlay** : compositions Signature, Repère, Fil du temps et Chrono ; simulation En direct / Ajout du délai / Différé, réglages par composition. Le damier représente la transparence. L'accent personnalisé ne recolore jamais le logo. L'aperçu local est distingué d'une source OBS active.
 - **Réglages** : rubriques horizontales ; choix natif compact aux petites tailles. Les libellés et champs partagent une ligne quand l'espace le permet, puis s'empilent. Les données privées restent locales et chiffrées selon les services existants.
 
 La palette, les trois polices et les géométries du symbole restent celles des sections précédentes. Les contrôles natifs gardent leurs états clavier, focus, survol, pression et désactivation. Les ressources sémantiques conservent les substitutions du contraste élevé Windows. Grille sur 4 px, marges de page 28 px ou 20 px en mode compact, espacement de section 24 px, champs et commandes de 44 px minimum sauf petites actions contextuelles.
 
-Sources : `src/Temhalo.App/Views/DashboardPage.xaml`, ses fichiers partiels, `Controls/TelemetryCanvas.cs`, `Controls/OverlayPreview.cs` et `Controls/WrapPanel.cs`. Captures natives initiales : `design/native-etape-5bis/` ; procédure courante : `docs/ETAPE-5BIS-SERVICES.md`.
+Sources : `src/Temhalo.App/Views/DashboardPage.xaml`, ses fichiers partiels, `Controls/TelemetryCanvas.cs` et `Controls/WrapPanel.cs`. Captures natives initiales : `design/native-etape-5bis/` ; procédure courante : `docs/CONTROLES-LOCAUX.md`.
 
 ### Déclinaisons navigateur de l'étape 5 bis
 
 Le dock reprend Nuit, Halo et Écho, avec Space Grotesk pour le titre, Inter pour les commandes et JetBrains Mono pour les temps. Ses commandes restent utilisables à 320 px ; les groupes se replient verticalement. Il ne crée pas un second bloc de marque dans l'application. Les ressources sont intégrées à `Temhalo.Infrastructure.Windows/LocalWeb/Assets` et servies localement.
 
-La source d'overlay conserve les quatre compositions et leurs réglages enregistrés ; le fond de page reste transparent. Une mesure absente affiche « — », un relais arrêté est nommé et une perte du serveur affiche « État indisponible ». Le dock désactive les commandes lorsque le serveur ne répond plus. Les captures navigateur vérifiées sont sous `design/native-etape-5bis-services/`.
+La source d'overlay n'est plus exposée. Le dock navigateur est facultatif, désactivé par défaut et indépendant de Stream Deck. Le plugin se connecte directement à l'application et reçoit ses états. Une mesure absente affiche « — », un relais arrêté est nommé et une perte de connexion reste explicite. Les anciennes captures sous `design/native-etape-5bis-services/` documentent l'interface historique.
 
 ## 14. Déploiement Windows de l'étape 6
 
 La préversion portable conserve la DA et les vues approuvées. Le symbole de l'EXE et de la barre de titre reprend l'ICO multitailles original ; aucun bloc de marque supplémentaire n'est introduit. Les SVG, fontes et notices, PNG d'icônes et ressource de splash sont fournis dans le dossier de l'application. Le PRI et les XBF de Temhalo font partie de la publication, pour conserver les styles et vues sur une installation déplacée.
 
 Le nom de livraison est `Temhalo-0.6.0-preview.1-win-x64.zip`. Les textes de préparation distinguent téléchargement, vérification, attente OBS, état arrêté et erreur. Les chemins privés et liens de commande ne figurent pas dans le nom de l'archive ni dans son manifeste. Guide courant : `docs/ETAPE-6.md` ; capture réelle du package : `design/native-etape-6/Temhalo-portable-direct.jpg`.
+
+## 15. Touches Stream Deck
+
+Le dessin `design/streamdeck-v3/` est validé et intégré. Pour les commandes preset, ajout, retrait et retour à 0 : fond Ardoise, angle de 8 unités sur une grille 144 × 144, trait de pictogramme de 5 unités. L'horloge, le signe + et le retour au direct utilisent Halo ; le signe − utilise Écho. La valeur blanche et son unité grise partagent la ligne inférieure. Aucun logo ni petit libellé d'action n'est ajouté à la touche.
+
+La variante normale correspond à la maquette à 72 et 144 px. Un contour Vigilance signale les transitions et problèmes de flux. Les états hors ligne et occupé remplacent la valeur par un libellé explicite ; ils ne présentent pas une cible comme une mesure confirmée. Les touches de suivi conservent leur distinction entre mesure et cible. Le panneau de réglages reprend les contrôles compacts de Stream Deck et indique la connexion directe à Temhalo.

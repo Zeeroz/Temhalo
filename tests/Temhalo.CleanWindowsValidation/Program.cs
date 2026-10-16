@@ -185,7 +185,7 @@ internal static class Program
         Check(settingsBefore == Snapshot(await store.LoadAsync(token)), "Réglages et clé témoin déchiffrables après mise à jour");
         using var updatedApp = StartApp(install);
         State("verify-updated-ui", "waiting-for-action",
-            "Vérifier l'interface mise à jour : mémoire 384 MiB, presets 0/12/24/48 s, overlay Fil, raccourcis désactivés. Fermer normalement Temhalo pour poursuivre la désinstallation.");
+            "Vérifier l'interface mise à jour : mémoire 384 MiB, presets 0/12/24/48 s, raccourcis désactivés. Fermer normalement Temhalo pour poursuivre la désinstallation.");
         await WaitFor(() => !updatedApp.HasExited && updatedApp.MainWindowHandle != IntPtr.Zero, TimeSpan.FromMinutes(2), token);
         await updatedApp.WaitForExitAsync(token).WaitAsync(ManualTimeout, token);
         Check(updatedApp.ExitCode == 0, "Relancement et arrêt normal après mise à jour");
@@ -221,8 +221,8 @@ internal static class Program
         OutputMode = 0, Provider = 3, ServerUrl = "rtmp://127.0.0.1:1936/local",
         StreamKey = "TEMHALO-TEST-" + Guid.NewGuid().ToString("N"), MemoryLimitMiB = 384,
         Hotkeys = new() { Enabled = false, ProtectionSeconds = 48 },
-        Interface = new() { Presets = [0, 12, 24, 48], OverlayStyle = 2 },
-        Destinations = [], LocalAccess = new()
+        Interface = new() { Presets = [0, 12, 24, 48] },
+        Destinations = [], ObsDockEnabled = true, LocalAccess = new()
     };
     private static string Snapshot(AppSettings settings) => Hash(JsonSerializer.SerializeToUtf8Bytes(settings));
     private static string Hash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes));

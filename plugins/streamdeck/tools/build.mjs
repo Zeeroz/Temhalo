@@ -34,7 +34,7 @@ for (const [name,size] of [['category',28],['category@2x',56],['action',20],['ac
   await writeFile(path.join(output, `imgs/${name}.svg`), symbol.replace(/width="128" height="128"/,`width="${size}" height="${size}"`).replaceAll('#7CE8CD','#FFFFFF').replaceAll('#B9B2FF','#FFFFFF'));
 }
 for (const [kind,name] of ACTIONS) {
-  for (const size of [72,144]) await writeFile(path.join(output,`imgs/${kind}${size===144?'@2x':''}.svg`),keySvg({top:'TEMHALO',value:kind==='direct'?'0s':kind==='increase'?'+10s':kind==='decrease'?'−10s':kind==='preset'?'30s':'—',bottom:name.toUpperCase(),color:COLORS.mint},size));
+  for (const size of [72,144]) await writeFile(path.join(output,`imgs/${kind}${size===144?'@2x':''}.svg`),keySvg({kind,top:'TEMHALO',value:kind==='direct'?'0s':kind==='increase'?'+10s':kind==='decrease'?'−10s':kind==='preset'?'30s':'—',bottom:name.toUpperCase(),color:COLORS.mint},size));
 }
 const versions = [...(await readFile(path.join(root,'Directory.Build.props'),'utf8')).matchAll(/<Version>([^<]+)<\/Version>/g)];
 if (versions.length !== 1) throw new Error('Version Temhalo absente ou ambiguë.');

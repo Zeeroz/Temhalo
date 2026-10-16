@@ -40,12 +40,10 @@ public sealed partial class DashboardPage : Page
     {
         Vm = new DashboardViewModel(seconds => _session.RequestDelay(seconds));
         InitializeComponent();
-        _uiReady = true;
         Navigation.SelectedItem = Navigation.MenuItems[0];
         SettingsNavigation.SelectedItem = SettingsNavigation.Items[1];
         Vm.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(Vm.TargetSeconds)) UpdatePresetSelection(); };
         RenderPresets();
-        LoadOverlayAppearance();
         JournalList.ItemsSource = _journal;
         _refresh.Tick += (_, _) => Refresh();
         Loaded += async (_, _) =>
@@ -77,9 +75,7 @@ public sealed partial class DashboardPage : Page
             MemoryLimit.Value = _settings.MemoryLimitMiB;
             InitializeDestinations();
             _preferences = _settings.Interface ?? new();
-            _overlayStyle = _preferences.OverlayStyle;
-            OverlayStyle.SelectedIndex = _overlayStyle;
-            RenderPresets(); LoadOverlayAppearance(); UpdateDestinationLabels();
+            RenderPresets(); UpdateDestinationLabels();
             var keys = _settings.Hotkeys;
             HotkeysEnabled.IsOn = keys.Enabled; ProtectionSeconds.Value = keys.ProtectionSeconds;
             ProtectionHotkey.Text = keys.Protection; ZeroHotkey.Text = keys.Zero;
@@ -100,7 +96,7 @@ public sealed partial class DashboardPage : Page
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
         { HotkeyStatus.Text = "Raccourcis inactifs. Vérifiez puis appliquez les réglages."; ShowError(SecretRedactor.Shared.Redact(ex.Message)); }
-        finally { _settingsBusy = false; Refresh(); }
+        finally { _settingsBusy = false; await InitializeStreamDeckAsync(); Refresh(); }
     }
 
     private void HotkeyInvoked(HotkeyAction action)
@@ -172,8 +168,6 @@ public sealed partial class DashboardPage : Page
         DelayValues.RowSpacing = tiny ? 12 : 0;
         SettingsNavigation.Visibility = ActualWidth < 700 ? Visibility.Collapsed : Visibility.Visible;
         CompactSettingsNavigation.Visibility = ActualWidth < 700 ? Visibility.Visible : Visibility.Collapsed;
-        OverlayGallery.Visibility = ActualWidth < 700 ? Visibility.Collapsed : Visibility.Visible;
-        OverlayStyle.Visibility = ActualWidth < 700 ? Visibility.Visible : Visibility.Collapsed;
         string state = ActualWidth - 56 >= 920 ? "WideLayout" : "CompactLayout";
         if (_layout == state) return;
         _layout = state;
@@ -186,7 +180,6 @@ public sealed partial class DashboardPage : Page
         string tag = (args.SelectedItem as NavigationViewItem)?.Tag as string ?? "direct";
         DashboardView.Visibility = tag == "direct" ? Visibility.Visible : Visibility.Collapsed;
         DestinationView.Visibility = tag == "diffusion" ? Visibility.Visible : Visibility.Collapsed;
-        OverlayView.Visibility = tag == "overlay" ? Visibility.Visible : Visibility.Collapsed;
         SettingsView.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
         RefreshSetup();
         MainScroll.ChangeView(null, 0, null, disableAnimation: true);
@@ -266,11 +259,9 @@ public sealed partial class DashboardPage : Page
         ReserveValue.Text = $"{snapshot?.Delay?.BufferedTags ?? 0:N0} tags FLV";
         ReconnectValue.Text = (snapshot?.Outputs is { Count: > 1 } outputs ? outputs.Sum(output => Math.Max(0, output.Attempt - 1)) : snapshot?.Delay?.OutputReconnections ?? 0).ToString();
         SkippedValue.Text = $"{(snapshot?.Delay?.SkippedMediaTags ?? 0) + (snapshot?.Outputs?.Sum(output => output.SkippedTags) ?? 0):N0} tags FLV";
-        foreach (var control in new Control[] { OverlayStyle, SignatureChoice, RepereChoice, FilChoice, ChronoChoice,
-            OverlayPosition, OverlayScale, OverlayAccent, OverlayLabel, OverlayVisibleLive }) control.IsEnabled = !_settingsBusy;
         NewPreset.IsEnabled = !_settingsBusy;
-        CopyOverlayButton.IsEnabled = CopyDockButton.IsEnabled = _localServer?.Address is not null;
-        PublishLocalState();
+        CopyDockButton.IsEnabled = _localServer?.Address is not null;
+        PublishLocalState(); RefreshStreamDeckStatus();
         while (_session.TryReadEvent(out string? value))
         {
             _journal.Add(value!);

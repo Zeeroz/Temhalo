@@ -38,7 +38,6 @@
         <NavigationView.MenuItems>
           <NavigationViewItem Content="Direct" Tag="direct" AutomationProperties.AutomationId="DirectTab"/>
           <NavigationViewItem Content="Diffusion" Tag="diffusion" AutomationProperties.AutomationId="DiffusionTab"/>
-          <NavigationViewItem Content="Overlay" Tag="overlay" AutomationProperties.AutomationId="OverlayTab"/>
           <NavigationViewItem Content="Réglages" Tag="settings" AutomationProperties.AutomationId="SettingsTab"/>
         </NavigationView.MenuItems>
       </NavigationView>
@@ -284,7 +283,7 @@
               </StackPanel>
             </StackPanel>
           </Border>
-          <Expander Header="Options : test local, overlay et dock OBS" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+          <Expander Header="Options : test local et dock OBS" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <StackPanel Spacing="20">
               <ComboBox x:Name="OutputMode" Header="Destination du relais" SelectedIndex="0" SelectionChanged="OutputModeChanged" HorizontalAlignment="Stretch">
                 <ComboBoxItem Content="Fichier FLV local · test sans plateforme"/><ComboBoxItem Content="Mes plateformes · RTMP / RTMPS"/>
@@ -300,7 +299,6 @@
                 </StackPanel>
                 <StackPanel Spacing="12">
                   <TextBlock Text="Piloter depuis OBS" Style="{StaticResource TemhaloSectionTitle}"/>
-                  <Button Content="Personnaliser l’overlay →" Click="ShowOverlayClicked" HorizontalAlignment="Left"/>
                   <TextBlock x:Name="DockAddress" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}"/>
                   <Button x:Name="CopyDockButton" Content="Copier le lien privé du dock" Click="CopyDockClicked" HorizontalAlignment="Left"/>
                   <TextBlock Text="OBS → Docks → Docks de navigateur personnalisés. Le lien reste privé sur cet ordinateur." Style="{StaticResource TemhaloCaption}"/>
@@ -308,103 +306,6 @@
               </local:AdaptiveColumns>
             </StackPanel>
           </Expander>
-        </StackPanel>
-        <StackPanel x:Name="OverlayView" Visibility="Collapsed" Spacing="24">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Overlay" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
-            <TextBlock Text="Le temps porte votre signature." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
-          </StackPanel>
-          <local:WrapPanel Spacing="8">
-            <ToggleButton Content="En direct" Tag="0" Click="PreviewStateClicked" x:Name="PreviewLive" IsChecked="False"/>
-            <ToggleButton Content="Ajout du délai" Tag="1" Click="PreviewStateClicked" x:Name="PreviewAdding" IsChecked="False"/>
-            <ToggleButton Content="Différé" Tag="2" Click="PreviewStateClicked" x:Name="PreviewDelayed" IsChecked="True"/>
-            <TextBlock Text="Simulation d’affichage · 1920 × 1080" Style="{StaticResource TemhaloCaption}" VerticalAlignment="Center"/>
-          </local:WrapPanel>
-          <Border Style="{StaticResource TemhaloPanel}">
-            <local:OverlayPreview x:Name="OverlayStage"/>
-          </Border>
-          <StackPanel x:Name="OverlayGallery" Spacing="12">
-            <StackPanel.Resources>
-              <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="TemhaloRaisedBrush"/>
-              <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="TemhaloRaisedBrush"/>
-              <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="TemhaloSurfaceBrush"/>
-              <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="TemhaloHaloBrush"/>
-              <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="TemhaloHaloBrush"/>
-              <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="TemhaloHaloBrush"/>
-            </StackPanel.Resources>
-            <TextBlock Text="Composition" Style="{StaticResource TemhaloSectionTitle}"/>
-            <local:WrapPanel Spacing="12">
-              <ToggleButton x:Name="SignatureChoice" AutomationProperties.Name="Composition Signature" Tag="0" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
-                <StackPanel Spacing="8">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Image Source="ms-appx:///Assets/Brand/temhalo-symbol-color.svg" Width="24" Height="24"/>
-                    <TextBlock Text="00:30" Style="{StaticResource TemhaloMono}"/>
-                  </StackPanel>
-                  <TextBlock Text="Signature"/>
-                </StackPanel>
-              </ToggleButton>
-              <ToggleButton x:Name="RepereChoice" AutomationProperties.Name="Composition Repère" Tag="1" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="┃╎  00:30" Style="{StaticResource TemhaloMono}"/>
-                  <TextBlock Text="Repère"/>
-                </StackPanel>
-              </ToggleButton>
-              <ToggleButton x:Name="FilChoice" AutomationProperties.Name="Composition Fil du temps" Tag="2" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="───  00:30" Style="{StaticResource TemhaloMono}"/>
-                  <TextBlock Text="Fil du temps"/>
-                </StackPanel>
-              </ToggleButton>
-              <ToggleButton x:Name="ChronoChoice" AutomationProperties.Name="Composition Chrono" Tag="3" Click="OverlayChoiceClicked" MinWidth="160" HorizontalContentAlignment="Left">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="00:30" Style="{StaticResource TemhaloMono}"/>
-                  <TextBlock Text="Chrono"/>
-                </StackPanel>
-              </ToggleButton>
-            </local:WrapPanel>
-          </StackPanel>
-          <ComboBox x:Name="OverlayStyle" Header="Composition" Visibility="Collapsed" SelectedIndex="0" SelectionChanged="OverlayStyleChanged" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="OverlayStyle">
-            <ComboBoxItem Content="Signature · Halo et valeur"/>
-            <ComboBoxItem Content="Repère · Traits décalés"/>
-            <ComboBoxItem Content="Fil du temps · Ligne et valeur"/>
-            <ComboBoxItem Content="Chrono · Valeur seule"/>
-          </ComboBox>
-          <local:AdaptiveColumns Columns="3" Threshold="920">
-            <StackPanel Spacing="12">
-              <TextBlock Text="Dans votre scène" Style="{StaticResource TemhaloSectionTitle}"/>
-              <ComboBox x:Name="OverlayPosition" Header="Position" SelectedIndex="1" HorizontalAlignment="Stretch" SelectionChanged="OverlaySelectionChanged">
-                <ComboBoxItem Content="Haut gauche"/>
-                <ComboBoxItem Content="Haut droite"/>
-                <ComboBoxItem Content="Bas gauche"/>
-                <ComboBoxItem Content="Bas droite"/>
-              </ComboBox>
-              <TextBlock Text="Chaque composition conserve ses réglages." Style="{StaticResource TemhaloCaption}"/>
-            </StackPanel>
-            <StackPanel Spacing="12">
-              <TextBlock Text="Au bon format" Style="{StaticResource TemhaloSectionTitle}"/>
-              <Slider x:Name="OverlayScale" Header="Taille · 75 à 150 %" Minimum="75" Maximum="150" Value="100" StepFrequency="5" ValueChanged="OverlayScaleChanged"/>
-              <TextBox x:Name="OverlayAccent" Header="Accent #RRGGBB" Text="#7CE8CD" MaxLength="7" TextChanged="OverlayTextChanged"/>
-              <TextBlock Text="L’accent ne recolore pas le logo." Style="{StaticResource TemhaloCaption}"/>
-            </StackPanel>
-            <StackPanel Spacing="12">
-              <TextBlock Text="À votre façon" Style="{StaticResource TemhaloSectionTitle}"/>
-              <TextBox x:Name="OverlayLabel" Header="Libellé du différé" Text="Différé" MaxLength="24" TextChanged="OverlayTextChanged"/>
-              <ToggleSwitch x:Name="OverlayVisibleLive" Header="Afficher aussi à 0 s" IsOn="True" Toggled="OverlayVisibilityChanged" OnContent="Oui" OffContent="Non"/>
-            </StackPanel>
-          </local:AdaptiveColumns>
-          <TextBlock x:Name="OverlayError" Foreground="{ThemeResource TemhaloErrorBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
-          <local:WrapPanel Spacing="8">
-            <Button Content="Enregistrer l’overlay" Click="SaveOverlayClicked" Style="{StaticResource TemhaloPrimaryButton}"/>
-            <Button Content="Rétablir les compositions" Click="ResetOverlayClicked"/>
-          </local:WrapPanel>
-          <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="Source navigateur OBS" Message="L’aperçu reste une simulation. Enregistrez pour appliquer l’habillage à la source navigateur en direct ; celle-ci traversera le délai avec votre image OBS."/>
-          <TextBlock Text="Un habillage capturé dans OBS traversera le même délai que votre image." Style="{StaticResource TemhaloCaption}"/>
-          <StackPanel Spacing="12">
-            <TextBlock Text="Votre source navigateur" Style="{StaticResource TemhaloSectionTitle}"/>
-            <TextBlock x:Name="OverlayAddress" Text="Serveur en préparation" Style="{StaticResource TemhaloMono}" FontSize="12"/>
-            <Button x:Name="CopyOverlayButton" Content="Copier le lien privé de l’overlay" Click="CopyOverlayClicked" HorizontalAlignment="Left"/>
-            <TextBlock Text="OBS · Source navigateur · 1920 × 1080. Le lien de lecture ne peut pas changer votre délai." Style="{StaticResource TemhaloCaption}"/>
-          </StackPanel>
         </StackPanel>
         <StackPanel x:Name="SettingsView" Visibility="Collapsed" Spacing="24">
           <StackPanel Spacing="4">
@@ -516,17 +417,23 @@
             <TextBlock Text="Historique avec relecture : à étudier. Aucun mode de reprise immédiate n’est activé." Style="{StaticResource TemhaloCaption}"/>
           </StackPanel>
           <StackPanel x:Name="PrivacyView" Visibility="Collapsed" Spacing="20">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Stream Deck" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBlock x:Name="StreamDeckStatus" Text="Connexion automatique en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+              <TextBlock Text="Ouvrez Temhalo pour utiliser vos touches. La connexion est automatique sur cet ordinateur." Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
             <StackPanel Spacing="12">
-              <TextBlock Text="Accès OBS sur cet ordinateur" Style="{StaticResource TemhaloSectionTitle}"/>
+              <TextBlock Text="Dock OBS · facultatif" Style="{StaticResource TemhaloSectionTitle}"/>
               <TextBlock x:Name="LocalServerStatus" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+              <ToggleSwitch x:Name="ObsDockEnabled" Header="Activer le dock OBS" OnContent="Actif" OffContent="Désactivé"/>
               <NumberBox x:Name="LocalServerPort" Header="Port du serveur navigateur" Minimum="1024" Maximum="65535" Value="43120" Width="220" HorizontalAlignment="Left" SpinButtonPlacementMode="Inline"/>
-              <Button Content="Appliquer le port / relancer l’accès OBS" Click="SaveLocalServerClicked" HorizontalAlignment="Left"/>
+              <Button Content="Enregistrer le dock OBS" Click="SaveLocalServerClicked" HorizontalAlignment="Left"/>
               <TextBlock Text="Un changement de port demande de recopier les liens dans OBS. Il ne redémarre pas le relais média." Style="{StaticResource TemhaloCaption}"/>
             </StackPanel>
             <TextBlock Text="Confidentialité" Style="{StaticResource TemhaloSectionTitle}"/>
             <TextBlock Text="Clés chiffrées avec DPAPI · Liées à votre compte Windows."/>
             <TextBlock Text="Aucun envoi automatique. Les clés et URL de publication sont masquées dans les journaux." Style="{StaticResource TemhaloCaption}"/>
-            <TextBlock Text="L’accès OBS reste sur cet ordinateur. Les liens privés de lecture et de commande sont conservés dans le document DPAPI." Style="{StaticResource TemhaloCaption}"/>
+            <TextBlock Text="Le dock OBS facultatif reste sur cet ordinateur. Son lien privé est conservé avec vos réglages chiffrés." Style="{StaticResource TemhaloCaption}"/>
             <local:WrapPanel Spacing="8">
               <Button Content="Exporter les événements affichés" Click="ExportLogsClicked"/>
               <Button Content="Ouvrir les journaux" Click="OpenLogsClicked"/>

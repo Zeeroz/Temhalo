@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Temhalo · Touches Stream Deck</title>
+  <style>
+    :root { color-scheme:dark; font:14px/1.5 "Segoe UI",Arial,sans-serif; color:#F1F5F9; background:#0D1218; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:36px 28px; }
+    main { max-width:810px; margin:auto; }
+    h1 { font-size:26px; font-weight:600; margin:0 0 6px; }
+    p { color:#B4C1CF; margin:0; }
+    h2 { font-size:15px; font-weight:600; margin:30px 0 18px; }
+    .keys { display:grid; grid-template-columns:repeat(4,144px); gap:24px; }
+    figure { margin:0; }
+    figure svg { display:block; width:144px; height:144px; }
+    figcaption { color:#B4C1CF; font-size:12px; text-align:center; margin-top:10px; }
+    .device { width:fit-content; border:1px solid #404040; border-radius:12px; padding:18px; background:#1d1d1d; }
+    .device .keys { grid-template-columns:repeat(4,72px); gap:12px; }
+    .device svg { width:72px; height:72px; }
+    .settings { width:378px; max-width:100%; padding:13px 16px; margin-top:28px; background:#2d2d2d; color:#dedede; font-size:12px; }
+    .settings h2 { margin:0 0 12px; font-size:13px; }
+    .field { display:flex; align-items:center; gap:10px; }
+    .field label { width:50px; text-align:right; }
+    input { color:#fff; background:#414141; border:1px solid #686868; border-radius:3px; height:25px; width:62px; padding:3px 6px; }
+    input[type=range] { margin:8px 0 5px 60px; width:calc(100% - 60px); accent-color:#7CE8CD; padding:0; height:16px; }
+    .saved { margin-left:auto; color:#bfbfbf; font-size:10px; }
+    .quick { display:flex; gap:6px; margin-left:60px; }
+    button { font:11px "Segoe UI",Arial,sans-serif; color:#dedede; border:1px solid #626262; background:#393939; border-radius:3px; min-width:44px; height:23px; cursor:pointer; }
+    button[aria-pressed=true] { color:#7CE8CD; border-color:#7CE8CD; }
+    .hint { font-size:11px; margin:8px 0; color:#c0c0c0; }
+    .connection { padding-top:8px; border-top:1px solid #484848; font-size:11px; }
+    .connection::before { content:""; display:inline-block; width:6px; height:6px; margin-right:7px; border-radius:50%; background:#7CE8CD; }
+    .note { margin-top:24px; max-width:650px; font-size:12px; }
+    :focus-visible { outline:2px solid #7CE8CD; outline-offset:3px; }
+    @media(max-width:720px) { .keys { grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; } figure svg { width:100%; height:auto; } body { padding:24px 16px; } }
+    @media(max-width:390px) { .device { padding:12px; } .device .keys { gap:8px; grid-template-columns:repeat(4,62px); } .device svg { width:62px; height:62px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Touches Stream Deck</h1>
+  <p>Une icône pour l’action, une valeur lisible. Pas de texte minuscule sur les touches.</p>
+  <h2>Dessin validé</h2>
+  <section class="keys" id="large" aria-label="Proposition de quatre touches"></section>
+  <h2>À 72 × 72 px</h2>
+  <div class="device"><section class="keys" id="small" aria-label="Les mêmes touches à la taille réelle"></section></div>
+  <section class="settings" aria-label="Panneau de réglages simplifié">
+    <h2>Appliquer un délai</h2>
+    <div class="field"><label for="delay">Délai</label><input id="delay" type="number" min="0" max="300" step="1" value="15"><span>s</span><span class="saved" role="status">Enregistré</span></div>
+    <input id="range" aria-label="Délai de la touche" type="range" min="0" max="300" value="15">
+    <div class="quick"><button data-value="0">0 s</button><button data-value="15" aria-pressed="true">15 s</button><button data-value="30">30 s</button><button data-value="60">60 s</button></div>
+    <p class="hint">À l’appui : appliquer ce délai à la cible.</p>
+    <div class="connection">Temhalo connecté directement</div>
+  </section>
+  <p class="note">Dessin validé et intégré au plugin Stream Deck. Cette page reste une maquette : l’état de connexion et les réglages affichés ici sont simulés. Le plugin installé utilise la connexion directe à Temhalo.</p>
+</main>
+<script>
+const glyphs = {
+  preset:'<circle cx="72" cy="46" r="22"/><path d="M72 32v15l10 6"/>',
+  increase:'<path d="M72 24v44M50 46h44"/>',
+  decrease:'<path d="M50 46h44"/>',
+  direct:'<path d="m50 27 24 19-24 19z"/><path d="M92 25v42"/>'
+};
+const actions = [
+  {id:'preset',value:'15',label:'Appliquer 15 s',accent:'#7CE8CD'},
+  {id:'increase',value:'10',label:'Ajouter 10 s',accent:'#7CE8CD'},
+  {id:'decrease',value:'10',label:'Retirer 10 s',accent:'#B9B2FF'},
+  {id:'direct',value:'0',label:'Retour à 0 s',accent:'#7CE8CD'}
+];
+function key(action) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" role="img" aria-label="${action.label}"><title>${action.label}</title><rect x="1" y="1" width="142" height="142" rx="8" fill="#151D26" stroke="#526272" stroke-width="2"/><g fill="none" stroke="${action.accent}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${glyphs[action.id]}</g><text x="72" y="122" text-anchor="middle" fill="#F1F5F9" font-family="Segoe UI,Arial,sans-serif" font-size="49" font-weight="600"><tspan>${action.value}</tspan><tspan font-size="27" fill="#B4C1CF" dx="3">s</tspan></text></svg>`;
+}
+document.querySelector('#large').innerHTML = actions.map(action=>`<figure>${key(action)}<figcaption>${action.label}</figcaption></figure>`).join('');
+document.querySelector('#small').innerHTML = actions.map(action=>key(action)).join('');
+const delay=document.querySelector('#delay'),range=document.querySelector('#range');
+function update(value) {
+  if (!Number.isInteger(Number(value)) || Number(value)<0 || Number(value)>300 || value==='') return;
+  delay.value=range.value=value;
+  document.querySelectorAll('[data-value]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.value===String(value)));
+}
+delay.addEventListener('change',()=>update(delay.value));
+range.addEventListener('input',()=>update(range.value));
+document.querySelectorAll('[data-value]').forEach(button=>button.addEventListener('click',()=>update(button.dataset.value)));
+</script>
+</body>
+</html>
