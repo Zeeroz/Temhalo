@@ -46,7 +46,9 @@ Prérequis : droits d’écriture sur `Zeeroz/Temhalo`, GitHub Actions activé, 
 
 Les rapports `.build.json`, journaux, captures de validation et profils privés ne sont pas téléversés. Les sources et les ressources de marque sont dans Git ; les binaires vont dans les releases. Les actions tierces du workflow sont fixées à des commits précis.
 
-En cas d’échec de publication, consultez le job GitHub Actions. Une release déjà existante n’est jamais remplacée automatiquement. Si un brouillon incomplet existe, inspectez-le et corrigez-le manuellement ou publiez une nouvelle version. Ne republiez pas un binaire différent sous un tag déjà distribué.
+En cas d’échec de publication, consultez le job GitHub Actions. Une release déjà existante n’est jamais remplacée automatiquement. Si le job **build** du tag a réussi et que les quatre fichiers du brouillon sont présents, ouvrez **Actions → Windows → Run workflow** sur `main`, puis renseignez `recovery_run_id` (identifiant numérique du run du tag) et `recovery_tag` (par exemple `v0.7.0-preview.1`). Le workflow vérifie le commit du tag, le résultat du build et la provenance de l’archive, télécharge exactement ses fichiers et compare leurs tailles/SHA-256 au brouillon avant publication par identifiant numérique. Aucun fichier n’est remplacé ou reconstruit. Une release déjà publiée avec ces mêmes fichiers est seulement vérifiée.
+
+Si le brouillon est incomplet ou les fichiers diffèrent, la reprise est refusée : inspectez-le manuellement ou publiez une nouvelle version. Ne republiez pas un binaire différent sous un tag déjà distribué. Les archives temporaires GitHub Actions sont conservées sept jours ; les actifs publiés dans Releases restent disponibles indépendamment.
 
 ## Procédure de test
 
