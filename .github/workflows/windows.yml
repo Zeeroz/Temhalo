@@ -40,6 +40,9 @@ jobs:
       - name: Audit des fichiers publics
         shell: pwsh
         run: ./tools/Test-PublicSource.ps1
+      - name: Tester le script de publication sans publier
+        shell: pwsh
+        run: ./tools/Test-Publication.ps1
       - name: Vérifier la version du tag
         if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh

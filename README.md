@@ -32,6 +32,8 @@ Dans **Réglages → Au quotidien → Mises à jour**, recherchez, téléchargez
 
 L’installation conserve les comptes, clés et réglages. Une copie portable ou de développement ne remplace jamais automatiquement son dossier. Voir [la procédure utilisateur, les tests et la publication d’une version](docs/MISES-A-JOUR.md).
 
+Pour publier vos changements depuis les sources, lancez `./Publier-Temhalo.ps1` dans PowerShell 7 et choisissez le numéro de version. Le script prend en charge les tests, les livrables, le commit, le tag et le suivi de la publication GitHub. `./Publier-Temhalo.ps1 -Version 0.7.0-preview.2 -WhatIf` permet de voir le parcours sans publier.
+
 ## Fonctionnement et limites
 
 ```text
