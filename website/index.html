@@ -117,7 +117,7 @@
       <div class="guide-layout">
         <ol class="guide-steps">
           <li><span class="step-number">1</span><div><h3>Installez Temhalo</h3><p>Lancez l’installeur Windows. Gardez l’option Stream Deck cochée si vous l’utilisez.</p></div></li>
-          <li><span class="step-number">2</span><div><h3>Ajoutez vos plateformes</h3><p>Ouvrez <strong>Diffusion</strong>, puis renseignez votre clé de stream. La connexion de compte est aussi disponible si OAuth est configuré.</p></div></li>
+          <li><span class="step-number">2</span><div><h3>Ajoutez vos plateformes</h3><p>Ouvrez <strong>Diffusion</strong>, puis connectez votre compte Twitch ou renseignez une clé de stream. Pour YouTube et Kick, la connexion de compte nécessite encore une configuration OAuth.</p></div></li>
           <li><span class="step-number">3</span><div><h3>Reliez OBS à Temhalo</h3><p>Dans <strong>Paramètres → Stream</strong>, choisissez <strong>Personnalisé</strong> et utilisez les valeurs ci-contre.</p></div></li>
           <li><span class="step-number">4</span><div><h3>Lancez et choisissez votre tempo</h3><p>Démarrez le relais dans Temhalo, puis le streaming dans OBS. Appliquez ensuite un délai dans <strong>Direct</strong>.</p></div></li>
         </ol>
@@ -138,7 +138,7 @@
       <div class="faq-items">
         <details><summary>Est-ce que 0 s signifie aucune latence ? <span aria-hidden="true">+</span></summary><p>0 s demande le minimum de délai ajouté par Temhalo. OBS, le réseau, la plateforme et le lecteur conservent leur propre latence. Le délai affiché dans Temhalo mesure le moteur local.</p></details>
         <details><summary>Que voit le public quand j’ajoute du délai ? <span aria-hidden="true">+</span></summary><p>Avec assez d’historique, le flux revient sur un passage déjà reçu et le rejoue, audio compris. Si la réserve est trop courte, Temhalo complète avec des pauses par paliers. Le comportement du lecteur varie selon la plateforme : l’absence de coupure ne peut pas être garantie.</p></details>
-        <details><summary>Faut-il configurer une application développeur ? <span aria-hidden="true">+</span></summary><p>La clé manuelle est utilisable directement. Pour « Connecter mon compte », les identifiants OAuth doivent être configurés chez Twitch, Google/YouTube ou Kick. Le dépôt fournit le guide ; Kick demande aussi un service serveur pour son secret.</p></details>
+        <details><summary>Faut-il configurer une application développeur ? <span aria-hidden="true">+</span></summary><p>La connexion Twitch est prête dans Temhalo, sans configuration développeur personnelle. Pour connecter un compte YouTube ou Kick, les identifiants OAuth restent à configurer avec le guide du dépôt ; Kick demande aussi un service serveur pour son secret. La clé manuelle reste disponible pour toutes ces plateformes.</p></details>
         <details><summary>Quelle mémoire prévoir pour cinq minutes d’historique ? <span aria-hidden="true">+</span></summary><p>À 8 Mbit/s, cinq minutes représentent environ 300 Mo de média, auxquels s’ajoute le fonctionnement du moteur. L’historique est borné par la limite mémoire configurée ; il continue de se constituer à 0 s. Il ne constitue pas un enregistrement permanent sur disque.</p></details>
       </div>
     </section>
