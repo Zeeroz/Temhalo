@@ -5,7 +5,15 @@ on:
     branches: [main]
     paths:
       - 'website/**'
+      - 'tools/website/**'
       - '.github/workflows/pages.yml'
+  release:
+    types: [published, edited, deleted]
+  # Releases published with GITHUB_TOKEN do not emit another Actions run for
+  # the release event. Watch the successful publisher/recovery workflow too.
+  workflow_run:
+    workflows: [Windows]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -16,8 +24,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  request-deployment:
+    if: github.repository == 'Zeeroz/Temhalo' && github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      # Always deploy from main, even when the release's tag has older sources.
+      - name: Actualiser le site depuis main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run pages.yml --ref main
+
   deploy:
-    if: github.repository == 'Zeeroz/Temhalo' && github.ref == 'refs/heads/main'
+    if: >-
+      github.repository == 'Zeeroz/Temhalo' && github.ref == 'refs/heads/main' &&
+      github.event_name != 'release' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&
+        (github.event.workflow_run.head_branch == 'main' || startsWith(github.event.workflow_run.head_branch, 'v'))))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -31,19 +60,30 @@ jobs:
       - name: Récupérer le site
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          ref: main
           persist-credentials: false
+      - name: Préparer Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
       - name: Vérifier les fichiers statiques
         run: |
           node --check website/app.js
+          node --test tools/website/releases.test.mjs
           test -s website/index.html
           test -s website/styles.css
           test -f website/assets/temhalo-logo.svg
+      - name: Choisir la dernière version complète, previews comprises
+        id: website
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/website/build.mjs
       - name: Configurer GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - name: Préparer les fichiers du site
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
-          path: website
+          path: ${{ steps.website.outputs.directory }}
       - name: Publier le site
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

@@ -4,6 +4,8 @@ Votre live. Votre tempo.
 
 [Site de présentation et guide rapide](https://zeeroz.github.io/Temhalo/) · [Télécharger Temhalo](https://zeeroz.github.io/Temhalo/#telecharger)
 
+Le site propose automatiquement la dernière version complète, previews comprises, après publication sur GitHub. [Fonctionnement du site et du déploiement](website/README.md).
+
 Temhalo est une application Windows open source qui permet d’ajuster le délai d’un stream OBS en direct, de 0 à 300 secondes. Le flux H.264/AAC est relayé sans réencodage vers Twitch, YouTube, Kick ou un serveur RTMP/RTMPS, avec jusqu’à quatre destinations partageant le même délai.
 
 ![Interface Temhalo](design/simplification-v3/Temhalo-comptes-planche.png)
