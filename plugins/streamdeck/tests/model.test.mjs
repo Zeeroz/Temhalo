@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { actionSettings, clock, commandFor, readState, streamDeckVersion } from '../src/model.mjs';
+import { actionSettings, clock, commandFor, readState, streamDeckVersion, validateCommand } from '../src/model.mjs';
 import { COLORS, keySvg, keyView } from '../src/render.mjs';
 
 export const state = (extra = {}) => ({ running:true,canControl:true,targetSeconds:30,currentDelayMilliseconds:15230,
@@ -45,4 +45,26 @@ test('indisponibilité et chaînes SVG sans injection',()=>{
   assert.equal(view.bottom,'HORS LIGNE');assert.equal(view.value,'—');
   assert.ok(keySvg({...view,top:'<script>',value:'&',bottom:'"x"'}).includes('&lt;script&gt;'));
   assert.ok(!keySvg({...view,top:'<script>'}).includes('<script>'));
+});
+
+test('la touche relais demande un état explicite et reste bloquée pendant les transitions', () => {
+  for (const [phase, canStart, canStop, expected] of [['Stopped', true, false, 'relay-start'], ['Running', false, true, 'relay-stop']]) {
+    const current = readState(state({ relay: { phase, canStart, canStop } }));
+    assert.deepEqual(commandFor('relay', {}, 1, current), { action: expected });
+    const view = keyView('relay', {}, { state: current });
+    assert.equal(view.value, phase === 'Stopped' ? 'DÉMARRER' : 'ARRÊTER');
+    assert.ok(keySvg(view, 72).includes('width="72"'));
+  }
+  for (const phase of ['Starting', 'Stopping', 'Stopped', 'Running']) {
+    const current = readState(state({ relay: { phase, canStart: false, canStop: false } }));
+    assert.throws(() => commandFor('relay', {}, 1, current));
+    assert.equal(keyView('relay', {}, { state: current }).color, COLORS.warning);
+  }
+  const legacy = readState(state());
+  assert.throws(() => commandFor('relay', {}, 1, legacy));
+  assert.equal(keyView('relay', {}, { state: legacy }).value, 'METTRE À JOUR');
+  for (const relay of [{ phase: 'Starting', canStart: true, canStop: false }, { phase: 'Running', canStart: false }, { phase: 'unknown', canStart: false, canStop: false }])
+    assert.throws(() => readState(state({ relay })));
+  assert.deepEqual(validateCommand({ action: 'relay-start' }), { action: 'relay-start' });
+  assert.throws(() => validateCommand({ action: 'relay-stop', seconds: 0 }));
 });

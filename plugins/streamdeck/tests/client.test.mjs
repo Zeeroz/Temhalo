@@ -76,3 +76,31 @@ test('aucune interrogation lorsque les touches ne sont plus visibles', async con
   client.setActive(false); await until(() => fixture.sockets.size === 0);
   await delay(80); assert.equal(fixture.connections, 1); assert.equal(client.state, null);
 });
+
+test('le cycle du relais utilise ses capacités sans modifier le délai', async context => {
+  const { fixture, client } = await connected(context, { state: defaultState({
+    running: false, relay: { phase: 'Stopped', canStart: true, canStop: false }
+  }) });
+  await assert.rejects(client.send({ action: 'relay-stop' }));
+  await client.send({ action: 'relay-start' }); await until(() => client.state.relay.phase === 'Running');
+  await assert.rejects(client.send({ action: 'relay-start' }));
+  fixture.state.relay = { phase: 'Stopping', canStart: false, canStop: false }; fixture.publish();
+  await until(() => client.state.relay.phase === 'Stopping');
+  await assert.rejects(client.send({ action: 'relay-start' })); await assert.rejects(client.send({ action: 'relay-stop' }));
+  fixture.state.relay = { phase: 'Running', canStart: false, canStop: true }; fixture.publish();
+  await until(() => client.state.relay.canStop);
+  await client.send({ action: 'relay-stop' }); await until(() => client.state.relay.phase === 'Stopped');
+  assert.deepEqual(fixture.commands, [{ action: 'relay-start' }, { action: 'relay-stop' }]);
+  assert.equal(client.state.targetSeconds, 0);
+});
+
+test('un démarrage accepté dont la réponse est perdue ne sera jamais rejoué', async context => {
+  const { fixture, client } = await connected(context, {
+    state: defaultState({ running: false, relay: { phase: 'Stopped', canStart: true, canStop: false } }),
+    afterApply: socket => { socket.destroy(); return false; }
+  });
+  await assert.rejects(client.send({ action: 'relay-start' }));
+  await until(() => client.status === 'ready' && client.state.relay.phase === 'Running');
+  await assert.rejects(client.send({ action: 'relay-start' }));
+  assert.deepEqual(fixture.commands, [{ action: 'relay-start' }]);
+});

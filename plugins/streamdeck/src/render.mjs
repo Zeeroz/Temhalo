@@ -16,6 +16,15 @@ export function keyView(kind, settings, client) {
   const state = client.state, values = actionSettings(kind, settings);
   let top = 'TEMHALO', value = '—', bottom = 'OUVRIR TEMHALO', color = COLORS.muted;
   if (!state) return { kind, top, value, bottom: client.status === 'connecting' ? 'CONNEXION' : 'HORS LIGNE', color };
+  if (kind === 'relay') {
+    const relay = state.relay;
+    if (!relay) return { kind, top: 'RELAIS', value: 'METTRE À JOUR', bottom: 'TEMHALO', color: COLORS.muted };
+    const busy = !relay.canStart && !relay.canStop;
+    return { kind, top: 'RELAIS', relayPhase: relay.phase,
+      value: relay.phase === 'Starting' ? 'DÉMARRAGE' : relay.phase === 'Stopping' ? 'ARRÊT…' : relay.phase === 'Running' ? 'ARRÊTER' : 'DÉMARRER',
+      bottom: busy ? 'OCCUPÉ' : relay.phase === 'Running' ? 'RELAIS ACTIF' : 'RELAIS ARRÊTÉ',
+      color: busy ? COLORS.warning : relay.phase === 'Running' ? COLORS.lavender : COLORS.mint };
+  }
   const ready = state.outputs.filter(output => output.ready).length;
   const adding = state.phase.startsWith('Increasing');
   const transitioning = adding || state.phase === 'SeekingKeyframe' || state.phase.endsWith('Backlog');
@@ -39,6 +48,13 @@ export function keyView(kind, settings, client) {
 
 export function keySvg(view, size = 144) {
   const { kind, top, value, bottom, color } = view;
+  if (kind === 'relay') {
+    const unavailable = value === '—' || value === 'METTRE À JOUR';
+    const label = value === '—' ? bottom : value;
+    const glyph = view.relayPhase === 'Running' || view.relayPhase === 'Stopping'
+      ? '<rect x="52" y="37" width="40" height="40" rx="2"/>' : '<path d="m57 34 36 23-36 23z"/>';
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 144 144" role="img"><title>${escape(top)} — ${escape(value)} — ${escape(bottom)}</title><rect x="1" y="1" width="142" height="142" rx="8" fill="${COLORS.surface}" stroke="${color}" stroke-width="2"/><g fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${glyph}</g><text x="72" y="108" text-anchor="middle" fill="${unavailable ? COLORS.muted : COLORS.text}" font-family="Segoe UI,Arial,sans-serif" font-size="${label.length > 10 ? 15 : 21}" font-weight="600">${escape(label)}</text><text x="72" y="130" text-anchor="middle" fill="${COLORS.muted}" font-family="Segoe UI,Arial,sans-serif" font-size="12">${escape(unavailable ? 'TEMHALO' : bottom)}</text></svg>`;
+  }
   const seconds = /^([+−]?)(\d+)s$/.exec(value);
   if (Object.hasOwn(COMMAND_GLYPHS, kind)) {
     const unavailable = !seconds, busy = bottom === 'TEMHALO OCCUPÉ';

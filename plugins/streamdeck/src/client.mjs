@@ -121,9 +121,14 @@ export class TemhaloClient {
     if (this.#active && !this.#socket) await this.#connect();
     return this.state;
   }
+  #canSend(command) {
+    if (command.action === 'relay-start') return this.state?.relay?.phase === 'Stopped' && this.state.relay.canStart;
+    if (command.action === 'relay-stop') return this.state?.relay?.phase === 'Running' && this.state.relay.canStop;
+    return this.state?.canControl;
+  }
   send(value) {
     const command = validateCommand(value);
-    if (!this.state?.canControl || !this.#socket || this.#now() - this.#lastSeen > this.#heartbeat)
+    if (!this.#canSend(command) || !this.#socket || this.#now() - this.#lastSeen > this.#heartbeat)
       return Promise.reject(new Error(this.state ? 'Temhalo est occupé ou indisponible.' : this.message));
     if (this.#queue.length >= 8) return Promise.reject(new Error('Trop de commandes en attente. Vérifiez la cible.'));
     return new Promise((resolve, reject) => {
@@ -134,7 +139,7 @@ export class TemhaloClient {
     if (this.#pending) return;
     while (this.#queue.length) {
       const job = this.#queue.shift();
-      if (!this.#socket || !this.state?.canControl || job.generation !== this.#generation || this.#now() - job.createdAt > 1500) {
+      if (!this.#socket || !this.#canSend(job.command) || job.generation !== this.#generation || this.#now() - job.createdAt > 1500) {
         job.reject(new Error('Commande expirée. Vérifiez la cible.')); continue;
       }
       job.id = randomUUID(); this.#pending = job;

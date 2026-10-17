@@ -55,11 +55,12 @@ public sealed partial class DashboardPage
             : OutputMode.SelectedIndex == 0 ? [new("primary", "Fichier local", false, false, 0)]
             : _destinations.Where(destination => destination.Enabled).Select(destination =>
                 new PublicOutputState(destination.Id, destination.Name, false, false, 0)).ToArray();
-        Volatile.Write(ref _localState, new(_session.Running, !_settingsBusy && !_starting && !_session.Stopping && !_localShuttingDown,
+        Volatile.Write(ref _localState, new(_session.Running, !_settingsBusy && !_starting && !_relayStopping && !_session.Stopping && !_localShuttingDown,
             Vm.TargetSeconds, _session.Running ? snapshot?.Delay?.LastMediaAgeMilliseconds : null,
             snapshot?.Delay?.Control.Phase ?? "Stopped", _session.Running && snapshot?.IngestConnected == true,
             _preferences.Presets, _settings.Hotkeys.ProtectionSeconds,
             publicOutputs));
+        Volatile.Write(ref _relayState, ReadRelayControlState());
         _streamDeck?.PublishState();
     }
     private async Task<DelayCommandResult> ApplyLocalCommandAsync(DelayCommand command, CancellationToken token)
@@ -69,7 +70,7 @@ public sealed partial class DashboardPage
         if (!DispatcherQueue.TryEnqueue(() =>
         {
             if (token.IsCancellationRequested) return;
-            if (_closed || _localShuttingDown || _settingsBusy || _starting || _session.Stopping)
+            if (_closed || _localShuttingDown || _settingsBusy || _starting || _relayStopping || _session.Stopping)
             { completion.TrySetResult(new(false, Vm.TargetSeconds, "Commande indisponible pendant cette opération.")); return; }
             switch (command.Action)
             {

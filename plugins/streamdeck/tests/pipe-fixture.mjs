@@ -19,8 +19,13 @@ export async function pipeFixture({ pipePath = `\\\\.\\pipe\\Temhalo.StreamDeck.
           if (frame.type === 'hello') { socket.hello = true; send(socket, { type: 'state', protocol: 1, state }); continue; }
           if (frame.type !== 'command') { socket.destroy(); continue; }
           commands.push(frame.command);
-          if (!reject) state.targetSeconds = frame.command.action === 'protect' ? 60 : frame.command.action === 'set'
-            ? frame.command.seconds : Math.max(0, Math.min(300, state.targetSeconds + frame.command.seconds));
+          if (!reject) {
+            if (frame.command.action === 'relay-start' || frame.command.action === 'relay-stop') {
+              const running = frame.command.action === 'relay-start';
+              state.running = running; state.relay = { phase: running ? 'Running' : 'Stopped', canStart: !running, canStop: running };
+            } else state.targetSeconds = frame.command.action === 'protect' ? 60 : frame.command.action === 'set'
+              ? frame.command.seconds : Math.max(0, Math.min(300, state.targetSeconds + frame.command.seconds));
+          }
           void (async () => {
             if (afterApply && await afterApply(socket, frame, commands.length) === false) return;
             send(socket, { type: 'result', id: frame.id, result: { accepted: !reject, targetSeconds: state.targetSeconds } }); publish();

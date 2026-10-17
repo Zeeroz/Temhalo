@@ -7,6 +7,7 @@ Unicode true
 !include "WordFunc.nsh"
 !include "x64.nsh"
 !include "WinVer.nsh"
+!include "Sections.nsh"
 
 !ifdef TEST_ROOT
   !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Temhalo.Installer.Test.${TEST_ID}"
@@ -53,12 +54,12 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "Temhalo"
 !define MUI_WELCOMEPAGE_TITLE "Installez votre tempo."
 !define MUI_WELCOMEPAGE_TEXT "Temhalo ${PRODUCT_VERSION}$\r$\nContrôle du délai de diffusion$\r$\n$\r$\nL'application sera installée pour votre compte Windows, avec une entrée dans le menu Démarrer.$\r$\n$\r$\nFermez Temhalo avant une mise à jour, une fois votre diffusion terminée.$\r$\n$\r$\nVos réglages et vos clés chiffrées seront conservés."
 !insertmacro MUI_PAGE_WELCOME
-!define MUI_COMPONENTSPAGE_TEXT_TOP "Le raccourci du menu Démarrer est inclus. Vous pouvez également ajouter un accès sur le Bureau."
+!define MUI_COMPONENTSPAGE_TEXT_TOP "Le menu Démarrer est inclus. Choisissez le raccourci Bureau et, si Stream Deck est détecté, l'installation ou la mise à jour du plugin Temhalo."
 !define MUI_COMPONENTSPAGE_NODESC
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !define MUI_FINISHPAGE_TITLE "Temhalo est prêt."
-!define MUI_FINISHPAGE_TEXT "Lancez Temhalo depuis le menu Démarrer ou votre Bureau.$\r$\n$\r$\nAu premier démarrage du relais, une connexion Internet est nécessaire pour acquérir MediaMTX et FFmpeg. Les outils sont vérifiés avant utilisation.$\r$\n$\r$\nLe guide INSTALLATION-WINDOWS.md se trouve dans le dossier de l'application."
+!define MUI_FINISHPAGE_TEXT "Lancez Temhalo depuis le menu Démarrer ou votre Bureau.$\r$\n$\r$\nSi vous avez choisi le plugin, son installation s'ouvre dans Stream Deck : terminez les éventuelles confirmations dans cette application.$\r$\n$\r$\nMediaMTX et FFmpeg seront téléchargés et vérifiés au premier démarrage du relais."
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Ouvrir Temhalo"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchTemhalo
@@ -83,6 +84,13 @@ Var GuardedPath
 Var SetupMutex
 Var ProbeHandle
 Var UpdateParentPid
+Var StreamDeckAvailable
+!ifdef TEST_ROOT
+  ; Isolated installer tests simulate detection and ShellExecute. They never
+  ; install into the real Stream Deck profile, including on a developer PC.
+  Var TestStreamDeckMode
+  Var TestStreamDeckUi
+!endif
 
 ; Functions are shared with the uninstaller. Never recursively remove $INSTDIR.
 !macro SharedFunctions PREFIX
@@ -240,6 +248,7 @@ Function .onInit
     ${EndIf}
   ${EndIf}
   Call ValidateInstallDirectory
+  Call ConfigureStreamDeckComponent
 FunctionEnd
 
 Function un.onInit
@@ -299,6 +308,113 @@ Section "Raccourci sur le Bureau" SEC_DESKTOP
     SetErrorLevel 5
   ${EndIf}
 SectionEnd
+
+Section /o "Plugin Stream Deck (facultatif)" SEC_STREAMDECK
+  DetailPrint "Plugin Temhalo : le paquet sera ouvert dans Stream Deck après installation."
+SectionEnd
+
+Function ConfigureStreamDeckComponent
+  StrCpy $StreamDeckAvailable 0
+  !ifdef TEST_ROOT
+    ${GetParameters} $0
+    ${GetOptions} $0 "/TESTSD=" $TestStreamDeckMode
+    ${GetOptions} $0 "/TESTPLUGINUI=" $TestStreamDeckUi
+    ${If} $TestStreamDeckMode == "present"
+    ${OrIf} $TestStreamDeckMode == "failure"
+      StrCpy $StreamDeckAvailable 1
+    ${EndIf}
+  !else
+    ; Stream Deck registers this package type in HKCR for both registry views.
+    ; Let Windows/Elgato handle installation, never edit its plugin/profile files.
+    ReadRegStr $0 HKCR ".streamDeckPlugin" ""
+    ${If} $0 != ""
+      ReadRegStr $1 HKCR "$0\shell\open\command" ""
+      ${If} $1 != ""
+        StrCpy $StreamDeckAvailable 1
+      ${EndIf}
+    ${EndIf}
+  !endif
+  ${If} $StreamDeckAvailable == 1
+    ClearErrors
+    ReadRegDWORD $0 HKCU "${UNINSTALL_KEY}" "InstallStreamDeckPlugin"
+    ${If} ${Errors}
+      StrCpy $0 1
+    ${EndIf}
+    ${If} $0 == 1
+      SectionSetFlags ${SEC_STREAMDECK} ${SF_SELECTED}
+    ${Else}
+      SectionSetFlags ${SEC_STREAMDECK} 0
+    ${EndIf}
+    !ifdef TEST_ROOT
+      ${GetParameters} $0
+      ${GetOptions} $0 "/TESTPLUGINCHOICE=" $1
+      ${If} $1 == "1"
+        SectionSetFlags ${SEC_STREAMDECK} ${SF_SELECTED}
+      ${ElseIf} $1 == "0"
+        SectionSetFlags ${SEC_STREAMDECK} 0
+      ${EndIf}
+    !endif
+  ${Else}
+    SectionSetText ${SEC_STREAMDECK} "Plugin Stream Deck (Stream Deck non détecté)"
+    SectionSetFlags ${SEC_STREAMDECK} ${SF_RO}
+  ${EndIf}
+  !ifdef TEST_ROOT
+    WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Component" "Available" "$StreamDeckAvailable"
+    SectionGetFlags ${SEC_STREAMDECK} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Component" "Selected" "$0"
+    WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "pending"
+  !endif
+FunctionEnd
+
+Function .onInstSuccess
+  ; Silent installations never open another application or alter this choice.
+  !ifdef TEST_ROOT
+    ${If} $TestStreamDeckUi == "1"
+      Goto streamdeck_interactive
+    ${EndIf}
+  !endif
+  IfSilent streamdeck_silent streamdeck_interactive
+  streamdeck_silent:
+    !ifdef TEST_ROOT
+      WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "silent"
+    !endif
+    Return
+  streamdeck_interactive:
+    ${If} $StreamDeckAvailable != 1
+      !ifdef TEST_ROOT
+        WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "unavailable"
+      !endif
+      Return
+    ${EndIf}
+    SectionGetFlags ${SEC_STREAMDECK} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    WriteRegDWORD HKCU "${UNINSTALL_KEY}" "InstallStreamDeckPlugin" $0
+    ${If} $0 == 0
+      !ifdef TEST_ROOT
+        WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "not-selected"
+      !endif
+      Return
+    ${EndIf}
+    SetOutPath "$INSTDIR"
+    ClearErrors
+    !ifdef TEST_ROOT
+      WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Package" "$INSTDIR\plugins\streamdeck\Temhalo.streamDeckPlugin"
+      ${If} $TestStreamDeckMode == "failure"
+        WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "failed"
+        SetErrors
+      ${Else}
+        WriteINIStr "${TEST_ROOT}\streamdeck-test.ini" "Handoff" "Status" "opened"
+      ${EndIf}
+    !else
+      ExecShell "open" "$INSTDIR\plugins\streamdeck\Temhalo.streamDeckPlugin" "" SW_SHOWNORMAL
+    !endif
+    ${If} ${Errors}
+      MessageBox MB_OK|MB_ICONINFORMATION "Temhalo est installé. Le plugin n'a pas pu être ouvert dans Stream Deck.$\r$\n$\r$\nInstallez ou ouvrez Stream Deck, puis double-cliquez sur :$\r$\n$INSTDIR\plugins\streamdeck\Temhalo.streamDeckPlugin" /SD IDOK
+      ; Plugin handoff is optional; the successful application install stays valid.
+      ClearErrors
+    ${EndIf}
+FunctionEnd
 
 Function LaunchTemhalo
   SetOutPath "$INSTDIR"

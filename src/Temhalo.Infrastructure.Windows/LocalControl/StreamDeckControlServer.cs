@@ -10,6 +10,8 @@ using Temhalo.Infrastructure.Windows.LocalWeb;
 
 namespace Temhalo.Infrastructure.Windows.LocalControl;
 
+public sealed record RelayControlState(string Phase, bool CanStart, bool CanStop);
+
 /// <summary>Per-user Windows IPC. No browser, HTTP listener or capability link.
 /// State publication is non-blocking; each client retains only its latest snapshot.</summary>
 public sealed class StreamDeckControlServer : IAsyncDisposable
@@ -17,6 +19,7 @@ public sealed class StreamDeckControlServer : IAsyncDisposable
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly Func<LocalViewState> _state;
     private readonly Func<DelayCommand, CancellationToken, Task<DelayCommandResult>> _command;
+    private readonly Func<RelayControlState?> _relayState;
     private readonly CancellationTokenSource _stop = new();
     private readonly ConcurrentDictionary<long, Connection> _clients = new();
     private sealed record Snapshot(long Revision, byte[] Bytes);
@@ -34,9 +37,11 @@ public sealed class StreamDeckControlServer : IAsyncDisposable
         (WindowsIdentity.GetCurrent().User?.Value ?? throw new InvalidOperationException("Compte Windows indisponible."));
 
     public StreamDeckControlServer(Func<LocalViewState> state,
-        Func<DelayCommand, CancellationToken, Task<DelayCommandResult>> command, string? pipeName = null)
+        Func<DelayCommand, CancellationToken, Task<DelayCommandResult>> command, string? pipeName = null,
+        Func<RelayControlState?>? relayState = null)
     {
         _state = state; _command = command; PipeName = pipeName ?? UserPipeName;
+        _relayState = relayState ?? (() => null);
         if (PipeName.Length > 200 || PipeName.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '-')))
             throw new ArgumentException("Canal Stream Deck invalide.");
     }
@@ -68,6 +73,7 @@ public sealed class StreamDeckControlServer : IAsyncDisposable
         byte[] bytes = Frame(new { type = "state", protocol = 1, state = new {
             state.Running, state.CanControl, state.TargetSeconds, state.CurrentDelayMilliseconds,
             state.Phase, state.IngestConnected, state.ProtectionSeconds,
+            relay = _relayState(),
             outputs = state.Outputs.Select(output => new { output.Ready, output.Reconnecting }).ToArray()
         }});
         if (Volatile.Read(ref _latest).Bytes.AsSpan().SequenceEqual(bytes)) return;
@@ -140,7 +146,7 @@ public sealed class StreamDeckControlServer : IAsyncDisposable
                 {
                     recent.Enqueue(requestId);
                     if (recent.Count > 64) seen.Remove(recent.Dequeue());
-                    if (!Valid(command) || expires <= now || expires > now + 3000)
+                    if (!Valid(command) || !Available(command!) || expires <= now || expires > now + 3000)
                         result = new(false, _state().TargetSeconds, "Commande invalide ou expirée.");
                     else
                     {
@@ -168,8 +174,16 @@ public sealed class StreamDeckControlServer : IAsyncDisposable
         "set" => command.Seconds is >= 0 and <= 300,
         "adjust" => command.Seconds is >= -300 and <= 300,
         "protect" => true,
+        "relay-start" or "relay-stop" => command.Seconds is null,
         _ => false
     });
+
+    private bool Available(DelayCommand command) => command.Action switch
+    {
+        "relay-start" => _relayState() is { Phase: "Stopped", CanStart: true },
+        "relay-stop" => _relayState() is { Phase: "Running", CanStop: true },
+        _ => true
+    };
 
     private static byte[] Frame<T>(T value)
     {

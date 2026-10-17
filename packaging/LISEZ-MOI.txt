@@ -1,4 +1,4 @@
-Temhalo 0.6.0-preview.1 — Windows x64
+Temhalo — Windows x64
 
 1. Extraire TOUT le dossier Temhalo de l'archive ZIP dans un dossier utilisateur.
 2. Lancer Temhalo.App.exe. Ne pas déplacer l'EXE seul : les DLL, Assets et config sont nécessaires.
@@ -11,7 +11,9 @@ Réglages DPAPI, journaux, outils et sessions : %LOCALAPPDATA%\Temhalo. Les outi
 Pour mettre à jour : arrêter Temhalo, extraire la nouvelle version dans un nouveau dossier, puis la lancer. Les données du profil restent conservées.
 Pour retirer l'application : fermer Temhalo et retirer son dossier. Conserver le dossier %LOCALAPPDATA%\Temhalo pour garder les réglages et les clés chiffrées.
 
+Stream Deck : l'installeur propose le plugin si Stream Deck est détecté. En portable, ouvrir plugins/streamdeck/Temhalo.streamDeckPlugin. Les profils et les touches sont gérés par Stream Deck. La touche Démarrer / arrêter commande le relais Temhalo ; OBS reste indépendant.
+
 Version de validation non signée. Les essais locaux ne remplacent pas la validation sur vos plateformes ni sur une machine Windows vierge.
 Les licences et notices des composants fournis figurent dans Licenses/, Assets/Fonts/Licenses et THIRD-PARTY-NOTICES.md. Les outils média sont acquis directement auprès des projets amont et conservent leurs propres notices dans le cache.
 
-Délai affiché = délai ajouté localement. Les lecteurs et plateformes ajoutent leur propre latence. Un ajout de délai en passthrough produit des pauses ; aucune garantie universelle de maintien de session.
+Délai affiché = délai ajouté localement. Les lecteurs et plateformes ajoutent leur propre latence. Augmenter le délai relit l'historique disponible ; une pause complète seulement l'historique manquant. L'historique RAM est glissant et limité en mémoire.

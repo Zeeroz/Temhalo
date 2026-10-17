@@ -1,5 +1,6 @@
 export const PLUGIN_ID = 'com.temhalo.streamdeck';
 export const ACTIONS = Object.freeze([
+  ['relay', 'Démarrer / arrêter le relais', 'Commander le relais Temhalo selon son état ; OBS reste indépendant.'],
   ['protection', 'Protection', 'Appliquer le délai de protection défini dans Temhalo.'],
   ['direct', 'Direct · 0 s', 'Revenir au minimum local, avec reprise sur image clé.'],
   ['preset', 'Appliquer un délai', 'Choisir un délai précis entre 0 et 300 secondes.'],
@@ -37,10 +38,17 @@ export function readState(value) {
     throw new Error('État local invalide.');
   }
   // Do not retain arbitrary server strings, URL fields, overlay settings or output names.
+  const relay = value.relay;
+  if (relay != null && (typeof relay !== 'object' || !['Stopped', 'Starting', 'Running', 'Stopping'].includes(relay.phase) ||
+      typeof relay.canStart !== 'boolean' || typeof relay.canStop !== 'boolean' ||
+      relay.canStart && relay.phase !== 'Stopped' || relay.canStop && relay.phase !== 'Running')) {
+    throw new Error('État du relais invalide.');
+  }
   return {
     running: value.running, canControl: value.canControl, targetSeconds: value.targetSeconds,
     currentDelayMilliseconds: value.currentDelayMilliseconds, ingestConnected: value.ingestConnected,
     protectionSeconds: value.protectionSeconds, phase: value.phase,
+    relay: relay == null ? null : { phase: relay.phase, canStart: relay.canStart, canStop: relay.canStop },
     outputs: value.outputs.map(({ ready, reconnecting }) => ({ ready, reconnecting })),
   };
 }
@@ -52,9 +60,14 @@ export function actionSettings(kind, settings = {}) {
   return {};
 }
 
-export function commandFor(kind, settings, ticks = 1) {
+export function commandFor(kind, settings, ticks = 1, state = null) {
   const values = actionSettings(kind, settings);
   switch (kind) {
+    case 'relay': {
+      if (state?.relay?.phase === 'Stopped' && state.relay.canStart) return { action: 'relay-start' };
+      if (state?.relay?.phase === 'Running' && state.relay.canStop) return { action: 'relay-stop' };
+      throw new Error('Relais occupé ou application à mettre à jour.');
+    }
     case 'protection': return { action: 'protect' };
     case 'direct': return { action: 'set', seconds: 0 };
     case 'preset': return { action: 'set', seconds: values.seconds };
@@ -72,6 +85,7 @@ export function commandFor(kind, settings, ticks = 1) {
 export function validateCommand(command) {
   if (!command || typeof command !== 'object') throw new Error('Commande invalide.');
   if (command.action === 'protect') return { action: 'protect' };
+  if (['relay-start', 'relay-stop'].includes(command.action) && command.seconds == null) return { action: command.action };
   if (command.action === 'set') return { action: 'set', seconds: integer(command.seconds, undefined, 0, 300) };
   if (command.action === 'adjust') return { action: 'adjust', seconds: integer(command.seconds, undefined, -300, 300) };
   throw new Error('Commande invalide.');

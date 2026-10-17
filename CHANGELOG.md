@@ -1,5 +1,13 @@
 # Historique
 
+## 0.7.0-preview.6
+
+- Nouvelle touche Stream Deck « Démarrer / arrêter le relais » : triangle menthe à l'arrêt, carré lavande en activité, états de démarrage/arrêt affichés et commandes bloquées pendant les transitions. La connexion est directe à Temhalo ; OBS reste indépendant.
+- Commandes de démarrage et d'arrêt explicites, appuis rapides filtrés, expiration et reconnexion sans rejeu. Les quatre touches de délai et leurs valeurs restent compatibles.
+- L'installeur propose l'installation ou la mise à jour du plugin lorsque Stream Deck est détecté et mémorise ce choix. Il ouvre le paquet fourni avec Temhalo dans Stream Deck, qui conserve les profils et les touches.
+- Sans Stream Deck, l'option est désactivée. Le mode silencieux n'ouvre aucune application externe ; un échec d'ouverture du paquet laisse Temhalo installé et indique la procédure manuelle.
+- Tests du cycle complet du relais, des commandes et des doubles appuis, des neuf panneaux du plugin et des parcours d'installation avec et sans Stream Deck.
+
 ## 0.7.0-preview.5
 
 - Relecture activée par défaut : augmenter le délai revient à une keyframe de l'historique, avec le son correspondant, sans ré-encodage. Une pause par paliers complète uniquement l'historique manquant.

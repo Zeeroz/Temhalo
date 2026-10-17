@@ -67,6 +67,60 @@ public sealed class StreamDeckControlServerTests
     }
 
     [Fact]
+    public async Task RelayCommandsRequireAnAdvertisedIdleStateAndCannotToggleOrReplay()
+    {
+        RelayControlState relay = new("Stopped", true, false);
+        int starts = 0, stops = 0;
+        StreamDeckControlServer? server = null;
+        server = new(() => State(15), (command, _) =>
+        {
+            if (command.Action == "relay-start") { starts++; relay = new("Starting", false, false); }
+            else if (command.Action == "relay-stop") { stops++; relay = new("Stopping", false, false); }
+            server!.PublishState();
+            return Task.FromResult(new DelayCommandResult(true, 15, "Demandé"));
+        }, PipeName(), () => relay);
+        await using var lifetime = server;
+        await server.StartAsync();
+        await using var client = await ConnectAsync(server.PipeName);
+        using var reader = new StreamReader(client, Encoding.UTF8, leaveOpen: true);
+        Assert.Equal("Stopped", (await ReceiveAsync(reader, "state")).GetProperty("state").GetProperty("relay").GetProperty("phase").GetString());
+        async Task<bool> Command(string action, string? id = null, int? seconds = null, bool expired = false)
+        {
+            await SendAsync(client, new { type = "command", id = id ?? Guid.NewGuid().ToString(),
+                command = new { action, seconds }, expiresAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (expired ? -100 : 1500) });
+            return (await ReceiveAsync(reader, "result")).GetProperty("result").GetProperty("accepted").GetBoolean();
+        }
+        Assert.False(await Command("relay-stop"));
+        Assert.False(await Command("relay-start", seconds: 15));
+        Assert.False(await Command("relay-start", expired: true));
+        string id = Guid.NewGuid().ToString();
+        Assert.True(await Command("relay-start", id));
+        Assert.False(await Command("relay-start", id));
+        Assert.False(await Command("relay-start"));
+        Assert.False(await Command("relay-stop"));
+        relay = new("Running", false, true); server.PublishState();
+        Assert.False(await Command("relay-start"));
+        Assert.True(await Command("relay-stop"));
+        Assert.False(await Command("relay-stop"));
+        Assert.False(await Command("relay-start"));
+        Assert.Equal(1, starts); Assert.Equal(1, stops);
+    }
+
+    [Fact]
+    public async Task RelayCommandsAreUnavailableWithoutTheLifecycleCapability()
+    {
+        int calls = 0;
+        await using var server = new StreamDeckControlServer(() => State(), (_, _) =>
+        { calls++; return Task.FromResult(new DelayCommandResult(true, 0, "Unexpected")); }, PipeName());
+        await server.StartAsync(); await using var client = await ConnectAsync(server.PipeName);
+        using var reader = new StreamReader(client, Encoding.UTF8, leaveOpen: true); await ReceiveAsync(reader, "state");
+        await SendAsync(client, new { type = "command", id = Guid.NewGuid().ToString(), command = new { action = "relay-start" },
+            expiresAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 1500 });
+        Assert.False((await ReceiveAsync(reader, "result")).GetProperty("result").GetProperty("accepted").GetBoolean());
+        Assert.Equal(0, calls);
+    }
+
+    [Fact]
     public async Task OversizedInputDisconnectsOnlyThatClientAndNewClientsCanConnect()
     {
         await using var server = new StreamDeckControlServer(() => State(), (_, _) => throw new InvalidOperationException(), PipeName());

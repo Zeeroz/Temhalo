@@ -18,7 +18,8 @@ public sealed partial class DashboardPage : Page
     private readonly RelaySession _session = new();
     private readonly DispatcherTimer _refresh = new() { Interval = TimeSpan.FromSeconds(1) };
     private readonly ObservableCollection<string> _journal = new();
-    private bool _starting, _closed;
+    private bool _starting, _closed, _relayStopping;
+    private Task _relayOperationTask = Task.CompletedTask;
     private string? _shownError;
     private string? _layout;
     private readonly DpapiSettingsStore _settingsStore = CreateSettingsStore();
@@ -197,23 +198,33 @@ public sealed partial class DashboardPage : Page
 
     private async void StartStopClicked(object sender, RoutedEventArgs e)
     {
-        if (_starting || _settingsBusy || _session.Stopping || !_session.Running && _accountMaintenance) return;
-        if (_session.Running)
+        var state = ReadRelayControlState();
+        if (!(state.CanStart || state.CanStop)) return;
+        await (_relayOperationTask = ChangeRelayRunningAsync(!_session.Running));
+    }
+
+    private async Task ChangeRelayRunningAsync(bool start)
+    {
+        if (!start)
         {
-            var stopped = _session.StopAsync(); Refresh();
-            await stopped; Refresh();
+            _relayStopping = true;
+            try { var stopped = _session.StopAsync(); Refresh(); await stopped; }
+            catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException)
+            { ShowError(SecretRedactor.Shared.Redact(ex.Message)); }
+            finally { _relayStopping = false; Refresh(); }
             return;
         }
         try
         {
             _starting = true; Vm.CanEdit = false; StartStopButton.IsEnabled = false; Notice.IsOpen = false;
+            Refresh();
             if (!double.IsFinite(MemoryLimit.Value) || MemoryLimit.Value is < 1 or > 4096 || Math.Truncate(MemoryLimit.Value) != MemoryLimit.Value)
                 throw new ArgumentException("La limite mémoire doit être un entier de 1 à 4096 Mio.");
             using var preparation = CancellationTokenSource.CreateLinkedTokenSource(_accountLifetime.Token);
             preparation.CancelAfter(TimeSpan.FromMinutes(2));
             _accountPreparationTask = ReadOutputsAsync(preparation.Token);
             var outputs = await _accountPreparationTask;
-            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), null, outputs, PreviewOutput()?.Target);
+            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), null, outputs, PreviewOutput()?.Target, _accountLifetime.Token);
             OutputTitle.Text = outputs is null ? "Sortie fichier local" : $"Sorties · {outputs.Count} destination(s)";
             OutputDetail.Text = outputs is null ? "FLV · H.264 / AAC · passthrough" : "RTMP / RTMPS · passthrough";
             _shownError = null;
@@ -242,11 +253,12 @@ public sealed partial class DashboardPage : Page
         if (_starting) Vm.CanEdit = false;
         DestinationFields.IsEnabled = !_session.Running && !_starting && !_settingsBusy && !_accountMaintenance;
         HotkeyFields.IsEnabled = !_settingsBusy && !_session.Stopping;
-        StartStopButton.IsEnabled = !_starting && !_session.Stopping && !_settingsBusy && !_dialogOpen && !_accountMaintenance && !_installingUpdate;
+        var relayControl = ReadRelayControlState();
+        StartStopButton.IsEnabled = relayControl.CanStart || relayControl.CanStop;
         OutputMode.IsEnabled = !_session.Running && !_starting && !_settingsBusy && !_dialogOpen && !_accountMaintenance;
         ObsAcknowledged.IsEnabled = !_settingsBusy && !_starting;
         RefreshSetup(); MaintainTwitchAccounts();
-        StartStopButton.Content = _starting ? "Démarrage…" : _session.Stopping ? "Vidange en cours…" : _session.Running ? "Arrêter le relais" : "Démarrer le relais";
+        StartStopButton.Content = _starting ? "Démarrage…" : _relayStopping || _session.Stopping ? "Vidange en cours…" : _session.Running ? "Arrêter le relais" : "Démarrer le relais";
         LastEvent.Text = snapshot?.State == "RetryingOutput" ? "Reconnexion automatique de la sortie. Le buffer RAM est conservé." :
             _session.LastAction ?? snapshot?.LastEvent ?? "Prêt. Démarrez le relais, puis lancez la publication OBS.";
         SessionPath.Text = _session.DirectoryPath ?? "Aucune session démarrée.";
@@ -300,6 +312,7 @@ public sealed partial class DashboardPage : Page
 
     public async Task ShutdownAsync()
     {
+        _localShuttingDown = true; PublishLocalState();
         _updateLifetime.Cancel(); _updateCancellation?.Cancel();
         if (_updateTask is { } updateTask) await updateTask;
         _updateHttp.Dispose();
@@ -308,6 +321,7 @@ public sealed partial class DashboardPage : Page
         if (_accountMaintenanceTask is { } maintenance) await maintenance;
         if (_accountPreparationTask is { IsCompleted: false } preparation)
             try { await preparation; } catch (Exception ex) when (ex is OperationCanceledException || Controls.PlatformEditor.IsConnectionError(ex)) { }
+        await _relayOperationTask;
         await StopLocalServerAsync();
         _hotkeys?.Dispose();
         var stop = _session.StopAsync(); Refresh();

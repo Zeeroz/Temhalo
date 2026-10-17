@@ -2,6 +2,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const names = {
+    relay: ['Relais Temhalo', 'Appuyer pour démarrer ou arrêter le relais configuré dans Temhalo. OBS reste indépendant. Arrêter le relais termine sa diffusion.'],
     protection: ['Protection', 'À l’appui : appliquer la protection réglée dans Temhalo.'],
     direct: ['Retour au direct · 0 s', 'Aucun réglage. Reprise sur une image clé, au plus près du direct.'],
     preset: ['Délai prédéfini', 'À l’appui : appliquer ce délai à la cible.'],

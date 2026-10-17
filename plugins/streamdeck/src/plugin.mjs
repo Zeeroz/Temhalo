@@ -10,6 +10,7 @@ const client = new TemhaloClient({ pipePath: testPipe });
 const visible = new Map();
 const settingsWrites = new Map();
 let inspectorSignature = '';
+let relayNextPress = 0;
 
 async function inspector(extra = {}, force = false) {
   const payload = { type: 'status', configured: client.configured, status: client.status, message: client.message, ...extra };
@@ -64,7 +65,13 @@ class TemhaloAction extends SingletonAction {
     }
   }
   async onKeyDown(ev) {
-    try { await this.execute(ev, commandFor(this.kind, ev.payload.settings)); }
+    try {
+      if (this.kind === 'relay' && performance.now() < relayNextPress) return;
+      const command = commandFor(this.kind, ev.payload.settings, 1, client.state);
+      // Shared across relay keys: ignore a fast double press, never queue a toggle.
+      if (this.kind === 'relay') relayNextPress = performance.now() + 1000;
+      await this.execute(ev, command);
+    }
     catch { await ev.action.showAlert().catch(() => {}); }
   }
   async onDialRotate(ev) {

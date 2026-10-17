@@ -33,7 +33,11 @@ try {
     if (-not $entry) { throw 'Manifeste Stream Deck absent.' }
     $reader = [IO.StreamReader]::new($entry.Open())
     try { $streamDeckManifest = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
-    if ($streamDeckManifest.UUID -ne 'com.temhalo.streamdeck' -or @($streamDeckManifest.Actions).Count -ne 8) { throw 'Actions du plugin Stream Deck incomplètes.' }
+    $requiredActions = @('relay','protection','direct','preset','increase','decrease','delay','status','dial' |
+        ForEach-Object { 'com.temhalo.streamdeck.' + $_ })
+    $actualActions = @($streamDeckManifest.Actions | ForEach-Object UUID)
+    if ($streamDeckManifest.UUID -cne 'com.temhalo.streamdeck' -or $actualActions.Count -ne $requiredActions.Count -or
+        @(Compare-Object $requiredActions $actualActions -CaseSensitive).Count -ne 0) { throw 'Actions du plugin Stream Deck absentes, dupliquées ou inattendues.' }
     if (@($streamDeckZip.Entries | Where-Object { $_.FullName -match '(?i)(^|/)(logs|node_modules)/|\.dpapi$' }).Count) { throw 'Fichiers privés ou de développement dans le plugin.' }
 }
 finally { $streamDeckZip.Dispose() }

@@ -60,10 +60,10 @@ internal sealed class RelaySession : IAsyncDisposable
     }
 
     public async Task StartAsync(int initialSeconds, long bufferBytes, RelayDestination? destination, IReadOnlyList<RelayOutput>? outputs = null,
-        LocalPreviewTarget? previewTarget = null)
+        LocalPreviewTarget? previewTarget = null, CancellationToken cancellationToken = default)
     {
         if (Running) throw new InvalidOperationException("Le relais est déjà actif.");
-        _cancellation?.Dispose(); _cancellation = new CancellationTokenSource();
+        _cancellation?.Dispose(); _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var preparationToken = _cancellation.Token;
         Volatile.Write(ref _error, null);
         var layout = ApplicationLayout.Resolve(AppContext.BaseDirectory, Environment.CurrentDirectory, AppStorage.DataDirectory);

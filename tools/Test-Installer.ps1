@@ -18,6 +18,9 @@ $profileSentinel = Join-Path $profileData 'preserve-settings-and-recordings.bin'
 $sentinelHash = (Get-FileHash -LiteralPath $profileSentinel).Hash
 $checks = [Collections.Generic.List[object]]::new()
 $reportPath = Join-Path $testRoot 'installer-test.json'
+$streamDeckIni = Join-Path $testRoot 'streamdeck-test.ini'
+# Windows INI APIs preserve UTF-16 when the file already has its BOM.
+[IO.File]::WriteAllText($streamDeckIni, '', [Text.UnicodeEncoding]::new($false, $true))
 $installedFiles = @(Get-ChildItem -LiteralPath (Join-Path $build.BuildDirectory 'payload\Temhalo') -Recurse -File)
 
 function Assert-Check([bool]$Condition, [string]$Name) {
@@ -33,6 +36,14 @@ function Invoke-TestExecutable([string]$Executable, [string]$Arguments, [int]$Ex
 function Invoke-Setup([int]$ExpectedExit = 0) {
     # NSIS /D= consumes the rest of the command line, including spaces.
     Invoke-TestExecutable $build.Installer "/S /D=$installPath" $ExpectedExit
+}
+function Invoke-StreamDeckSetup([string]$Options) {
+    Invoke-TestExecutable $build.Installer "/S $Options /D=$installPath"
+}
+function Read-StreamDeckTestValue([string]$Name) {
+    $match = @(Get-Content -LiteralPath $streamDeckIni | Select-String -Pattern ('^' + [regex]::Escape($Name) + '=(.*)$'))
+    if ($match.Count -ne 1) { throw "Valeur de test Stream Deck absente ou ambiguë : $Name" }
+    return $match[0].Matches[0].Groups[1].Value
 }
 function Invoke-Uninstall([int]$ExpectedExit = 0) {
     # Run a separate copy so ExecWait waits for the actual uninstaller, and the
@@ -68,6 +79,29 @@ try {
         Assert-Check ($link.Arguments -eq ('--data-directory "' + $profileData + '"')) 'Profil du raccourci isolé du profil personnel'
     }
     Assert-Check (Test-Path -LiteralPath (Join-Path $testRoot 'Start Menu\Temhalo\Désinstaller Temhalo.lnk')) 'Entrée de désinstallation dans le menu Démarrer'
+    Assert-Profile
+
+    # All ShellExecute calls are simulated only in TEST_ROOT builds. Never open
+    # Elgato or change the developer's real plugin/profile during automated tests.
+    Invoke-StreamDeckSetup '/TESTSD=present'
+    Assert-Check ((Read-StreamDeckTestValue 'Available') -eq '1' -and (Read-StreamDeckTestValue 'Selected') -eq '1') 'Plugin proposé par défaut lorsque Stream Deck est détecté'
+    Assert-Check ((Read-StreamDeckTestValue 'Status') -eq 'silent') 'Mode silencieux : aucune ouverture de Stream Deck'
+    $registeredKey = Get-Item -LiteralPath $registryPath
+    try { $pluginChoice = $registeredKey.GetValue('InstallStreamDeckPlugin', $null) }
+    finally { $registeredKey.Dispose() }
+    Assert-Check ($null -eq $pluginChoice) 'Mode silencieux : choix interactif non créé'
+    Invoke-StreamDeckSetup '/TESTSD=present /TESTPLUGINUI=1'
+    Assert-Check ((Read-StreamDeckTestValue 'Status') -eq 'opened' -and (Read-StreamDeckTestValue 'Package') -ceq (Join-Path $installPath 'plugins\streamdeck\Temhalo.streamDeckPlugin')) 'Plugin sélectionné : remise du paquet installé à Stream Deck'
+    Assert-Check ((Get-ItemPropertyValue -LiteralPath $registryPath -Name InstallStreamDeckPlugin) -eq 1) 'Choix du plugin mémorisé pour les mises à jour'
+    Invoke-StreamDeckSetup '/TESTSD=present /TESTPLUGINUI=1 /TESTPLUGINCHOICE=0'
+    Assert-Check ((Read-StreamDeckTestValue 'Status') -eq 'not-selected') 'Plugin décoché : aucune remise à Stream Deck'
+    Invoke-StreamDeckSetup '/TESTSD=present /TESTPLUGINUI=1'
+    Assert-Check ((Read-StreamDeckTestValue 'Selected') -eq '0' -and (Read-StreamDeckTestValue 'Status') -eq 'not-selected') 'Mise à jour : choix décoché conservé'
+    Invoke-StreamDeckSetup '/TESTSD=missing /TESTPLUGINUI=1'
+    Assert-Check ((Read-StreamDeckTestValue 'Available') -eq '0' -and (Read-StreamDeckTestValue 'Selected') -eq '0' -and (Read-StreamDeckTestValue 'Status') -eq 'unavailable') 'Stream Deck absent : option désactivée, installation Temhalo réussie'
+    Invoke-StreamDeckSetup '/TESTSD=failure /TESTPLUGINUI=1 /TESTPLUGINCHOICE=1'
+    Assert-Check ((Read-StreamDeckTestValue 'Status') -eq 'failed') 'Échec ouverture du plugin : installation Temhalo conservée et récupération manuelle proposée'
+    Assert-Payload
     Assert-Profile
 
     # The updater's parent is still exiting when the installer starts. Wait for

@@ -10,7 +10,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { ACTIONS, PLUGIN_ID } from '../src/model.mjs';
 import { pipeFixture, until } from './pipe-fixture.mjs';
 
-test('bundle SDK : connexion automatique à l’app, huit actions, migration et reprise sans rejeu', { timeout: 20000 }, async context => {
+test('bundle SDK : connexion automatique à l’app, actions de délai et relais, migration et reprise sans rejeu', { timeout: 20000 }, async context => {
   const root = fileURLToPath(new URL('../../../', import.meta.url));
   const output = path.join(root, `artifacts/streamdeck/${PLUGIN_ID}.sdPlugin`);
   const directory = path.join(root, 'artifacts/validation/streamdeck/sdk-' + randomUUID());
@@ -58,6 +58,18 @@ test('bundle SDK : connexion automatique à l’app, huit actions, migration et 
   send('dialDown', 'dial', { settings: {}, controller: 'Encoder' }); await wait(() => fixture.state.targetSeconds === 60, 'dial press');
   fixture.state.targetSeconds = 30; fixture.state.currentDelayMilliseconds = 19400; fixture.publish();
   await wait(() => svg('delay').includes('00:19') && svg('delay').includes('CIBLE 00:30'), 'pushed state');
+  fixture.state.running = false;
+  fixture.state.relay = { phase: 'Stopped', canStart: true, canStop: false }; fixture.publish();
+  await wait(() => svg('relay').includes('DÉMARRER'), 'relay stopped');
+  const beforeRelay = fixture.commands.length;
+  send('keyDown', 'relay', { settings: {}, controller: 'Keypad' });
+  send('keyDown', 'relay', { settings: {}, controller: 'Keypad' });
+  await wait(() => fixture.state.relay.phase === 'Running' && svg('relay').includes('ARRÊTER'), 'relay started');
+  await delay(50); assert.equal(fixture.commands.length, beforeRelay + 1);
+  await delay(1050);
+  send('keyDown', 'relay', { settings: {}, controller: 'Keypad' });
+  await wait(() => fixture.state.relay.phase === 'Stopped' && svg('relay').includes('DÉMARRER'), 'relay stopped again');
+  assert.equal(fixture.commands.length, beforeRelay + 2); assert.equal(fixture.state.targetSeconds, 30);
   const count = fixture.commands.length;
   send('keyDown', 'delay', { settings: {}, controller: 'Keypad' }); send('keyDown', 'status', { settings: {}, controller: 'Keypad' }); await delay(40);
   assert.equal(fixture.commands.length, count);

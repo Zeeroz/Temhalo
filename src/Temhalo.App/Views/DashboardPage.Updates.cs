@@ -47,7 +47,7 @@ public sealed partial class DashboardPage
         DownloadUpdateButton.Visibility = _availableUpdate is not null && _downloadedUpdate is null ? Visibility.Visible : Visibility.Collapsed;
         DownloadUpdateButton.IsEnabled = !_updateBusy;
         InstallUpdateButton.Visibility = _downloadedUpdate is not null && _installedCopy ? Visibility.Visible : Visibility.Collapsed;
-        InstallUpdateButton.IsEnabled = !_updateBusy && !_installingUpdate && !_session.Running && !_session.Stopping && !_starting && !_settingsBusy && !_accountMaintenance;
+        InstallUpdateButton.IsEnabled = !_updateBusy && !_installingUpdate && !_session.Running && !_session.Stopping && !_relayStopping && !_starting && !_settingsBusy && !_accountMaintenance;
         CancelUpdateButton.Visibility = _updateBusy ? Visibility.Visible : Visibility.Collapsed;
         CheckUpdatesAtStartup.IsEnabled = IncludePreviewUpdates.IsEnabled = !_updateBusy && !_settingsBusy;
         UpdateInstallHint.Text = !_installedCopy
@@ -112,7 +112,7 @@ public sealed partial class DashboardPage
 
     private async void InstallUpdateClicked(object sender, RoutedEventArgs e)
     {
-        if (_downloadedUpdate is null || _updateBusy || _session.Running || _session.Stopping || _starting || _settingsBusy || _accountMaintenance || _installingUpdate) return;
+        if (_downloadedUpdate is null || _updateBusy || _session.Running || _session.Stopping || _relayStopping || _starting || _settingsBusy || _accountMaintenance || _installingUpdate) return;
         _installingUpdate = true; Refresh();
         try
         {

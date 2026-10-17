@@ -8,6 +8,13 @@
 4. Une fois votre live terminé, arrêtez le relais. Le bouton **Installer et fermer Temhalo** devient disponible.
 5. Suivez l’assistant d’installation. Cochez **Ouvrir Temhalo** sur sa dernière page pour relancer l’application.
 
+Depuis preview.6, l'assistant propose aussi **Plugin Stream Deck (facultatif)**
+si Stream Deck est détecté. Laissez l'option cochée pour ouvrir le paquet du plugin
+dans Stream Deck et mettre à jour les deux composants. Le choix est mémorisé pour
+les installations suivantes ; les profils et touches restent gérés par Stream Deck.
+Sans Stream Deck ou en mode silencieux, le paquet reste disponible sous
+`plugins/streamdeck/Temhalo.streamDeckPlugin`, sans ouvrir d'application externe.
+
 Le téléchargement seul ne coupe jamais le relais. L’installation ne démarre pas si le relais fonctionne ou se vide. L’installeur attend la fermeture du processus Temhalo, puis met à jour l’emplacement déjà enregistré pour ce compte Windows, sans privilèges administrateur. Les réglages, comptes OAuth, clés DPAPI, journaux et outils téléchargés restent dans le profil utilisateur.
 
 Les **versions de test** (`-preview.N`) sont proposées par défaut dans cette première version preview ; désactivez cette option pour ne recevoir que les versions stables. Une version stable est plus récente que toutes les previews portant les mêmes numéros majeur/mineur/correctif. Une version plus ancienne n’est jamais proposée.

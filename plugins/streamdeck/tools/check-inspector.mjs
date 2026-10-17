@@ -50,7 +50,7 @@ host.on('connection', socket => {
 const browser = await chromium.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
 const cases = [];
 try {
-  for (const kind of ['protection', 'direct', 'preset', 'increase', 'decrease', 'delay', 'status', 'dial']) {
+  for (const kind of ['relay', 'protection', 'direct', 'preset', 'increase', 'decrease', 'delay', 'status', 'dial']) {
     const id = `${kind}-${randomUUID()}`, page = await browser.newPage({ viewport: { width: 378, height: 185 } });
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${http.address().port}/inspector.html`);

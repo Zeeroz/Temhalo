@@ -1,18 +1,35 @@
 # Installer Temhalo sous Windows
 
-Version 0.6.0-preview.1 · Windows x64 · 16 octobre 2026
+Version 0.7.0-preview.6 · Windows x64 · 17 octobre 2026
 
 ## Installation
 
 1. Terminer votre diffusion et fermer toute instance de Temhalo.
-2. Lancer `Temhalo-0.6.0-preview.1-Setup-x64.exe`.
-3. Garder « Raccourci sur le Bureau » coché, puis choisir **Installer**.
+2. Lancer `Temhalo-0.7.0-preview.6-Setup-x64.exe`.
+3. Choisir le raccourci Bureau et, si proposé, **Plugin Stream Deck (facultatif)**, puis **Installer**.
 4. Ouvrir Temhalo depuis le Bureau ou **Démarrer → Temhalo → Temhalo**.
 
 L'installation se fait pour le compte courant dans `%LOCALAPPDATA%\Programs\Temhalo`,
 sans élévation administrateur. Le menu Démarrer contient aussi **Désinstaller Temhalo**.
 Le raccourci du Bureau est proposé et coché par défaut. Le logo et les icônes
 proviennent de l'identité Temhalo validée.
+
+## Plugin Stream Deck
+
+Si l'association Windows des fichiers `.streamDeckPlugin` est détectée, l'option
+du plugin est cochée par défaut. Vous pouvez la décocher ; le choix est conservé
+pour les prochaines mises à jour. L'installeur ouvre le paquet livré dans
+Stream Deck à la fin de la copie. Terminez les éventuelles confirmations dans
+Stream Deck. Les profils, touches et valeurs existantes restent gérés par Elgato.
+
+Sans Stream Deck, l'option est désactivée et Temhalo s'installe normalement.
+Après avoir installé Stream Deck 6.6 ou ultérieur, double-cliquez sur
+`plugins/streamdeck/Temhalo.streamDeckPlugin` dans le dossier de Temhalo.
+Ce fichier reste fourni même lorsque l'option est décochée. Si son ouverture
+échoue, l'installeur affiche son emplacement et termine l'installation de Temhalo.
+
+La touche **Démarrer / arrêter le relais** contrôle Temhalo selon son état réel.
+OBS se lance séparément ; l'arrêt du relais termine son émission vers les plateformes.
 
 L'application inclut .NET 8, ASP.NET Core 8 et Windows App SDK : aucun SDK ou
 Visual Studio n'est nécessaire. Windows 10 version 1809 minimum est déclaré ;
@@ -53,10 +70,13 @@ Elle n'efface pas récursivement le dossier d'installation : les fichiers que
 vous y avez ajoutés sont conservés.
 
 **Les données du profil restent dans `%LOCALAPPDATA%\Temhalo`** : configuration
-DPAPI, clés de stream chiffrées, liens privés du dock/overlay, journaux, outils
+DPAPI, clés de stream chiffrées, liens privés du dock, journaux, outils
 téléchargés et sessions locales. Une réinstallation avec le même compte Windows
 peut les réutiliser. Leur suppression définitive reste une action manuelle,
 après sauvegarde des enregistrements souhaités.
+
+Le plugin déjà installé dans Stream Deck et ses profils sont conservés.
+Pour retirer ce plugin, utilisez la gestion des plugins de Stream Deck.
 
 Les réglages DPAPI sont liés au compte Windows ; conserver leurs fichiers
 ne permet pas de les déchiffrer depuis un autre compte.
@@ -65,7 +85,7 @@ ne permet pas de les déchiffrer depuis un autre compte.
 
 1. Installer en gardant le raccourci du Bureau coché.
 2. Vérifier les deux raccourcis, leur icône et l'entrée dans les applications Windows.
-3. Lancer depuis le Bureau ; vérifier les quatre onglets et les réglages conservés.
+3. Lancer depuis le Bureau ; vérifier les trois onglets et les réglages conservés.
 4. Fermer Temhalo, relancer l'installeur et vérifier que les réglages sont identiques.
 5. Temhalo ouvert, tenter une mise à jour : un message doit demander de le fermer.
    Choisir Annuler pour laisser votre session en cours ; ne pas le tester en live public.
@@ -85,7 +105,7 @@ Depuis la racine du projet, sous PowerShell 7 :
 & .\tools\Test-Installer.ps1
 ```
 
-Le ZIP `artifacts/packages/Temhalo-0.6.0-preview.1-win-x64.zip` et sa somme
+Le ZIP `artifacts/packages/Temhalo-0.7.0-preview.6-win-x64.zip` et sa somme
 `.sha256` doivent être présents. Pour le reconstruire d'abord, utiliser
 `tools/Package-Windows.ps1` après avoir conservé toute archive déjà livrée.
 L'installeur est écrit sous `artifacts/packages/`, avec sa somme SHA-256 et
@@ -110,6 +130,7 @@ pour vérifier le retrait des fichiers obsolètes. La version numérique peut ê
 avec `-NumericVersion` ; elle doit croître lors des futures préversions.
 
 Pour une installation automatisée, l'option `/S` lance le mode silencieux.
+Ce mode n'ouvre jamais Stream Deck et ne modifie pas le choix interactif du plugin.
 Un dossier dédié peut être choisi avec `/D=C:\chemin\Temhalo` en dernier argument,
 sans guillemets après `/D=` même si le chemin contient des espaces. Une mise à jour
 reprend toujours le dossier déjà enregistré. Les chemins longs sont pris en charge
