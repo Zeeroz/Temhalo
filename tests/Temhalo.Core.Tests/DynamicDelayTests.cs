@@ -93,7 +93,7 @@ public sealed class DynamicDelayTests
         var clock = new ManualMediaClock();
         using var input = new PushStream();
         using var output = new MemoryStream();
-        var engine = new FlvDelayMediaTransfer(new() { MaximumPauseStepSeconds = 2 }, clock, control);
+        var engine = new FlvDelayMediaTransfer(new() { MaximumPauseStepSeconds = 2, ReplayOnIncrease = false }, clock, control);
         input.Push(File((FlvTagType.Video, 0, Avc), (FlvTagType.Audio, 0, Aac),
             (FlvTagType.Video, 0, Video(true))));
         Task running = engine.TransferAsync(input, output, CancellationToken.None);
@@ -163,7 +163,7 @@ public sealed class DynamicDelayTests
         var clock = new ManualMediaClock();
         using var input = new PushStream();
         using var output = new MemoryStream();
-        var engine = new FlvDelayMediaTransfer(new(), clock, control);
+        var engine = new FlvDelayMediaTransfer(new() { ReplayOnIncrease = false }, clock, control);
         input.Push(File((FlvTagType.Video, 0, Avc), (FlvTagType.Audio, 0, Aac), (FlvTagType.Video, 0, Video(true))));
         Task running = engine.TransferAsync(input, output, CancellationToken.None);
         await FixedDelayTests.UntilAsync(() => engine.Snapshot.EmittedMediaTags == 1);

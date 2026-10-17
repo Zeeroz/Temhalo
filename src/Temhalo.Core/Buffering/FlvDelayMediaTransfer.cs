@@ -58,14 +58,18 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
     }
     public FixedDelaySnapshot Snapshot => new(_control.Request.TargetSeconds, _budget.UsedBytes, _budget.PeakBytes,
         _budget.MaximumBytes, _budget.UsedBytes >= _budget.MaximumBytes * _options.WarningUsageRatio,
-        _budget.PeakBytes >= _budget.MaximumBytes * _options.WarningUsageRatio, Volatile.Read(ref _ring)?.Count ?? 0,
+        _budget.PeakBytes >= _budget.MaximumBytes * _options.WarningUsageRatio,
+        (Volatile.Read(ref _ring)?.Count ?? 0) + Interlocked.Read(ref _replayQueued) + (Volatile.Read(ref _livePending) is null ? 0 : 1),
         Interlocked.Read(ref _readTags), Interlocked.Read(ref _emitted), Interlocked.Read(ref _skipped),
         Interlocked.Read(ref _discontinuities), Volatile.Read(ref _waiting) != 0, Volatile.Read(ref _inputCompleted) != 0,
         Volatile.Read(ref _truncated) != 0, Interlocked.Read(ref _minimumAge) is var min && min != long.MaxValue ? min : null,
         Interlocked.Read(ref _lastAge) is var last && last >= 0 ? last : null,
         Interlocked.Read(ref _maximumAge) is var max && max >= 0 ? max : null, ControlSnapshot(),
         Interlocked.Read(ref _inputBytes), Interlocked.Read(ref _recoveryDelay),
-        Interlocked.Read(ref _outputReconnections), Interlocked.Read(ref _inputSessions));
+        Interlocked.Read(ref _outputReconnections), Interlocked.Read(ref _inputSessions),
+        Interlocked.Read(ref _historyOldest) is var oldest && oldest >= 0
+            ? Math.Clamp(Interlocked.Read(ref _latestInputArrival) - oldest, 0, 300_000) : 0,
+        Interlocked.Read(ref _historyTags), Interlocked.Read(ref _historyEvicted), Interlocked.Read(ref _replayed));
 
     private DelayTransitionSnapshot ControlSnapshot()
     {
@@ -96,6 +100,9 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
         if (Interlocked.Exchange(ref _started, 1) != 0) throw new InvalidOperationException("Une instance correspond à une seule session FLV.");
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         using var ring = new SpscFlvRing(_options.TagCapacity, _budget);
+        using var history = _options.ReplayOnIncrease
+            ? new FlvPlaybackHistory((int)Math.Min(_options.TagCapacity, Math.Max(2, _options.MaximumBufferBytes / 512)), _budget) : null;
+        _history = history;
         Volatile.Write(ref _ring, ring);
         _connection = connection;
         if (output is not null) SetWriter(new FlvTagWriter(output));
@@ -118,6 +125,9 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
         {
             _avc?.Dispose(); _aac?.Dispose();
             _avc = _aac = null;
+            _livePending?.Dispose(); _livePending = null;
+            _history = null;
+            Interlocked.Exchange(ref _historyTags, 0); Interlocked.Exchange(ref _historyOldest, -1);
             // The using scope releases queued tags and ring storage after both tasks have ended.
         }
     }
@@ -129,7 +139,8 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
             long generation = 0;
             await foreach (Stream input in inputs.WithCancellation(cancellation.Token).ConfigureAwait(false))
             {
-                var reader = new FlvTagReader(input, _budget, _clock, _options.MaximumTagBytes);
+                var reader = new FlvTagReader(input, _budget, _clock, _options.MaximumTagBytes,
+                    _options.ReplayOnIncrease ? (bytes, token) => ReservePayloadAsync(bytes, ring, token) : null);
                 bool headerRead = false;
                 try
                 {
@@ -143,6 +154,7 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
                         tag.InputGeneration = generation;
                         tag.SourceHeader = header;
                         Interlocked.Increment(ref _readTags);
+                        Interlocked.Exchange(ref _latestInputArrival, tag.ArrivalMilliseconds);
                         Interlocked.Add(ref _inputBytes, tag.Payload.Length + 15L);
                         if (!ring.TryWrite(tag))
                         {
@@ -164,13 +176,17 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
     private async Task ConsumeAsync(SpscFlvRing ring, CancellationTokenSource cancellation)
     {
         FlvTag? pending = null;
+        bool historical = false;
         try
         {
             while (true)
             {
                 cancellation.Token.ThrowIfCancellationRequested();
+                MaintainHistory();
                 Task changed = _control.Changed; // Capture before inspecting the mailbox: no lost wakeup.
                 var request = _control.Request;
+                bool increase = request.Version != _planner.Version &&
+                    request.TargetSeconds * 1000L > _planner.Snapshot(_clock.NowMilliseconds).ActiveDelayMilliseconds;
                 bool catchUpSeek = request.Version != _planner.Version &&
                     ((_recoveryDelay > 0 && request.TargetSeconds * 1000L <= _planner.ScheduledDelay + _recoveryDelay) ||
                      (request.TargetSeconds == 0 && Interlocked.Read(ref _lastAge) >= OutputBacklogToleranceMilliseconds));
@@ -185,13 +201,14 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
                     _collapseNextSegment = true;
                     var owned = pending;
                     pending = null; // Seek owns the old pending tag, also on exceptions.
-                    pending = await SeekAsync(owned, ring, cancellation.Token).ConfigureAwait(false);
+                    (pending, historical) = await SeekAsync(owned, historical, ring, cancellation.Token).ConfigureAwait(false);
                     continue;
                 }
-                pending ??= ring.TryRead();
+                if (increase && TryIncreaseFromHistory(ref pending, ref historical, request.TargetSeconds, _clock.NowMilliseconds)) continue;
+                pending ??= TakeNext(ring, out historical);
                 if (pending is null)
                 {
-                    if (ring.Completed) pending = ring.TryRead();
+                    if (ring.Completed) pending = TakeNext(ring, out historical);
                     if (pending is null)
                     {
                         if (ring.Completed) { _planner.MarkEnded(); break; }
@@ -203,15 +220,16 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
                 if (_planner.Paused)
                 {
                     if (now < _planner.PauseEnd)
-                    { await WaitForDeadlineAsync(_planner.PauseEnd, changed, cancellation.Token).ConfigureAwait(false); continue; }
+                    { await WaitForDeadlineAsync(_planner.PauseEnd, changed, ring, cancellation.Token).ConfigureAwait(false); continue; }
                     _planner.FinishPause(now);
                     Volatile.Write(ref _waiting, 1); // Pauses only start before an IDR; resend both configurations.
                 }
                 long deadline = pending.ArrivalMilliseconds + _planner.ScheduledDelay + _recoveryDelay;
                 if (_clock.NowMilliseconds < deadline)
-                { await WaitForDeadlineAsync(deadline, changed, cancellation.Token).ConfigureAwait(false); continue; }
+                { await WaitForDeadlineAsync(deadline, changed, ring, cancellation.Token).ConfigureAwait(false); continue; }
                 if (_planner.CanStartPause(ring.Completed || Volatile.Read(ref _inputCompleted) != 0) && IsReadyIdr(pending))
                 { _planner.StartPause(_clock.NowMilliseconds); continue; }
+                long emittedBefore = _emitted;
                 try { await ProcessTagAsync(pending, cancellation.Token).ConfigureAwait(false); }
                 catch (Exception ex) when (_connection is not null && (ex is IOException or ObjectDisposedException))
                 {
@@ -224,6 +242,8 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
                     await _connection!.CloseAsync(true, cancellation.Token).ConfigureAwait(false);
                     continue;
                 }
+                if (!historical) Remember(pending);
+                else if (_emitted > emittedBefore) Interlocked.Increment(ref _replayed);
                 pending.Dispose(); pending = null;
             }
         }
@@ -308,6 +328,7 @@ public partial class FlvDelayMediaTransfer : IMediaTransfer
         }
         _planner.MarkMedia(mapped, _clock.NowMilliseconds);
         Interlocked.Increment(ref _emitted);
+        _lastEmittedArrival = tag.ArrivalMilliseconds;
         long age = _clock.NowMilliseconds - tag.ArrivalMilliseconds;
         Interlocked.Exchange(ref _lastAge, age);
         long min;

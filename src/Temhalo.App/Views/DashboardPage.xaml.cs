@@ -213,7 +213,7 @@ public sealed partial class DashboardPage : Page
             preparation.CancelAfter(TimeSpan.FromMinutes(2));
             _accountPreparationTask = ReadOutputsAsync(preparation.Token);
             var outputs = await _accountPreparationTask;
-            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), null, outputs);
+            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), null, outputs, PreviewOutput()?.Target);
             OutputTitle.Text = outputs is null ? "Sortie fichier local" : $"Sorties · {outputs.Count} destination(s)";
             OutputDetail.Text = outputs is null ? "FLV · H.264 / AAC · passthrough" : "RTMP / RTMPS · passthrough";
             _shownError = null;
@@ -238,6 +238,7 @@ public sealed partial class DashboardPage : Page
             snapshot?.OutputReady == true, _session.Network, snapshot?.State ?? "Stopped", snapshot?.Attempt ?? 0,
             snapshot?.BytesTransferred ?? 0, _session.ElapsedSeconds, _session.LiveDuration);
         RefreshDestinationStates(snapshot);
+        RefreshPreview();
         if (_starting) Vm.CanEdit = false;
         DestinationFields.IsEnabled = !_session.Running && !_starting && !_settingsBusy && !_accountMaintenance;
         HotkeyFields.IsEnabled = !_settingsBusy && !_session.Stopping;
@@ -303,6 +304,7 @@ public sealed partial class DashboardPage : Page
         if (_updateTask is { } updateTask) await updateTask;
         _updateHttp.Dispose();
         _activeEditor?.Close(); _accountLifetime.Cancel();
+        if (_previewTask is { } previewTask) await previewTask;
         if (_accountMaintenanceTask is { } maintenance) await maintenance;
         if (_accountPreparationTask is { IsCompleted: false } preparation)
             try { await preparation; } catch (Exception ex) when (ex is OperationCanceledException || Controls.PlatformEditor.IsConnectionError(ex)) { }

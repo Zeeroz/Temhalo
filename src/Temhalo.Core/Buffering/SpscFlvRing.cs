@@ -63,6 +63,8 @@ internal sealed class SpscFlvRing : IDisposable
     public void Complete()
     { Volatile.Write(ref _completed, 1); Volatile.Read(ref _changed).TrySetResult(); }
 
+    internal void SignalChange() => Volatile.Read(ref _changed).TrySetResult();
+
     // Only after producer AND consumer have completed.
     public void Dispose()
     {

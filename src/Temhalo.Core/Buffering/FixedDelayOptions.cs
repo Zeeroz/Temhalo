@@ -9,6 +9,8 @@ public sealed record FixedDelayOptions
     public int MaximumTagBytes { get; init; } = 4 * 1024 * 1024;
     public int MaximumPauseStepSeconds { get; init; } = 5;
     public int ResumeBetweenStepsSeconds { get; init; } = 1;
+    /// <summary>Keep the last five minutes for an immediate replay when increasing the live delay.</summary>
+    public bool ReplayOnIncrease { get; init; } = true;
 
     internal void Validate()
     {
@@ -25,4 +27,5 @@ public sealed record FixedDelaySnapshot(int TargetSeconds, long BufferBytes, lon
     bool WaitingForKeyframe, bool InputCompleted, bool TruncatedInput,
     long? MinimumMediaAgeMilliseconds, long? LastMediaAgeMilliseconds, long? MaximumMediaAgeMilliseconds,
     Temhalo.Core.Timing.DelayTransitionSnapshot Control, long InputBytes = 0,
-    long RecoveryDelayMilliseconds = 0, long OutputReconnections = 0, long InputSessions = 0);
+    long RecoveryDelayMilliseconds = 0, long OutputReconnections = 0, long InputSessions = 0,
+    long HistoryAvailableMilliseconds = 0, long HistoryTags = 0, long HistoryEvictedTags = 0, long ReplayedMediaTags = 0);

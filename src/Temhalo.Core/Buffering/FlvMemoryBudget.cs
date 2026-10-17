@@ -18,16 +18,22 @@ public sealed class FlvMemoryBudget
 
     internal void Reserve(long bytes)
     {
+        if (!TryReserve(bytes))
+            throw new BufferLimitExceededException("Limite mémoire du buffer atteinte ; arrêt sans réduction du délai.");
+    }
+
+    internal bool TryReserve(long bytes)
+    {
         while (true)
         {
             long current = UsedBytes;
             if (bytes > MaximumBytes - current)
-                throw new BufferLimitExceededException("Limite mémoire du buffer atteinte ; arrêt sans réduction du délai.");
+                return false;
             long next = current + bytes;
             if (Interlocked.CompareExchange(ref _used, next, current) != current) continue;
             long peak;
             while (next > (peak = PeakBytes) && Interlocked.CompareExchange(ref _peak, next, peak) != peak) { }
-            return;
+            return true;
         }
     }
 

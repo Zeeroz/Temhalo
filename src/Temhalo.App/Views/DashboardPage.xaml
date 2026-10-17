@@ -71,6 +71,9 @@
                   </StackPanel>
                 </Grid>
                 <TextBlock Text="Mesure à la sortie du moteur. La latence de lecture s’ajoute." Style="{StaticResource TemhaloCaption}"/>
+                  <TextBlock Text="{x:Bind Vm.HistoryText, Mode=OneWay}" Style="{StaticResource TemhaloCaption}"
+                             AutomationProperties.AutomationId="ReplayHistory"
+                             ToolTipService.ToolTip="L’augmentation rejoue un passage déjà diffusé, avec son audio. La pause complète uniquement l’historique manquant. L’historique partage la limite RAM du buffer."/>
                 <Grid ColumnDefinitions="*,Auto">
                   <TextBlock Text="Sortie différée" Style="{StaticResource TemhaloCaption}"/>
                   <TextBlock Grid.Column="1" Text="Entrée OBS · maintenant" Style="{StaticResource TemhaloCaption}"/>
@@ -127,6 +130,14 @@
             </Grid>
           </local:AdaptiveColumns>
           <TextBlock x:Name="ActiveOutputs" Visibility="Collapsed" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+          <local:SettingRow>
+            <StackPanel Spacing="4">
+              <TextBlock Text="Aperçu local" FontWeight="Medium"/>
+              <TextBlock x:Name="PreviewHint" Text="Démarrez le relais, puis lancez le flux OBS." Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+            </StackPanel>
+            <Button x:Name="OpenVlcButton" Content="Ouvrir l’aperçu VLC" Click="OpenVlcClicked" IsEnabled="False"
+                    AutomationProperties.AutomationId="OpenVlcPreview" ToolTipService.ToolTip="Lire la sortie locale avec les réglages VLC adaptés aux changements de délai."/>
+          </local:SettingRow>
           <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
           <local:AdaptiveColumns Columns="4" Threshold="900">
             <StackPanel Spacing="6">

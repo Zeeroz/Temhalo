@@ -1,5 +1,13 @@
 # Historique
 
+## 0.7.0-preview.5
+
+- Relecture activée par défaut : augmenter le délai revient à une keyframe de l'historique, avec le son correspondant, sans ré-encodage. Une pause par paliers complète uniquement l'historique manquant.
+- Historique glissant de cinq minutes conservé en RAM, y compris à 0 s, dans la limite mémoire commune au buffer. L'interface indique la durée disponible ; les données déjà lues sont libérées en priorité en cas de pression mémoire.
+- Réduction du délai et retour à 0 avec reprise sur keyframe, timestamps continus et synchronisation audio/vidéo. Les quatre commandes du plugin Stream Deck restent compatibles.
+- Bouton « Ouvrir l'aperçu VLC » dans Direct pour une destination RTMP locale, avec récepteur local préparé automatiquement et paramètres VLC adaptés au retour à 0 sans relancer la lecture. VLC doit être installé séparément.
+- Tests de régression pour la relecture, les changements rapides, les reconnexions, la mémoire et l'aperçu local ; validation OBS/VLC et des quatre touches Stream Deck.
+
 ## 0.7.0-preview.4
 
 - Connexion automatique et directe du plugin Stream Deck à Temhalo par un canal Windows réservé au compte courant ; une seule connexion partagée, états poussés et reconnexion sans rejeu des commandes.

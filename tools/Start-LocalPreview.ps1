@@ -32,6 +32,7 @@ foreach ($entry in @(Get-ChildItem Env: | Where-Object Name -like 'MTX_*')) {
 }
 try {
     Write-Host "Apercu local : rtmp://127.0.0.1:$Port/live/preview"
+    Write-Host "Apres Emission confirmee, ouvrez VLC dans un autre terminal : & .\tools\Open-LocalPreview.ps1 -Port $Port"
     Write-Host 'Gardez ce terminal ouvert. Ctrl+C pour arreter le serveur apres Temhalo.'
     & $tool[0].Executable $config
     if ($LASTEXITCODE -ne 0) {

@@ -50,6 +50,7 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty] private string _bufferText = "0 / 512 Mio";
     [ObservableProperty] private double _bufferPercent;
     [ObservableProperty] private string _bufferHint = "Le buffer se remplit avec le flux OBS.";
+    [ObservableProperty] private string _historyText = "Relecture · en attente du flux OBS";
     [ObservableProperty] private bool _bufferWarning;
     [ObservableProperty] private bool _preset0 = true;
     [ObservableProperty] private bool _preset15;
@@ -114,6 +115,7 @@ public partial class DashboardViewModel : ObservableObject
             CurrentText = "—"; TransitionText = running ? "En attente du flux OBS" : "Relais arrêté";
             BufferPercent = 0; BufferWarning = false; BufferText = $"0 / {ConfiguredMemoryLimitMiB} MiB";
             BufferHint = "Le buffer se remplit avec le flux OBS.";
+            HistoryText = "Relecture · en attente du flux OBS";
             return;
         }
         if (_target != delay.TargetSeconds) { _target = delay.TargetSeconds; NotifyTarget(); }
@@ -127,9 +129,10 @@ public partial class DashboardViewModel : ObservableObject
             delay.ReadTags == 0 ? "En attente du flux OBS" :
             delay.Control.Phase switch
             {
-                "IncreasingPause" => "Ajout du délai · pause en cours",
+                "IncreasingPause" => "Historique insuffisant · pause pour compléter le délai",
                 "IncreasingPlayback" => "Ajout du délai · reprise intermédiaire",
                 "IncreasingAwaitingKeyframe" => "Ajout du délai · attente d’image clé",
+                "ReplayingKeyframe" => "Relecture · reprise sur image clé",
                 "SeekingKeyframe" => "Réduction · attente d’image clé",
                 "ResumingKeyframe" => "Reprise sur image clé",
                 "OutputBacklog" => delay.TargetSeconds == 0
@@ -139,11 +142,13 @@ public partial class DashboardViewModel : ObservableObject
                 _ => delay.Control.TargetReached ? "Délai atteint" : "Remplissage du buffer"
             };
         BufferWarning = delay.BufferWarning;
+        HistoryText = !running ? "Relecture · historique actif pendant le relais" :
+            $"Relecture · {FormatDelay(delay.HistoryAvailableMilliseconds)} d’historique disponible";
         BufferPercent = delay.MaximumBufferBytes == 0 ? 0 : 100.0 * delay.BufferBytes / delay.MaximumBufferBytes;
         BufferText = $"{delay.BufferBytes / 1048576.0:0.#} / {delay.MaximumBufferBytes / 1048576} MiB";
         BufferHint = delay.BufferWarning ? "Buffer proche de la limite mémoire" : state == "RetryingOutput"
             ? "Entrée maintenue tant que la limite RAM le permet." : delay.InputCompleted && delay.BufferedTags > 0
-            ? "OBS déconnecté. Le buffer continue de se vider." : "Mémoire utilisée par le buffer RAM";
+            ? "OBS déconnecté. Le buffer continue de se vider." : "Mémoire du buffer et de l’historique de relecture";
     }
 
     private static string FormatDelay(long milliseconds) => TimeSpan.FromMilliseconds(milliseconds).ToString(@"mm\:ss", CultureInfo.InvariantCulture);

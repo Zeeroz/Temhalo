@@ -1,10 +1,20 @@
 # Délai dynamique Temhalo pendant une session
 
-Le relais local peut changer sa cible de 0 à 300 secondes sans relancer MediaMTX ni les FFmpeg. L'augmentation retient progressivement le contenu ; la réduction saute vers une image IDR ; le retour à zéro rejoint la dernière IDR disponible. La sortie reste un fichier FLV de test. L'interface WinUI attend l'étape 4.
+Le relais peut changer sa cible de 0 à 300 secondes sans relancer MediaMTX ni les FFmpeg. Dans Temhalo, l’augmentation utilise désormais **la relecture par défaut** ; les pauses servent uniquement à compléter l’historique manquant. La réduction saute vers une image IDR et le retour à zéro rejoint la dernière IDR disponible. Ces comportements fonctionnent avec les sorties RTMP et le fichier FLV de test.
 
-## Augmentation par paliers
+## Relecture par défaut
 
-Avec une sortie déjà active, le moteur attend une IDR avant chaque pause. La pause demandée dure au plus **5 secondes par défaut**, puis le moteur renvoie les en-têtes AVC/AAC et reprend sur cette IDR. Il conserve tous les tags média pendant l'augmentation. L'entrée continue de lire pendant les pauses.
+Pendant le relais, les paquets déjà traités restent dans un historique RAM glissant de cinq minutes, même à 0 s. Une augmentation déplace le lecteur vers l’IDR correspondant à la nouvelle cible et reprend à vitesse normale : le public revoit et réentend un passage déjà diffusé. La même connexion de sortie continue ; OBS reste en cours de diffusion. La reprise retransmet les en-têtes AVC/AAC associés à cette IDR et réécrit la chronologie avec un décalage commun aux deux pistes.
+
+Si la cible est de 30 s et que l’historique offre 10 s, le moteur rejoue ces 10 s puis construit les 20 s manquantes avec les paliers décrits ci-dessous. Avant toute première image émise, le délai initial se construit par remplissage. Les keyframes imposent une marge correspondant à leur intervalle ; avec OBS réglé à 1 s, viser une précision de l’ordre d’une seconde.
+
+L’historique et la file de média à diffuser partagent **la même limite RAM**. Les payloads sont partagés par référence, sans seconde copie ni réencodage. Sous pression mémoire ou à la limite de capacité des tags, l’historique ancien est libéré en priorité ; les paquets encore nécessaires à la lecture ne sont pas évincés pour raccourcir silencieusement le délai. Si cette libération ne suffit pas, le relais s’interrompt explicitement. La durée disponible affichée dans Direct peut donc être inférieure à cinq minutes. L’historique est libéré à l’arrêt du relais ; il n’est pas sauvegardé sur disque.
+
+`ReplayOnIncrease` est activé par défaut dans le moteur dynamique. L’adaptateur à délai fixe et les tests de compatibilité des paliers conservent le comportement antérieur. `ReplayDelayTests` couvre les quatre commandes Stream Deck, l’historique insuffisant, les commandes rapprochées, le tag en attente, les changements de codec, les reconnexions OBS, le roulement au-delà de cinq minutes et la libération sous pression RAM.
+
+## Pause de complément par paliers
+
+Lorsque l’historique ne suffit pas, le moteur attend une IDR avant chaque pause. La pause demandée dure au plus **5 secondes par défaut**, puis le moteur renvoie les en-têtes AVC/AAC et reprend sur cette IDR. Il conserve tous les tags média encore à diffuser. L'entrée continue de lire pendant les pauses.
 
 Avant un nouveau palier, il faut au moins une seconde de temps réel et une seconde de progression des timestamps du média émis. Le prochain palier attend ensuite une IDR ; la reprise intermédiaire peut donc dépasser une seconde. Atteindre 300 s prend plus de 300 s de temps réel. Les cibles et le délai effectivement atteint sont affichés séparément.
 
@@ -30,6 +40,8 @@ Les commandes reçues avant traitement sont coalescées : **la dernière cible g
 | `Core/Timing/DelayTransitionPlanner.cs` | Paliers, reprise intermédiaire, interruption et progression |
 | `Core/Buffering/FlvDelayMediaTransfer.cs` | Moteur FLV partagé, lecture et émission |
 | `Core/Buffering/FlvDelayMediaTransfer.Dynamic.cs` | Attentes interruptibles, recherche IDR et saut |
+| `Core/Buffering/FlvDelayMediaTransfer.History.cs` | Relecture, restauration des codecs et récupération de mémoire historique |
+| `Core/Buffering/FlvPlaybackHistory.cs` | Historique borné, index d’IDR et références partagées |
 | `Core/Buffering/FixedDelayMediaTransfer.cs` | Adaptateur de compatibilité pour les tests à cible fixe |
 | `tools/Set-LocalDelay.ps1` | Commande locale de diagnostic et accusé de réception |
 | `tools/Test-Stage3.ps1` | Essai réel de transitions et vérification du fichier |

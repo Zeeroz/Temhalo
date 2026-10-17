@@ -5,7 +5,8 @@ using Temhalo.Core.Timing;
 namespace Temhalo.Core.Flv;
 
 /// <summary>Strict streaming FLV v1 framing reader, including PreviousTagSize validation.</summary>
-public sealed class FlvTagReader(Stream input, FlvMemoryBudget budget, IMediaClock clock, int maximumTagBytes = 4 * 1024 * 1024)
+public sealed class FlvTagReader(Stream input, FlvMemoryBudget budget, IMediaClock clock, int maximumTagBytes = 4 * 1024 * 1024,
+    Func<long, CancellationToken, ValueTask>? reservePayload = null)
 {
     private readonly byte[] _header = new byte[11];
     private readonly byte[] _previous = new byte[4];
@@ -44,7 +45,8 @@ public sealed class FlvTagReader(Stream input, FlvMemoryBudget budget, IMediaClo
         if (length > maximumTagBytes) throw new InvalidDataException("Tag FLV trop volumineux.");
         uint timestamp = (uint)ReadUInt24(_header.AsSpan(4, 3)) | ((uint)_header[7] << 24);
         long charge = length + FlvTag.AllocationOverhead;
-        budget.Reserve(charge);
+        if (reservePayload is null) budget.Reserve(charge);
+        else await reservePayload(charge, token).ConfigureAwait(false);
         try
         {
             // Exact sized arrays avoid hidden pool capacity and retained payloads after release.

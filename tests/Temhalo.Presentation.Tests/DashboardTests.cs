@@ -7,6 +7,19 @@ namespace Temhalo.Presentation.Tests;
 public sealed class DashboardTests
 {
     [Fact]
+    public void HistoryAvailabilityAndMissingTimePauseAreExplainedWithoutChangingMeasuredDelay()
+    {
+        var vm = new DashboardViewModel(_ => { });
+        var delay = new FixedDelaySnapshot(30, 1048576, 1048576, 10485760, false, false, 10, 100, 90, 0, 0,
+            false, false, false, 0, 25000, 25000, new DelayTransitionSnapshot(1, "IncreasingPause", 25000,
+                true, 5000, 0, 0, 0, 0, false), HistoryAvailableMilliseconds: 25000);
+        vm.Refresh(delay, true, false, true, true, true, "Relaying", 1, 1000000, 1, TimeSpan.FromSeconds(30));
+        Assert.Equal("00:25", vm.CurrentText);
+        Assert.Contains("00:25", vm.HistoryText);
+        Assert.Contains("Historique insuffisant", vm.TransitionText);
+        Assert.Contains("historique", vm.BufferHint);
+    }
+    [Fact]
     public void HotkeyAdjustmentsUseAppliedTargetAndClampWithoutDependingOnDraft()
     {
         var sent = new List<int>(); var vm = new DashboardViewModel(sent.Add);

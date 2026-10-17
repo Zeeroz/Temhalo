@@ -4,17 +4,18 @@ namespace Temhalo.Core.Timing;
 
 public sealed record DelayTransitionSnapshot(long AppliedVersion, string Phase, long ActiveDelayMilliseconds,
     bool IsPaused, long? PauseRemainingMilliseconds, long CompletedPauseSteps, long CompletedSeeks,
-    long LastPauseMilliseconds, long MaximumPauseMilliseconds, bool TargetReached);
+    long LastPauseMilliseconds, long MaximumPauseMilliseconds, bool TargetReached, long CompletedReplays = 0);
 
 /// <summary>Consumer-owned transition state; only immutable snapshots cross thread boundaries.</summary>
 internal sealed class DelayTransitionPlanner
 {
     private readonly long _step, _resume;
     private long _active, _target, _version, _pauseStart, _pauseEnd, _pauseBase;
-    private long _steps, _seeks, _lastPause, _maxPause, _outputHigh = -1, _resumeOutput, _resumeWall;
-    private bool _paused, _hasOutput, _seeking, _cooldown, _captureResume, _ended;
+    private long _steps, _seeks, _replays, _lastPause, _maxPause, _outputHigh = -1, _resumeOutput, _resumeWall;
+    private bool _paused, _hasOutput, _seeking, _replaying, _cooldown, _captureResume, _ended;
     private sealed record Published(long Version, long Active, long Target, string Phase, bool Paused,
-        long PauseStart, long PauseEnd, long Steps, long Seeks, long LastPause, long MaxPause, bool Seeking, bool HasOutput, bool Resuming);
+        long PauseStart, long PauseEnd, long Steps, long Seeks, long LastPause, long MaxPause, bool Seeking, bool HasOutput, bool Resuming,
+        long Replays, bool Replaying);
     private Published _published;
 
     public DelayTransitionPlanner(FixedDelayOptions options, DelayRequest initial)
@@ -35,13 +36,14 @@ internal sealed class DelayTransitionPlanner
         var p = Volatile.Read(ref _published);
         long active = p.Paused ? p.Active + Math.Clamp(now - p.PauseStart, 0, p.PauseEnd - p.PauseStart) : p.Active;
         return new(p.Version, p.Phase, active, p.Paused, p.Paused ? Math.Max(0, p.PauseEnd - now) : null,
-            p.Steps, p.Seeks, p.LastPause, p.MaxPause, active == p.Target && !p.Paused && !p.Seeking && p.HasOutput && !p.Resuming);
+            p.Steps, p.Seeks, p.LastPause, p.MaxPause, active == p.Target && !p.Paused && !p.Seeking && !p.Replaying && p.HasOutput && !p.Resuming, p.Replays);
     }
 
     // True requests a keyframe seek. A lower TARGET can still mean increasing the actual delay.
     public bool Apply(DelayRequest request, long now)
     {
         if (request.Version == _version) return false;
+        _replaying = false;
         long current = _paused ? _pauseBase + Math.Clamp(now - _pauseStart, 0, _pauseEnd - _pauseStart) : _active;
         long previousTarget = _target;
         _version = request.Version;
@@ -64,7 +66,7 @@ internal sealed class DelayTransitionPlanner
         return seek;
     }
 
-    public bool CanStartPause(bool inputEnded) => !inputEnded && !_paused && !_seeking && _hasOutput &&
+    public bool CanStartPause(bool inputEnded) => !inputEnded && !_paused && !_seeking && !_replaying && _hasOutput &&
         !_cooldown && !_captureResume && _target > _active;
 
     public void StartPause(long now)
@@ -92,9 +94,10 @@ internal sealed class DelayTransitionPlanner
     public void MarkMedia(long outputDts, long now)
     {
         _outputHigh = Math.Max(_outputHigh, outputDts);
-        bool publish = !_hasOutput || _seeking || _captureResume;
+        bool publish = !_hasOutput || _seeking || _replaying || _captureResume;
         _hasOutput = true;
         if (_seeking) { _seeking = false; _seeks++; }
+        if (_replaying) { _replaying = false; _replays++; }
         if (_captureResume)
         {
             _captureResume = false; _cooldown = true;
@@ -106,17 +109,25 @@ internal sealed class DelayTransitionPlanner
     }
 
     public void MarkEnded() { _ended = true; Publish(); }
+    public void ReplayFrom(long availableDelay, long now)
+    {
+        if (_paused) FinishPause(now);
+        _active = Math.Min(_target, availableDelay);
+        _seeking = false; _replaying = true;
+        _cooldown = _captureResume = false;
+        Publish();
+    }
     public void SeekToTarget(long now)
     {
         if (_paused) FinishPause(now);
         _active = _target;
-        _seeking = true;
+        _seeking = true; _replaying = false;
         _cooldown = _captureResume = false;
         Publish();
     }
     private Published Build() => new(_version, _paused ? _pauseBase : _active, _target,
-        _paused ? "IncreasingPause" : _seeking ? "SeekingKeyframe" : _captureResume ? "ResumingKeyframe" : _ended && _target > _active ? "TargetUnreachedAtInputEnd" :
+        _paused ? "IncreasingPause" : _replaying ? "ReplayingKeyframe" : _seeking ? "SeekingKeyframe" : _captureResume ? "ResumingKeyframe" : _ended && _target > _active ? "TargetUnreachedAtInputEnd" :
         _target > _active ? (_cooldown || _captureResume ? "IncreasingPlayback" : "IncreasingAwaitingKeyframe") : "Stable",
-        _paused, _pauseStart, _pauseEnd, _steps, _seeks, _lastPause, _maxPause, _seeking, _hasOutput, _captureResume);
+        _paused, _pauseStart, _pauseEnd, _steps, _seeks, _lastPause, _maxPause, _seeking, _hasOutput, _captureResume, _replays, _replaying);
     private void Publish() => Volatile.Write(ref _published, Build());
 }
