@@ -1,5 +1,11 @@
 # Historique
 
+## 0.7.0-preview.7
+
+- Site de présentation public sur GitHub Pages, avec démonstration du délai, commandes Stream Deck simulées, téléchargements et guide rapide OBS.
+- Actualisation automatique des téléchargements à chaque publication : versions stables et previews, installeur, ZIP et notes de version. Les brouillons et fichiers incomplets sont écartés.
+- Préparation du HTML pendant le déploiement, sans appel à l'API GitHub par les visiteurs. Tests de sélection des versions et validation du déclenchement depuis le workflow de publication Windows.
+
 ## 0.7.0-preview.6
 
 - Nouvelle touche Stream Deck « Démarrer / arrêter le relais » : triangle menthe à l'arrêt, carré lavande en activité, états de démarrage/arrêt affichés et commandes bloquées pendant les transitions. La connexion est directe à Temhalo ; OBS reste indépendant.
