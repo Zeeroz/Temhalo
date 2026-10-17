@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <Description>Processus natifs, secrets DPAPI, raccourcis et services Windows.</Description>
+    <Description>Processus natifs, secrets DPAPI et contrôle Stream Deck.</Description>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -12,11 +12,5 @@
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="Serilog.Sinks.File" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="LocalWeb/Assets/*" LogicalName="Temhalo.LocalWeb.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="../../assets/brand/fonts/Inter-Variable.ttf" LogicalName="Temhalo.LocalWeb.Inter.ttf" />
-    <EmbeddedResource Include="../../assets/brand/fonts/JetBrainsMono-Variable.ttf" LogicalName="Temhalo.LocalWeb.Mono.ttf" />
-    <EmbeddedResource Include="../../assets/brand/fonts/SpaceGrotesk-Variable.ttf" LogicalName="Temhalo.LocalWeb.Space.ttf" />
   </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@ public sealed partial class DashboardPage
     private int _setupStep = 1;
     private bool _accountMaintenance;
     private Task? _accountMaintenanceTask;
-    private Task<IReadOnlyList<RelayOutput>?>? _accountPreparationTask;
+    private Task<IReadOnlyList<RelayOutput>>? _accountPreparationTask;
     private DateTimeOffset _nextAccountValidation = DateTimeOffset.MinValue;
 
     private StreamingAccountService Accounts
@@ -49,7 +49,7 @@ public sealed partial class DashboardPage
         foreach (var destination in _destinations)
         { SecretRedactor.Shared.Remember(destination.StreamKey); destination.Account?.ProtectDiagnostics(); }
         ObsAcknowledged.IsChecked = _settings.ObsInstructionsAcknowledged;
-        RenderDestinations(); ShowSetupStep(1);
+        RenderDestinations(); ShowSetupStep(HasPreparedOutput() ? (_settings.ObsInstructionsAcknowledged ? 3 : 2) : 1);
     }
     private void RenderDestinations()
     {
@@ -109,7 +109,7 @@ public sealed partial class DashboardPage
                 {
                     var value = editor.ValidatedValue();
                     var values = existing is null ? _destinations.Append(value).ToArray() : _destinations.Select(item => item.Id == existing.Id ? value : item).ToArray();
-                    if (!await SaveDestinationSetAsync(values, switchToNetwork: true)) args.Cancel = true;
+                    if (!await SaveDestinationSetAsync(values)) args.Cancel = true;
                 }
                 catch (ArgumentException ex) { args.Cancel = true; editor.Error(ex.Message); }
                 finally { deferral.Complete(); }
@@ -119,7 +119,7 @@ public sealed partial class DashboardPage
         catch (Exception ex) when (PlatformEditor.IsConnectionError(ex)) { ShowError(ex is IOException ? ex.Message : PlatformEditor.SafeError(ex)); }
         finally { editor?.Close(); _activeEditor = null; _dialogOpen = false; Refresh(); }
     }
-    private async Task<bool> SaveDestinationSetAsync(DestinationSettings[] values, bool switchToNetwork = false)
+    private async Task<bool> SaveDestinationSetAsync(DestinationSettings[] values)
     {
         if (_settingsBusy || _starting || _session.Running) return false;
         _settingsBusy = true; Refresh();
@@ -127,9 +127,9 @@ public sealed partial class DashboardPage
         {
             foreach (var value in values) value.Validate();
             var updated = _settings with { Destinations = Persistable(values), ServerUrl = "", StreamKey = "",
-                OutputMode = switchToNetwork ? 1 : OutputMode.SelectedIndex };
+                OutputMode = 1 };
             await _settingsStore.SaveAsync(updated, _accountLifetime.Token); _settings = updated;
-            _destinations.Clear(); _destinations.AddRange(values); OutputMode.SelectedIndex = updated.OutputMode;
+            _destinations.Clear(); _destinations.AddRange(values);
             RenderDestinations(); return true;
         }
         catch (OperationCanceledException) when (_closed || _accountLifetime.IsCancellationRequested) { return false; }
@@ -158,9 +158,8 @@ public sealed partial class DashboardPage
         }
         finally { _settingsBusy = false; }
     }
-    private async Task<IReadOnlyList<RelayOutput>?> ReadOutputsAsync(CancellationToken token)
+    private async Task<IReadOnlyList<RelayOutput>> ReadOutputsAsync(CancellationToken token)
     {
-        if (OutputMode.SelectedIndex == 0) return null;
         var enabled = _destinations.Where(destination => destination.Enabled).ToArray();
         if (enabled.Length == 0) throw new ArgumentException("Ajoutez puis activez au moins une destination.");
         var outputs = new List<RelayOutput>();
@@ -217,7 +216,6 @@ public sealed partial class DashboardPage
     }
     private bool HasPreparedOutput()
     {
-        if (OutputMode.SelectedIndex == 0) return true;
         var enabled = _destinations.Where(value => value.Enabled).ToArray();
         return enabled.Length > 0 && enabled.All(value => value.Account is { } account
             ? (account.AccessToken.Length > 0 || account.RefreshToken.Length > 0) && (account.Provider != StreamingProvider.YouTube || account.BroadcastId.Length > 0)
@@ -237,8 +235,7 @@ public sealed partial class DashboardPage
         LaunchHelp.Text = _session.Running ? "Temhalo est actif. Lancez le stream dans OBS ; les connexions ci-dessous se mettront à jour." : "Activez Temhalo, puis cliquez sur Commencer le streaming dans OBS.";
         bool diffusion = DestinationView.Visibility == Visibility.Visible;
         StartStopButton.Visibility = diffusion && !_session.Running ? Visibility.Collapsed : Visibility.Visible;
-        DestinationHelp.Text = OutputMode.SelectedIndex == 0 ? "Test local sélectionné : aucune plateforme ne sera contactée." :
-            ready ? "Les connexions sont enregistrées. Continuez vers OBS." : "Ajoutez une plateforme ou reconnectez les comptes signalés avant de continuer.";
+        DestinationHelp.Text = ready ? "Les connexions sont enregistrées. Continuez vers OBS." : "Ajoutez une plateforme ou reconnectez les comptes signalés avant de continuer.";
     }
     private void SetupStepClicked(object sender, RoutedEventArgs e) => ShowSetupStep(int.Parse((string)((FrameworkElement)sender).Tag));
     private void PlatformsNextClicked(object sender, RoutedEventArgs e) => ShowSetupStep(2);

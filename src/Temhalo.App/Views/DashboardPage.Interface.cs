@@ -11,50 +11,26 @@ namespace Temhalo.App.Views;
 
 public sealed partial class DashboardPage
 {
-    private InterfacePreferences _preferences = new();
-    private bool _selectingSettings, _dialogOpen;
+    private static readonly int[] DelayPresets = [0, 15, 30, 60];
+    private bool _dialogOpen;
     private nint _windowHandle;
 
     private void Navigate(string tag)
         => Navigation.SelectedItem = Navigation.MenuItems.OfType<NavigationViewItem>().Single(item => (string)item.Tag == tag);
-    private void ShowJournalClicked(object sender, RoutedEventArgs e) { Navigate("settings"); SelectSettings(3); }
-    private void SettingsNavigationChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
-    { if (!_selectingSettings && sender.SelectedItem is not null) SelectSettings(sender.Items.IndexOf(sender.SelectedItem)); }
-    private void CompactSettingsChanged(object sender, SelectionChangedEventArgs e)
-    { if (!_selectingSettings && SettingsNavigation is not null) SelectSettings(CompactSettingsNavigation.SelectedIndex); }
-    private void SelectSettings(int index)
-    {
-        if (UsageView is null || index is < 0 or > 3) return;
-        _selectingSettings = true;
-        SettingsNavigation.SelectedItem = SettingsNavigation.Items[index]; CompactSettingsNavigation.SelectedIndex = index;
-        UsageView.Visibility = index == 0 ? Visibility.Visible : Visibility.Collapsed;
-        HotkeysView.Visibility = index == 1 ? Visibility.Visible : Visibility.Collapsed;
-        ContinuityView.Visibility = index == 2 ? Visibility.Visible : Visibility.Collapsed;
-        PrivacyView.Visibility = index == 3 ? Visibility.Visible : Visibility.Collapsed;
-        _selectingSettings = false;
-    }
+    private void ShowJournalClicked(object sender, RoutedEventArgs e)
+    { Navigate("settings"); JournalExpander.IsExpanded = true; JournalExpander.StartBringIntoView(); }
 
     private void RenderPresets()
     {
         if (DirectPresets is null) return;
-        DirectPresets.Children.Clear(); SettingsPresets.Children.Clear();
-        foreach (int value in _preferences.Presets)
+        DirectPresets.Children.Clear();
+        foreach (int value in DelayPresets)
         {
             var button = new ToggleButton { Content = value == 0 ? "0 s · Direct" : $"{value} s", Tag = value };
             AutomationProperties.SetName(button, $"Appliquer {value} secondes");
             button.Click += (_, _) => { Vm.RequestTarget(value); UpdatePresetSelection(); Refresh(); };
             DirectPresets.Children.Add(button);
-            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, MinHeight = 36 };
-            row.Children.Add(new TextBlock { Text = value == 0 ? "Direct" : $"{value} s", VerticalAlignment = VerticalAlignment.Center });
-            if (value > 0)
-            {
-                var remove = new Button { Content = "×", Padding = new Thickness(4), MinWidth = 36, MinHeight = 36 };
-                AutomationProperties.SetName(remove, $"Retirer le preset {value} secondes");
-                remove.Click += async (_, _) => await ChangePresetsAsync(_preferences.Presets.Where(item => item != value).ToArray());
-                row.Children.Add(remove);
-            }
-            SettingsPresets.Children.Add(new Border { Child = row, Padding = new Thickness(12, 4, 4, 4),
-                CornerRadius = new CornerRadius(8), Background = Brush("TemhaloSurfaceBrush") });
+
         }
         var custom = new ToggleButton { Content = "Personnalisé", Tag = -1 };
         custom.Click += (_, _) => { UpdatePresetSelection(); DelayNumber.Focus(FocusState.Programmatic); };
@@ -64,41 +40,8 @@ public sealed partial class DashboardPage
     {
         if (DirectPresets is null) return;
         foreach (var button in DirectPresets.Children.OfType<ToggleButton>())
-            button.IsChecked = (int)button.Tag == Vm.TargetSeconds || (int)button.Tag == -1 && !_preferences.Presets.Contains(Vm.TargetSeconds);
+            button.IsChecked = (int)button.Tag == Vm.TargetSeconds || (int)button.Tag == -1 && !DelayPresets.Contains(Vm.TargetSeconds);
     }
-    private async void AddPresetClicked(object sender, RoutedEventArgs e)
-    {
-        if (_settingsBusy) return;
-        try
-        {
-            int value = ReadInteger(NewPreset.Value, 1, 300, "Choisissez un nombre entier de 1 à 300 secondes.");
-            if (_preferences.Presets.Contains(value)) throw new ArgumentException("Ce preset existe déjà.");
-            if (_preferences.Presets.Length >= 8) throw new ArgumentException("Conservez au maximum huit presets.");
-            await ChangePresetsAsync(_preferences.Presets.Append(value).Order().ToArray());
-        }
-        catch (ArgumentException ex) { PresetError.Text = ex.Message; }
-    }
-    private async Task ChangePresetsAsync(int[] values)
-    {
-        if (_settingsBusy) return;
-        var updated = _preferences with { Presets = values };
-        if (await SavePreferencesAsync(updated)) { RenderPresets(); PresetError.Text = ""; }
-    }
-    private async Task<bool> SavePreferencesAsync(InterfacePreferences preferences)
-    {
-        if (_settingsBusy) return false;
-        _settingsBusy = true; Refresh();
-        try
-        {
-            var updated = _settings with { Interface = preferences };
-            await _settingsStore.SaveAsync(updated); _settings = updated; _preferences = preferences;
-            _session.RecordControlEvent("Préférences d’interface enregistrées."); return true;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
-        { ShowError(SecretRedactor.Shared.Redact(ex.Message)); return false; }
-        finally { _settingsBusy = false; Refresh(); }
-    }
-
     private async void SaveMemoryClicked(object sender, RoutedEventArgs e)
     {
         if (_settingsBusy) return;
@@ -114,22 +57,13 @@ public sealed partial class DashboardPage
     }
     private void UpdateDestinationLabels()
     {
-        if (RouteDestination is null || OutputMode is null || _session.Running) return;
-        int count = _destinations.Count(destination => destination.Enabled);
-        string destination = OutputMode.SelectedIndex == 1 ? $"{count} destination(s)" : "Fichier local";
-        RouteDestination.Text = OutputMode.SelectedIndex == 1 ? string.Join(" · ", _destinations.Where(value => value.Enabled).Select(value => value.Name)) : "Fichier de test local";
-        OutputTitle.Text = "Sortie · " + destination;
-        OutputDetail.Text = OutputMode.SelectedIndex == 1 ? "RTMP / RTMPS · copie du flux" : "FLV · H.264 / AAC · copie du flux";
+        if (RouteDestination is null || _session.Running) return;
+        var enabled = _destinations.Where(value => value.Enabled).ToArray();
+        RouteDestination.Text = string.Join(" · ", enabled.Select(value => value.Name));
+        OutputTitle.Text = $"Sortie · {enabled.Length} destination(s)";
+        OutputDetail.Text = "RTMP / RTMPS · copie du flux";
     }
 
-    private async void LocalPreviewClicked(object sender, RoutedEventArgs e)
-    {
-        if (_session.Running || _starting || _settingsBusy || _destinations.Count >= 4) return;
-        var added = new DestinationSettings { Name = "Aperçu VLC", Provider = 3,
-            ServerUrl = "rtmp://127.0.0.1:1936/live", StreamKey = "preview" };
-        if (await SaveDestinationSetAsync(_destinations.Append(added).ToArray(), switchToNetwork: true))
-            ShowInfo("Destination locale prête", "Lancez tools/Start-LocalPreview.ps1, puis ouvrez rtmp://127.0.0.1:1936/live/preview dans VLC. Désactivez vos plateformes si vous souhaitez tester seulement en local.");
-    }
     private async void ObsGuideClicked(object sender, RoutedEventArgs e)
     {
         if (_dialogOpen) return;

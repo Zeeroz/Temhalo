@@ -81,7 +81,7 @@ public sealed partial class DashboardPage
                     ? $"La version {release.Version} est disponible."
                     : "Vous utilisez la dernière version disponible pour le canal choisi.";
                 if (_availableUpdate is not null && automatic)
-                    ShowInfo("Mise à jour disponible", $"Temhalo {_availableUpdate.Version} vous attend dans Réglages → Au quotidien.");
+                    ShowInfo("Mise à jour disponible", $"Temhalo {_availableUpdate.Version} vous attend dans Réglages.");
             }
             else if (_availableUpdate is { } release)
             {

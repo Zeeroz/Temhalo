@@ -24,7 +24,7 @@ Cette touche commande le relais de Temhalo. Le démarrage d'OBS reste indépenda
 | Action | Effet |
 |---|---|
 | Démarrer / arrêter le relais | Une seule touche adaptée à l'état réel du relais. Configuration dans Temhalo, aucun réglage de touche. |
-| Protection | Applique le délai de protection enregistré dans les raccourcis de Temhalo. |
+| Protection | Demande le délai maximal de 300 secondes. Les presets individuels restent réglables. |
 | Direct · 0 s | Demande le minimum local et la reprise sur une image clé. |
 | Appliquer un délai | Preset de 0 à 300 s ; plusieurs touches peuvent avoir des valeurs différentes. |
 | Ajouter / retirer | ±10 s par défaut ; pas réglable de 1 à 60 s. |

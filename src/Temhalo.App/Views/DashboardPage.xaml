@@ -130,14 +130,7 @@
             </Grid>
           </local:AdaptiveColumns>
           <TextBlock x:Name="ActiveOutputs" Visibility="Collapsed" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
-          <local:SettingRow>
-            <StackPanel Spacing="4">
-              <TextBlock Text="Aperçu local" FontWeight="Medium"/>
-              <TextBlock x:Name="PreviewHint" Text="Démarrez le relais, puis lancez le flux OBS." Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
-            </StackPanel>
-            <Button x:Name="OpenVlcButton" Content="Ouvrir l’aperçu VLC" Click="OpenVlcClicked" IsEnabled="False"
-                    AutomationProperties.AutomationId="OpenVlcPreview" ToolTipService.ToolTip="Lire la sortie locale avec les réglages VLC adaptés aux changements de délai."/>
-          </local:SettingRow>
+
           <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
           <local:AdaptiveColumns Columns="4" Threshold="900">
             <StackPanel Spacing="6">
@@ -294,54 +287,14 @@
               </StackPanel>
             </StackPanel>
           </Border>
-          <Expander Header="Options : test local et dock OBS" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-            <StackPanel Spacing="20">
-              <ComboBox x:Name="OutputMode" Header="Destination du relais" SelectedIndex="0" SelectionChanged="OutputModeChanged" HorizontalAlignment="Stretch">
-                <ComboBoxItem Content="Fichier FLV local · test sans plateforme"/><ComboBoxItem Content="Mes plateformes · RTMP / RTMPS"/>
-              </ComboBox>
-              <Button Content="Enregistrer le mode de sortie" Click="SaveDestinationClicked" HorizontalAlignment="Left"/>
-              <TextBlock Text="En mode fichier, ouvrez la session depuis Réglages pour lire le FLV dans VLC. Un nouveau fichier est créé pour chaque connexion de sortie." Style="{StaticResource TemhaloCaption}"/>
-              <local:AdaptiveColumns Threshold="760">
-                <StackPanel Spacing="12">
-                  <TextBlock Text="Voir le flux dans VLC en direct" Style="{StaticResource TemhaloSectionTitle}"/>
-                  <TextBlock Text="Lancez tools/Start-LocalPreview.ps1 pour le second serveur, puis préparez cette destination locale." Style="{StaticResource TemhaloCaption}"/>
-                  <TextBlock Text="rtmp://127.0.0.1:1936/live/preview" Style="{StaticResource TemhaloMono}" IsTextSelectionEnabled="True"/>
-                  <Button Content="Préparer la destination locale" Click="LocalPreviewClicked" HorizontalAlignment="Left"/>
-                </StackPanel>
-                <StackPanel Spacing="12">
-                  <TextBlock Text="Piloter depuis OBS" Style="{StaticResource TemhaloSectionTitle}"/>
-                  <TextBlock x:Name="DockAddress" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}"/>
-                  <Button x:Name="CopyDockButton" Content="Copier le lien privé du dock" Click="CopyDockClicked" HorizontalAlignment="Left"/>
-                  <TextBlock Text="OBS → Docks → Docks de navigateur personnalisés. Le lien reste privé sur cet ordinateur." Style="{StaticResource TemhaloCaption}"/>
-                </StackPanel>
-              </local:AdaptiveColumns>
-            </StackPanel>
-          </Expander>
+
         </StackPanel>
         <StackPanel x:Name="SettingsView" Visibility="Collapsed" Spacing="24">
           <StackPanel Spacing="4">
             <TextBlock Text="Réglages" Style="{StaticResource TemhaloTitle}" AutomationProperties.HeadingLevel="Level1"/>
-            <TextBlock Text="Un outil qui suit vos habitudes." Foreground="{ThemeResource TemhaloSecondaryBrush}"/>
+            <TextBlock Text="L’essentiel pour votre live." Style="{StaticResource TemhaloCaption}"/>
           </StackPanel>
-          <SelectorBar x:Name="SettingsNavigation" SelectionChanged="SettingsNavigationChanged">
-            <SelectorBarItem Text="Au quotidien" Tag="usage"/>
-            <SelectorBarItem Text="Vos commandes" Tag="commands"/>
-            <SelectorBarItem Text="Continuité" Tag="continuity"/>
-            <SelectorBarItem Text="Confidentialité" Tag="privacy"/>
-          </SelectorBar>
-          <ComboBox x:Name="CompactSettingsNavigation" Header="Rubrique" Visibility="Collapsed" SelectedIndex="1" SelectionChanged="CompactSettingsChanged" HorizontalAlignment="Stretch">
-            <ComboBoxItem Content="Au quotidien"/>
-            <ComboBoxItem Content="Vos commandes"/>
-            <ComboBoxItem Content="Continuité"/>
-            <ComboBoxItem Content="Confidentialité"/>
-          </ComboBox>
-          <StackPanel x:Name="UsageView" Spacing="20" Visibility="Collapsed">
-            <TextBlock Text="Au quotidien" Style="{StaticResource TemhaloSectionTitle}"/>
-            <TextBlock Text="Langue de l’interface : français."/>
-            <TextBlock Text="Le relais démarre uniquement sur votre commande." Style="{StaticResource TemhaloCaption}"/>
-            <Button Content="Voir les paramètres OBS" Click="ObsGuideClicked" HorizontalAlignment="Left"/>
-            <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
-            <StackPanel Spacing="12">
+          <StackPanel Spacing="12">
               <TextBlock Text="Mises à jour" Style="{StaticResource TemhaloSectionTitle}"/>
               <TextBlock x:Name="InstalledVersionText" Style="{StaticResource TemhaloMono}" FontSize="14"/>
               <TextBlock x:Name="UpdateStatus" Text="Les nouvelles versions sont publiées sur GitHub." Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
@@ -366,99 +319,33 @@
                 <ToggleSwitch x:Name="IncludePreviewUpdates" AutomationProperties.Name="Recevoir les versions de test" OnContent="Oui" OffContent="Non" Toggled="UpdatePreferencesChanged"/>
               </local:SettingRow>
             </StackPanel>
+          <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
+          <StackPanel Spacing="12">
+            <TextBlock Text="Stream Deck" Style="{StaticResource TemhaloSectionTitle}"/>
+            <TextBlock x:Name="StreamDeckStatus" Text="Connexion automatique en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
+            <TextBlock Text="Le plugin se connecte directement à Temhalo. Réglez chaque touche dans Stream Deck." Style="{StaticResource TemhaloCaption}"/>
+            <Button Content="Installer ou mettre à jour le plugin" Click="InstallStreamDeckClicked" HorizontalAlignment="Left"/>
           </StackPanel>
-          <StackPanel x:Name="HotkeysView" Spacing="20">
-            <StackPanel Spacing="4">
-              <TextBlock Text="Vos commandes" Style="{StaticResource TemhaloSectionTitle}"/>
-              <TextBlock Text="Les bons délais, sous la main et au clavier." Style="{StaticResource TemhaloCaption}"/>
-            </StackPanel>
+          <Expander Header="Mémoire du relais" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <StackPanel Spacing="12">
-              <TextBlock Text="Vos temps favoris"/>
-              <local:WrapPanel x:Name="SettingsPresets" Spacing="8"/>
+              <NumberBox x:Name="MemoryLimit" Header="Limite du buffer RAM (MiB)" Value="512" Minimum="1" Maximum="4096" SpinButtonPlacementMode="Inline" Width="200" HorizontalAlignment="Left"/>
+              <TextBlock Text="512 MiB conviennent généralement à cinq minutes à 8 Mbit/s. Une alerte apparaît à 80 %." Style="{StaticResource TemhaloCaption}"/>
+              <Button Content="Enregistrer la limite mémoire" Click="SaveMemoryClicked" HorizontalAlignment="Left"/>
+              <TextBlock x:Name="MemoryStatus" Style="{StaticResource TemhaloCaption}"/>
+            </StackPanel>
+          </Expander>
+          <Expander x:Name="JournalExpander" Header="Journaux et diagnostic" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Les clés et les adresses de publication sont masquées dans les journaux." Style="{StaticResource TemhaloCaption}"/>
               <local:WrapPanel Spacing="8">
-                <NumberBox x:Name="NewPreset" Header="Nouveau preset · secondes" Value="45" Minimum="1" Maximum="300" Width="200" SpinButtonPlacementMode="Inline"/>
-                <Button Content="Ajouter" Click="AddPresetClicked" VerticalAlignment="Bottom"/>
+                <Button Content="Exporter les événements affichés" Click="ExportLogsClicked"/>
+                <Button Content="Ouvrir les journaux" Click="OpenLogsClicked"/>
               </local:WrapPanel>
-              <TextBlock x:Name="PresetError" Foreground="{ThemeResource TemhaloErrorBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"/>
+              <ListView x:Name="JournalList" SelectionMode="None" MaxHeight="480" HorizontalContentAlignment="Stretch">
+                <ListView.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource TemhaloMono}" FontSize="12" TextWrapping="Wrap"/></DataTemplate></ListView.ItemTemplate>
+              </ListView>
             </StackPanel>
-            <Border Height="1" Background="{ThemeResource TemhaloRuleBrush}"/>
-            <ContentControl x:Name="HotkeyFields" HorizontalContentAlignment="Stretch">
-              <StackPanel Spacing="16">
-                <local:SettingRow>
-                  <StackPanel Spacing="4">
-                    <TextBlock Text="Délai de protection"/>
-                    <TextBlock Text="La cible du raccourci de protection." Style="{StaticResource TemhaloCaption}"/>
-                  </StackPanel>
-                  <NumberBox x:Name="ProtectionSeconds" AutomationProperties.Name="Délai du raccourci de protection en secondes" Value="300" Minimum="0" Maximum="300" SpinButtonPlacementMode="Inline"/>
-                </local:SettingRow>
-                <local:SettingRow>
-                  <TextBlock Text="Raccourcis globaux"/>
-                  <ToggleSwitch x:Name="HotkeysEnabled" AutomationProperties.Name="Activer les raccourcis globaux" IsOn="True" OnContent="Actifs" OffContent="Inactifs"/>
-                </local:SettingRow>
-                <local:SettingRow>
-                  <TextBlock Text="Appliquer le délai de protection"/>
-                  <TextBox x:Name="ProtectionHotkey" AutomationProperties.Name="Appliquer le délai de protection" Text="Ctrl+Alt+F6"/>
-                </local:SettingRow>
-                <local:SettingRow>
-                  <TextBlock Text="Revenir au direct · 0 s"/>
-                  <TextBox x:Name="ZeroHotkey" AutomationProperties.Name="Revenir au direct · 0 s" Text="Ctrl+Alt+F7"/>
-                </local:SettingRow>
-                <local:SettingRow>
-                  <TextBlock Text="Ajouter 10 s"/>
-                  <TextBox x:Name="IncreaseHotkey" AutomationProperties.Name="Ajouter 10 s" Text="Ctrl+Alt+F8"/>
-                </local:SettingRow>
-                <local:SettingRow>
-                  <TextBlock Text="Retirer 10 s"/>
-                  <TextBox x:Name="DecreaseHotkey" AutomationProperties.Name="Retirer 10 s" Text="Ctrl+Alt+F9"/>
-                </local:SettingRow>
-                <Button Click="SaveHotkeysClicked" HorizontalAlignment="Left">
-                  <TextBlock Text="Enregistrer les commandes" TextWrapping="Wrap"/>
-                </Button>
-                <TextBlock x:Name="HotkeyStatus" Text="Chargement des raccourcis…" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
-              </StackPanel>
-            </ContentControl>
-          </StackPanel>
-          <StackPanel x:Name="ContinuityView" Visibility="Collapsed" Spacing="20">
-            <TextBlock Text="Continuité" Style="{StaticResource TemhaloSectionTitle}"/>
-            <NumberBox x:Name="MemoryLimit" Header="Limite du buffer RAM (MiB)" Value="512" Minimum="1" Maximum="4096" SpinButtonPlacementMode="Inline" Width="200" HorizontalAlignment="Left"/>
-            <TextBlock Text="Alerte à 80 %. Une limite atteinte ne réduit jamais silencieusement le délai de protection." Style="{StaticResource TemhaloCaption}"/>
-            <Button Content="Enregistrer la limite mémoire" Click="SaveMemoryClicked" HorizontalAlignment="Left"/>
-            <TextBlock x:Name="MemoryStatus" Style="{StaticResource TemhaloCaption}"/>
-            <TextBlock Text="Augmentation progressive · Paliers de 5 s séparés par une reprise du flux."/>
-            <TextBlock Text="Historique avec relecture : à étudier. Aucun mode de reprise immédiate n’est activé." Style="{StaticResource TemhaloCaption}"/>
-          </StackPanel>
-          <StackPanel x:Name="PrivacyView" Visibility="Collapsed" Spacing="20">
-            <StackPanel Spacing="8">
-              <TextBlock Text="Stream Deck" Style="{StaticResource TemhaloSectionTitle}"/>
-              <TextBlock x:Name="StreamDeckStatus" Text="Connexion automatique en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
-              <TextBlock Text="Ouvrez Temhalo pour utiliser vos touches. La connexion est automatique sur cet ordinateur." Style="{StaticResource TemhaloCaption}"/>
-            </StackPanel>
-            <StackPanel Spacing="12">
-              <TextBlock Text="Dock OBS · facultatif" Style="{StaticResource TemhaloSectionTitle}"/>
-              <TextBlock x:Name="LocalServerStatus" Text="Serveur en préparation" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite"/>
-              <ToggleSwitch x:Name="ObsDockEnabled" Header="Activer le dock OBS" OnContent="Actif" OffContent="Désactivé"/>
-              <NumberBox x:Name="LocalServerPort" Header="Port du serveur navigateur" Minimum="1024" Maximum="65535" Value="43120" Width="220" HorizontalAlignment="Left" SpinButtonPlacementMode="Inline"/>
-              <Button Content="Enregistrer le dock OBS" Click="SaveLocalServerClicked" HorizontalAlignment="Left"/>
-              <TextBlock Text="Un changement de port demande de recopier les liens dans OBS. Il ne redémarre pas le relais média." Style="{StaticResource TemhaloCaption}"/>
-            </StackPanel>
-            <TextBlock Text="Confidentialité" Style="{StaticResource TemhaloSectionTitle}"/>
-            <TextBlock Text="Clés chiffrées avec DPAPI · Liées à votre compte Windows."/>
-            <TextBlock Text="Aucun envoi automatique. Les clés et URL de publication sont masquées dans les journaux." Style="{StaticResource TemhaloCaption}"/>
-            <TextBlock Text="Le dock OBS facultatif reste sur cet ordinateur. Son lien privé est conservé avec vos réglages chiffrés." Style="{StaticResource TemhaloCaption}"/>
-            <local:WrapPanel Spacing="8">
-              <Button Content="Exporter les événements affichés" Click="ExportLogsClicked"/>
-              <Button Content="Ouvrir les journaux" Click="OpenLogsClicked"/>
-              <Button Content="Ouvrir le dossier de session" Click="OpenSessionClicked"/>
-            </local:WrapPanel>
-            <TextBlock x:Name="SessionPath" Text="Aucune session démarrée." Style="{StaticResource TemhaloCaption}" IsTextSelectionEnabled="True"/>
-            <ListView x:Name="JournalList" SelectionMode="None" MaxHeight="480" HorizontalContentAlignment="Stretch">
-              <ListView.ItemTemplate>
-                <DataTemplate>
-                  <TextBlock Text="{Binding}" Style="{StaticResource TemhaloMono}" FontSize="12" TextWrapping="Wrap"/>
-                </DataTemplate>
-              </ListView.ItemTemplate>
-            </ListView>
-          </StackPanel>
+          </Expander>
         </StackPanel>
       </StackPanel>
     </ScrollViewer>

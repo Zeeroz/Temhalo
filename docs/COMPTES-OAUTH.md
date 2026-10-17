@@ -2,8 +2,9 @@
 
 Cette version implémente le parcours WinUI **Vos plateformes → Relier OBS → Lancer
 votre live**, ainsi que les connecteurs de comptes Twitch, YouTube et Kick. Les clés
-manuelles restent disponibles. Les applications développeur ne sont pas encore
-enregistrées : les essais OAuth réels nécessitent la configuration ci-dessous.
+manuelles restent disponibles. L'application publique Twitch de Temhalo est intégrée :
+la connexion Twitch fonctionne sans fichier OAuth personnel sur un autre PC. YouTube
+et Kick nécessitent encore la configuration développeur ci-dessous.
 
 ## Lancer et vérifier la version
 
@@ -27,7 +28,8 @@ Kick, erreurs sans secrets et restrictions du service Kick.
 
 ## Configuration des applications développeur
 
-Copier `config/oauth-clients.example.json` sous le nom **oauth-clients.json** dans
+Pour YouTube, Kick ou un client Twitch personnalisé, copier
+`config/oauth-clients.example.json` sous le nom **oauth-clients.json** dans
 `%LOCALAPPDATA%\Temhalo`. Pour une session `--settings-directory`, placer le fichier
 dans ce répertoire isolé. Un fichier public livré à côté de l'exécutable peut aussi
 être utilisé ; le fichier utilisateur est prioritaire. Redémarrer Temhalo après
@@ -42,7 +44,7 @@ déplacé ou effacé par le lanceur. Il concerne la version de travail, pas l'in
 
 | Champ | Valeur à renseigner |
 | --- | --- |
-| TwitchClientId | Client ID d'une application Twitch de type Public |
+| TwitchClientId | Facultatif : client Twitch Public personnalisé. En l'absence de fichier/champ, le client public Temhalo est intégré. Une valeur explicitement vide désactive cette connexion. |
 | YouTubeClientId | Client ID Google de type Application de bureau |
 | YouTubeDesktopClientSecret | Valeur du JSON **Desktop** Google si nécessaire ; jamais un secret d'application Web |
 | KickClientId | Client ID de l'application Temhalo enregistrée chez Kick |
@@ -56,9 +58,11 @@ fichier malformé ou une plateforme non configurée laisse la saisie manuelle ut
 
 ### Twitch
 
-1. Enregistrer Temhalo dans la [console Twitch](https://dev.twitch.tv/console/apps),
-   avec un client **Public**. Compléter les champs requis par la console.
-2. Reporter son Client ID. Aucun secret Twitch n'est embarqué.
+1. Dans une installation standard, cliquer **Connecter mon compte** : le client public
+   Temhalo est déjà disponible, sans copie de fichiers depuis le PC du développeur.
+2. Pour une autre application ou un fork, l'enregistrer dans la
+   [console Twitch](https://dev.twitch.tv/console/apps) en type **Public**, puis reporter
+   son Client ID dans la configuration locale. Aucun secret Twitch n'est embarqué.
 3. Temhalo utilise le [Device Code Flow officiel](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/)
    et demande seulement `channel:read:stream_key`.
 4. Cliquer **Connecter mon compte** : le navigateur ouvre Twitch ; confirmer le code
@@ -136,28 +140,27 @@ Sources : [OAuth Kick](https://docs.kick.com/getting-started/generating-tokens-o
 
 ## Procédure de test dans l'application
 
-### Sans application développeur — utilisable immédiatement
+### Installation neuve — sans configuration personnelle
 
-1. Ouvrir **Diffusion**. Vérifier navigation supérieure, absence de bloc logo ajouté,
-   puis **Twitch → Connecter mon compte**. Une aide doit annoncer la configuration
-   manquante, sans faux succès ni ouverture d'une page de connexion Temhalo.
+1. Ouvrir **Diffusion**, puis **Twitch → Connecter mon compte**. Sans fichier personnel
+   `oauth-clients.json`, le parcours doit ouvrir le site officiel Twitch et afficher le
+   code temporaire. Annuler ne doit ajouter aucun compte. YouTube et Kick non configurés
+   doivent conserver une aide explicite et la possibilité d'utiliser une clé manuelle.
 2. Choisir **Utiliser une clé manuellement**. Le serveur Twitch est prérempli ; sur
    YouTube le serveur RTMPS est prérempli ; sur Kick, renseigner serveur et clé.
-3. Tester **Autre serveur RTMP** avec `rtmp://127.0.0.1:1936/live` et la clé `preview`,
-   ou utiliser **Options → Préparer la destination locale**. Aucun véritable identifiant
-   n'est nécessaire. Lancer `tools/Start-LocalPreview.ps1` pour la lecture VLC.
+3. Vérifier les champs et les erreurs de validation d'**Autre serveur RTMP**, puis
+   annuler sans enregistrer de destination fictive. Le mode test local et l'aperçu VLC
+   ne sont plus proposés dans l'application.
 4. Annuler une modification après changement de plateforme : la destination et sa
    méthode enregistrées doivent rester intactes ; aucune clé ne doit changer de plateforme.
 5. Activer/désactiver une destination, en ajouter plusieurs (maximum quatre), revenir
    dans le formulaire et vérifier la persistance après redémarrage.
 6. Continuer vers OBS, copier le serveur et la **clé locale stream**, confirmer le
    guide. La case ne doit pas afficher « OBS connecté ».
-7. À l'étape 3, **Activer Temhalo**, puis démarrer OBS avec H.264/AAC, CBR, images clés
-   toutes les secondes. Ouvrir `rtmp://127.0.0.1:1936/live/preview` dans VLC. Les états
+7. Pour une destination et un live de test explicitement choisis, **Activer Temhalo**,
+   puis démarrer OBS avec H.264/AAC, CBR et images clés toutes les secondes. Les états
    reçu/émis doivent suivre le média réel. Tester 0 → 15 → 30 → 0 secondes et l'arrêt.
-8. En mode test FLV local (Options), vérifier qu'aucune destination de plateforme
-   n'est contactée. Si le port 1935/1936 est occupé, arrêter soi-même le serveur en
-   conflit ou utiliser l'environnement de test approprié.
+   Si le port local 1935 est occupé, arrêter le serveur en conflit avant de réessayer.
 
 ### Avec les applications développeur configurées
 
@@ -180,9 +183,10 @@ Sources : [OAuth Kick](https://docs.kick.com/getting-started/generating-tokens-o
 7. Redimensionner la fenêtre (compacte puis maximisée), parcourir les étapes et les
    formulaires avec Tab/Entrée/Échap, vérifier le scroll vertical et les états désactivés.
 
-**Limite de validation actuelle :** les applications développeur n'étant pas créées,
-les consentements, quotas et émissions sur les véritables plateformes restent à
-valider après leur enregistrement. La procédure ci-dessus ne prétend pas les avoir exécutés.
+**Limite de validation :** les tests HTTP simulés ne remplacent pas un consentement réel
+sur l'autre PC. Le client Twitch public est intégré, mais une autorisation peut toujours
+être refusée ou le réseau indisponible. Les configurations publiques YouTube/Kick et les
+émissions réelles correspondantes restent à valider séparément.
 
 ## Conservation et retrait
 

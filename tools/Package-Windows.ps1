@@ -21,7 +21,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Restauration du profil portable échouée.' }
         # A unique output avoids stale files from any previous publish.
         $publishRoot = Join-Path $repoRoot ('artifacts\publish\' + [Guid]::NewGuid().ToString('N'))
-        & dotnet publish src/Temhalo.App -c Release -p:Platform=x64 -p:PublishProfile=Portable -p:SelfContained=true --no-restore -o $publishRoot
+        & dotnet publish src/Temhalo.App -c Release -p:Platform=x64 -p:PublishProfile=Portable -p:SelfContained=true -p:DebugType=None -p:DebugSymbols=false --no-restore -o $publishRoot
         if ($LASTEXITCODE -ne 0) { throw 'Publication autonome échouée.' }
         [void][IO.Directory]::CreateDirectory((Join-Path $repoRoot 'artifacts\publish'))
         $publishRoot | Set-Content -LiteralPath (Join-Path $repoRoot 'artifacts\publish\last-output.txt') -Encoding UTF8
@@ -46,8 +46,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $repoRoot 'BRAND.md') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\MISES-A-JOUR.md') -Destination $package
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\ETAPE-6.md') -Destination (Join-Path $package 'GUIDE-DE-TEST.md')
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\CONTROLES-LOCAUX.md') -Destination (Join-Path $package 'GUIDE-OBS.md')
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\DEMARRAGE-RAPIDE.md') -Destination (Join-Path $package 'GUIDE-RAPIDE.md')
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\LISEZ-MOI.txt') -Destination $package
     Copy-Item -LiteralPath (Join-Path $repoRoot 'packaging\THIRD-PARTY-NOTICES.md') -Destination $package
     $streamDeckDirectory = Join-Path $package 'plugins\streamdeck'

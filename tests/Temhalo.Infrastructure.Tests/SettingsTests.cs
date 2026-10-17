@@ -1,5 +1,4 @@
 using System.Text;
-using Temhalo.Infrastructure.Windows.Hotkeys;
 using Temhalo.Infrastructure.Windows.Logging;
 using Temhalo.Infrastructure.Windows.Settings;
 using Xunit;
@@ -80,20 +79,6 @@ public sealed class SettingsTests
         }
     }
 
-    [Theory]
-    [InlineData("F6")]
-    [InlineData("Ctrl+F12")]
-    [InlineData("Ctrl+Ctrl+P")]
-    [InlineData("Ctrl+Alt+")]
-    public void InvalidGesturesCannotBeRegistered(string gesture) => Assert.Throws<ArgumentException>(() => HotkeyGesture.Parse(gesture));
-
-    [Fact]
-    public void EquivalentGesturesCannotBeAssignedToTwoActions()
-    {
-        Assert.Equal(HotkeyGesture.Parse("Ctrl+Alt+F6"), HotkeyGesture.Parse("alt + CONTROL + f6"));
-        Assert.Throws<ArgumentException>(() => (new HotkeySettings { Zero = "alt+control+f6" }).Validate());
-    }
-
     [Fact]
     public void SecretsAreRemovedEvenOutsideUrlOrNamedCredentialFields()
     {
@@ -102,5 +87,30 @@ public sealed class SettingsTests
         redactor.Remember(key);
         string clean = redactor.Redact("failure: " + key + " rtmp://127.0.0.1/app/" + key);
         Assert.DoesNotContain(key, clean); Assert.DoesNotContain("rtmp://", clean);
+    }
+
+    [Fact]
+    public async Task RetiredFeaturesCannotBlockOrReactivateAfterUpgradeAndAccountsArePreserved()
+    {
+        string folder = Path.Combine(Path.GetTempPath(), "Temhalo-upgrade-" + Guid.NewGuid().ToString("N"));
+        var store = new DpapiSettingsStore(folder);
+        var destination = new DestinationSettings { Name = "Destination conservée", Provider = 3,
+            ServerUrl = "rtmps://example.test/live", StreamKey = "test-only-key" };
+        var old = new AppSettings { OutputMode = 0, ObsDockEnabled = true, Destinations = [destination],
+            Hotkeys = new() { Enabled = true, Increase = "legacy-invalid-key" },
+            Interface = new() { Presets = [-1] }, LocalAccess = new() { Port = -1 } };
+        try
+        {
+            await store.SaveAsync(old);
+            byte[] original = await File.ReadAllBytesAsync(store.FilePath);
+            var upgraded = (await store.LoadAsync()).ForDesktop();
+            Assert.Equal(1, upgraded.OutputMode); Assert.False(upgraded.ObsDockEnabled);
+            Assert.False(upgraded.Hotkeys.Enabled);
+            Assert.Equal(destination, Assert.Single(upgraded.Destinations!));
+            Assert.Equal(original, await File.ReadAllBytesAsync(store.FilePath));
+            await store.SaveAsync(upgraded);
+            Assert.Equal(destination, Assert.Single((await store.LoadAsync()).Destinations!));
+        }
+        finally { File.Delete(store.FilePath); Directory.Delete(folder); }
     }
 }

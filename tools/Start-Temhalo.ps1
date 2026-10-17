@@ -2,6 +2,7 @@
 param(
     [ValidatePattern('^[0-9]{3,4}x[0-9]{3,4}$')][string]$WindowSize = '1280x820',
     [string]$SettingsDirectory = '',
+    [switch]$ValidationSession,
     [ValidateSet('Debug','Release')][string]$Configuration = 'Debug'
 )
 Set-StrictMode -Version Latest
@@ -25,6 +26,16 @@ if (-not $SettingsDirectory -and (Test-Path -LiteralPath $launchProfilePath -Pat
 }
 $exe = Join-Path $repoRoot "src\Temhalo.App\bin\x64\$Configuration\net8.0-windows10.0.26100.0\win-x64\Temhalo.App.exe"
 if (-not (Test-Path -LiteralPath $exe)) { throw "Compilez la solution $Configuration x64 avant de lancer Temhalo." }
+if ($ValidationSession) {
+    if (-not $SettingsDirectory) { throw 'Une validation exige un dossier de reglages explicite.' }
+    # The desktop inspector resolves installed applications by executable name.
+    # A test-owned apphost avoids selecting the user's installed Temhalo window.
+    $validationExe = Join-Path (Split-Path $exe) ('Temhalo.Validation-' + [guid]::NewGuid().ToString('N') + '.exe')
+    Copy-Item -LiteralPath $exe -Destination $validationExe
+    Copy-Item -LiteralPath ([IO.Path]::ChangeExtension($exe, '.pri')) -Destination ([IO.Path]::ChangeExtension($validationExe, '.pri'))
+    $exe = $validationExe
+}
 $appArguments = @('--window-size', $WindowSize)
+if ($ValidationSession) { $appArguments += '--validation-session' }
 if ($SettingsDirectory) { $appArguments += @('--settings-directory', [IO.Path]::GetFullPath($SettingsDirectory), '--data-directory', [IO.Path]::GetFullPath($SettingsDirectory)) }
 & $exe @appArguments

@@ -4,7 +4,7 @@ Temhalo — Windows x64
 2. Lancer Temhalo.App.exe. Ne pas déplacer l'EXE seul : les DLL, Assets et config sont nécessaires.
 3. Au premier clic sur Démarrer, MediaMTX et FFmpeg sont téléchargés depuis leurs releases officielles GitHub et vérifiés par SHA-256. Une connexion Internet est nécessaire une seule fois par version des outils.
 4. Dans OBS : serveur rtmp://127.0.0.1:1935/live ; clé stream ; H.264/AAC, CBR, intervalle d'image clé 1 s.
-5. Commencer par une sortie fichier locale ou les essais VLC décrits dans GUIDE-DE-TEST.md.
+5. Dans Diffusion, ajouter les plateformes, puis suivre le guide OBS. Les commandes du délai sont sur Direct. Voir GUIDE-RAPIDE.md.
 
 .NET 8, ASP.NET Core 8 et Windows App SDK sont inclus. Aucun SDK/Visual Studio ni droit administrateur requis. Garder le dossier complet.
 Réglages DPAPI, journaux, outils et sessions : %LOCALAPPDATA%\Temhalo. Les outils vérifiés sont réutilisables hors ligne.

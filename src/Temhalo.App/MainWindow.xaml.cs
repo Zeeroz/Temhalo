@@ -12,7 +12,12 @@ public sealed partial class MainWindow : Window
     private bool _lastContrast;
     public MainWindow()
     {
+        // An explicit validation session has its own taskbar identity, so desktop
+        // test tools cannot confuse it with the installed application.
+        bool validation = Environment.GetCommandLineArgs().Contains("--validation-session");
+        if (validation) _ = SetCurrentProcessExplicitAppUserModelID($"Temhalo.Validation.{Environment.ProcessId}");
         InitializeComponent();
+        if (validation) Title = "Temhalo — Validation";
         Dashboard.AttachWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
         Dashboard.UpdateInstallerStarted += Close;
         AppWindow.Resize(InitialSize());
@@ -52,6 +57,9 @@ public sealed partial class MainWindow : Window
         }
         return new SizeInt32(1280, 820);
     }
+
+    [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
 
     private async void Closing(AppWindow sender, AppWindowClosingEventArgs args)
     {

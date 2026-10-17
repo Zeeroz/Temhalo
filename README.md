@@ -24,11 +24,13 @@ Un ZIP portable autonome est également disponible. Les réglages et comptes son
 2. Dans OBS → Paramètres → Stream, choisissez **Personnalisé**, serveur `rtmp://127.0.0.1:1935/live`, clé locale `stream`.
 3. Réglez OBS sur H.264 + AAC, débit CBR et intervalle d’images clés de **1 seconde**. Désactivez le délai de stream propre à OBS.
 4. Démarrez le relais dans Temhalo, puis la diffusion dans OBS.
-5. Dans **Direct**, appliquez un preset ou une valeur de 0 à 300 secondes. Les réglages donnent accès aux raccourcis et aux diagnostics. L'overlay a été retiré des sources actuelles.
+5. Dans **Direct**, appliquez un preset ou une valeur de 0 à 300 secondes. Une seule page Réglages regroupe les mises à jour, le Stream Deck, la mémoire et les journaux.
 
-Pour un essai privé, utilisez une destination locale : [voir le flux dans VLC](docs/APERÇU-LOCAL-VLC.md). Aucune plateforme ne doit être activée pendant ce test.
+[Guide rapide](docs/DEMARRAGE-RAPIDE.md) : plateformes, OBS, commandes du délai et Stream Deck.
 
-La connexion OAuth nécessite des applications développeur configurées : [guide Twitch, YouTube et Kick](docs/COMPTES-OAUTH.md). Les identifiants personnels, jetons et clés ne sont pas fournis dans le dépôt. Les clés manuelles restent utilisables sans broker. Kick nécessite un broker hébergé pour conserver son secret côté serveur ; ses sources sont dans `services/Temhalo.AccountBroker`.
+La connexion Twitch utilise l'identifiant public de l'application Temhalo intégré aux sources ; aucun fichier personnel ni secret Twitch n'est nécessaire sur un autre PC. YouTube et Kick nécessitent encore leur configuration développeur : [guide des comptes](docs/COMPTES-OAUTH.md). Les jetons et clés des utilisateurs ne sont jamais fournis dans le dépôt. Les clés manuelles restent utilisables sans broker. Kick nécessite un broker hébergé pour conserver son secret côté serveur ; ses sources sont dans `services/Temhalo.AccountBroker`.
+
+Les pages Vos commandes et Confidentialité, les raccourcis clavier globaux, les presets personnalisables, le dock OBS et le test local ont été retirés. Les commandes 0/15/30/60 s et la saisie jusqu’à 300 s restent sur Direct ; les touches se règlent dans Stream Deck.
 
 ## Mises à jour
 
@@ -40,7 +42,7 @@ Pour publier vos changements depuis les sources, lancez `./Publier-Temhalo.ps1` 
 
 ## Stream Deck
 
-Le plugin Stream Deck facultatif fournit huit actions : protection, direct 0 s, preset, ajout/retrait du délai, affichage du délai mesuré, état OBS/sorties et réglage à la molette pour Stream Deck +. Depuis `0.7.0-preview.4`, le plugin se connecte automatiquement à l'application par un canal Windows dédié, avec les états poussés par Temhalo. Aucun dock OBS n'est nécessaire. Mettez à jour l'application et le plugin ensemble ; `0.7.0-preview.3` utilise encore la liaison HTTP. [Installation, actions et procédure de test](plugins/streamdeck/README.md).
+Le plugin Stream Deck facultatif fournit neuf actions : démarrage/arrêt du relais, protection, direct 0 s, preset, ajout/retrait du délai, affichage du délai mesuré, état OBS/sorties et réglage à la molette pour Stream Deck +. Depuis `0.7.0-preview.4`, le plugin se connecte automatiquement à l'application par un canal Windows dédié, avec les états poussés par Temhalo. Aucun dock OBS n'est nécessaire. Mettez à jour l'application et le plugin ensemble ; `0.7.0-preview.3` utilise encore la liaison HTTP. [Installation, actions et procédure de test](plugins/streamdeck/README.md).
 
 Pour le construire ou produire les paquets Windows depuis les sources, installez aussi Node.js 24 et pnpm 11.25.0. `./tools/Build-StreamDeck.ps1` construit, teste, valide et emballe le plugin sans modifier vos profils Stream Deck. Ces outils ne sont pas nécessaires aux utilisateurs du paquet précompilé.
 

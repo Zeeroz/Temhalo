@@ -23,7 +23,8 @@ Stream Deck à la fin de la copie. Terminez les éventuelles confirmations dans
 Stream Deck. Les profils, touches et valeurs existantes restent gérés par Elgato.
 
 Sans Stream Deck, l'option est désactivée et Temhalo s'installe normalement.
-Après avoir installé Stream Deck 6.6 ou ultérieur, double-cliquez sur
+Après avoir installé Stream Deck 6.6 ou ultérieur, ouvrez **Réglages** dans Temhalo
+et utilisez **Installer / mettre à jour le plugin**. Vous pouvez aussi ouvrir
 `plugins/streamdeck/Temhalo.streamDeckPlugin` dans le dossier de Temhalo.
 Ce fichier reste fourni même lorsque l'option est décochée. Si son ouverture
 échoue, l'installeur affiche son emplacement et termine l'installation de Temhalo.
@@ -39,7 +40,7 @@ Cette préversion et son installeur ne sont pas signés avec un certificat édit
 MediaMTX et FFmpeg sont téléchargés depuis les versions officielles verrouillées
 au premier démarrage du relais, puis vérifiés par SHA-256. Internet est nécessaire
 à cette première acquisition ; le cache vérifié est réutilisable ensuite.
-Le guide `GUIDE-DE-TEST.md` détaille le test du relais avec OBS et VLC.
+Le fichier `GUIDE-RAPIDE.md` explique la configuration des plateformes et d'OBS.
 
 ## Mise à jour et réparation
 
@@ -70,8 +71,8 @@ Elle n'efface pas récursivement le dossier d'installation : les fichiers que
 vous y avez ajoutés sont conservés.
 
 **Les données du profil restent dans `%LOCALAPPDATA%\Temhalo`** : configuration
-DPAPI, clés de stream chiffrées, liens privés du dock, journaux, outils
-téléchargés et sessions locales. Une réinstallation avec le même compte Windows
+DPAPI, clés de stream chiffrées, journaux et outils téléchargés. Les éventuels anciens
+fichiers de sessions locales sont également conservés. Une réinstallation avec le même compte Windows
 peut les réutiliser. Leur suppression définitive reste une action manuelle,
 après sauvegarde des enregistrements souhaités.
 
@@ -105,7 +106,7 @@ Depuis la racine du projet, sous PowerShell 7 :
 & .\tools\Test-Installer.ps1
 ```
 
-Le ZIP `artifacts/packages/Temhalo-0.7.0-preview.6-win-x64.zip` et sa somme
+Le ZIP `artifacts/packages/Temhalo-0.7.0-preview.8-win-x64.zip` et sa somme
 `.sha256` doivent être présents. Pour le reconstruire d'abord, utiliser
 `tools/Package-Windows.ps1` après avoir conservé toute archive déjà livrée.
 L'installeur est écrit sous `artifacts/packages/`, avec sa somme SHA-256 et

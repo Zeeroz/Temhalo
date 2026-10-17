@@ -10,7 +10,6 @@ using Temhalo.Core.Buffering;
 using Temhalo.Infrastructure.Windows.Logging;
 using Temhalo.Infrastructure.Windows.Processes;
 using Temhalo.Infrastructure.Windows.Deployment;
-using Temhalo.Infrastructure.Windows.Preview;
 
 namespace Temhalo.App.Services;
 
@@ -25,8 +24,6 @@ internal sealed class RelaySession : IAsyncDisposable
     private ILoggerFactory? _factory;
     private string? _error;
     private bool _wasConnected;
-    private LocalPreviewReceiver? _previewReceiver;
-    private string? _mediaMtxExecutable;
     private bool _bufferWarning;
     private long _observedReplays;
     private string? _phase;
@@ -59,9 +56,11 @@ internal sealed class RelaySession : IAsyncDisposable
         _log?.Information("Cible demandée : {Seconds} s", seconds);
     }
 
-    public async Task StartAsync(int initialSeconds, long bufferBytes, RelayDestination? destination, IReadOnlyList<RelayOutput>? outputs = null,
-        LocalPreviewTarget? previewTarget = null, CancellationToken cancellationToken = default)
+    public async Task StartAsync(int initialSeconds, long bufferBytes, IReadOnlyList<RelayOutput> outputs,
+        CancellationToken cancellationToken = default)
     {
+        if (outputs.Count is < 1 or > 4 || outputs.Any(output => output.Destination is null))
+            throw new ArgumentException("Ajoutez puis activez au moins une plateforme de diffusion.");
         if (Running) throw new InvalidOperationException("Le relais est déjà actif.");
         _cancellation?.Dispose(); _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var preparationToken = _cancellation.Token;
@@ -88,22 +87,12 @@ internal sealed class RelaySession : IAsyncDisposable
             mediaMtx = Tool("MediaMTX"); ffmpeg = Tool("FFmpeg");
         }
         preparationToken.ThrowIfCancellationRequested();
-        if (_previewReceiver is not null) { await _previewReceiver.DisposeAsync(); _previewReceiver = null; }
-        _mediaMtxExecutable = mediaMtx;
         DirectoryPath = Path.Combine(layout.SessionDirectory, $"run-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
         Directory.CreateDirectory(DirectoryPath);
-        // Prepare before OBS arrives, so this optional local output cannot build a recovery backlog.
-        if (previewTarget is not null)
-        {
-            var receiver = new LocalPreviewReceiver(mediaMtx, DirectoryPath, _factory!.CreateLogger<LocalPreviewReceiver>());
-            try { await receiver.EnsureAsync(previewTarget, preparationToken); _previewReceiver = receiver; }
-            catch { await receiver.DisposeAsync(); throw; }
-        }
-        Network = outputs is not null ? outputs.Any(output => output.Destination is not null) : destination is not null;
+        Network = true;
         var options = new LocalRelayOptions(mediaMtx, ffmpeg,
             Path.Combine(layout.ConfigurationDirectory, "mediamtx.yml"), DirectoryPath)
         {
-            Destination = destination,
             Outputs = outputs,
             FixedDelay = new FixedDelayOptions { DelaySeconds = initialSeconds, MaximumBufferBytes = bufferBytes }
         };
@@ -156,17 +145,7 @@ internal sealed class RelaySession : IAsyncDisposable
         if (Running) LastAction = "Arrêt demandé. Vidange des tags complets en cours.";
         _cancellation?.Cancel();
         if (_run is not null) await _run;
-        if (_previewReceiver is not null) { await _previewReceiver.DisposeAsync(); _previewReceiver = null; }
         if (_run is not null) LastAction = Network ? "Relais arrêté. Émission terminée." : "Relais arrêté. Fichier de session finalisé.";
-    }
-
-    public async Task EnsurePreviewReceiverAsync(LocalPreviewTarget target, CancellationToken token)
-    {
-        if (!Running || Stopping || _mediaMtxExecutable is null || DirectoryPath is null)
-            throw new InvalidOperationException("Démarrez le relais avant l’aperçu.");
-        using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(token, _cancellation!.Token);
-        _previewReceiver ??= new LocalPreviewReceiver(_mediaMtxExecutable, DirectoryPath, _factory!.CreateLogger<LocalPreviewReceiver>());
-        await _previewReceiver.EnsureAsync(target, lifetime.Token);
     }
 
     public async ValueTask DisposeAsync()

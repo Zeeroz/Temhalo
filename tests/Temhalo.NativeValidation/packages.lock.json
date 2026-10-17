@@ -53,7 +53,7 @@
           "Microsoft.Extensions.Options": "[8.0.2, )",
           "Serilog.Sinks.File": "[7.0.0, )",
           "System.Security.Cryptography.ProtectedData": "[8.0.0, )",
-          "Temhalo.Core": "[0.0.0, )"
+          "Temhalo.Core": "[0.7.0-preview.8, )"
         }
       },
       "Microsoft.Extensions.Hosting.Abstractions": {

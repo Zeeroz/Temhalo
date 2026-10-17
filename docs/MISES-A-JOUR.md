@@ -2,7 +2,7 @@
 
 ## Dans l’application
 
-1. Ouvrez **Réglages → Au quotidien → Mises à jour**.
+1. Ouvrez **Réglages → Mises à jour**.
 2. Cliquez sur **Rechercher une mise à jour**. Une recherche au démarrage peut être activée ou désactivée ici.
 3. Si une version plus récente est disponible, consultez les notes puis cliquez sur **Télécharger la mise à jour**. Le téléchargement peut être annulé.
 4. Une fois votre live terminé, arrêtez le relais. Le bouton **Installer et fermer Temhalo** devient disponible.

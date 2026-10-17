@@ -53,6 +53,7 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "Temhalo"
 
 !define MUI_WELCOMEPAGE_TITLE "Installez votre tempo."
 !define MUI_WELCOMEPAGE_TEXT "Temhalo ${PRODUCT_VERSION}$\r$\nContrôle du délai de diffusion$\r$\n$\r$\nL'application sera installée pour votre compte Windows, avec une entrée dans le menu Démarrer.$\r$\n$\r$\nFermez Temhalo avant une mise à jour, une fois votre diffusion terminée.$\r$\n$\r$\nVos réglages et vos clés chiffrées seront conservés."
+!define MUI_PAGE_CUSTOMFUNCTION_PRE WelcomePagePre
 !insertmacro MUI_PAGE_WELCOME
 !define MUI_COMPONENTSPAGE_TEXT_TOP "Le menu Démarrer est inclus. Choisissez le raccourci Bureau et, si Stream Deck est détecté, l'installation ou la mise à jour du plugin Temhalo."
 !define MUI_COMPONENTSPAGE_NODESC
@@ -63,7 +64,6 @@ VIAddVersionKey /LANG=1036 "LegalCopyright" "Temhalo"
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Ouvrir Temhalo"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchTemhalo
-!define MUI_FINISHPAGE_RUN_NOTCHECKED
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW FinishPageShow
 !insertmacro MUI_PAGE_FINISH
 
@@ -196,6 +196,13 @@ FunctionEnd
 !macroend
 !insertmacro SharedFunctions ""
 !insertmacro SharedFunctions "un."
+
+; Updates keep the remembered options and skip the repeated introductory page.
+Function WelcomePagePre
+  ${If} $PreviousInstallDirectory != ""
+    Abort
+  ${EndIf}
+FunctionEnd
 
 Function .onInit
   ; The in-app updater starts the ordinary wizard, then closes Temhalo cleanly.

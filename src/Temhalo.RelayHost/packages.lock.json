@@ -295,15 +295,6 @@
         "resolved": "4.2.0",
         "contentHash": "gmoWVOvKgbME8TYR+gwMf7osROiWAURterc6Rt2dQyX7wtjZYpqFiA/pY6ztjGQKKV62GGCyOcmtP1UKMHgSmA=="
       },
-      "Serilog.Extensions.Logging": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "YEAMWu1UnWgf1c1KP85l1SgXGfiVo0Rz6x08pCiPOIBt2Qe18tcZLvdBUuV5o1QHvrs8FAry9wTIhgBRtjIlEg==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Serilog": "3.1.1"
-        }
-      },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
         "resolved": "8.0.1",
@@ -320,7 +311,7 @@
           "Microsoft.Extensions.Options": "[8.0.2, )",
           "Serilog.Sinks.File": "[7.0.0, )",
           "System.Security.Cryptography.ProtectedData": "[8.0.0, )",
-          "Temhalo.Core": "[0.0.0, )"
+          "Temhalo.Core": "[0.7.0-preview.8, )"
         }
       },
       "Microsoft.Extensions.Hosting.Abstractions": {
@@ -353,6 +344,16 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
           "Microsoft.Extensions.Primitives": "8.0.0"
+        }
+      },
+      "Serilog.Extensions.Logging": {
+        "type": "CentralTransitive",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "YEAMWu1UnWgf1c1KP85l1SgXGfiVo0Rz6x08pCiPOIBt2Qe18tcZLvdBUuV5o1QHvrs8FAry9wTIhgBRtjIlEg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "8.0.0",
+          "Serilog": "3.1.1"
         }
       },
       "System.Security.Cryptography.ProtectedData": {

@@ -45,7 +45,11 @@ public sealed class AccountConnectionException(string message, bool reconnect = 
 /// <summary>Public client configuration. The confidential Kick secret belongs ONLY to the broker.</summary>
 public sealed record OAuthClientConfiguration
 {
-    public string TwitchClientId { get; init; } = "";
+    // Registered PUBLIC Temhalo application, supplied by the project owner.
+    // A client ID identifies the app; it is neither a secret nor a user token.
+    // Shipping it makes Twitch sign-in work on a fresh PC, without a private file.
+    public const string PublicTwitchClientId = "2pr1nfnlymnne2a65p5ketd4gy3ki2";
+    public string TwitchClientId { get; init; } = PublicTwitchClientId;
     public string YouTubeClientId { get; init; } = "";
     // Desktop Google credentials are not confidential; a web-app secret must never be used here.
     public string YouTubeDesktopClientSecret { get; init; } = "";

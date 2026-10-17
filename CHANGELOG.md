@@ -1,5 +1,13 @@
 # Historique
 
+## 0.7.0-preview.8
+
+- Réglages réunis sur une seule page : mises à jour, connexion Stream Deck, mémoire et journaux. Suppression des pages Vos commandes et Confidentialité, des raccourcis clavier globaux et des presets personnalisables dans l'application.
+- Suppression du dock OBS, de son serveur HTTP et de ses ressources, ainsi que du mode fichier/test local et de l'aperçu VLC dans l'application. Le protocole direct Stream Deck et ses actions sont conservés.
+- Reprise du parcours Diffusion selon la configuration déjà enregistrée ; accès guidé depuis le bouton principal sans destination. Graphiques redessinés uniquement sur le Direct visible.
+- Dépendances de démarrage inutilisées et ressources web dupliquées retirées ; symboles de débogage exclus des livraisons. L'installeur saute l'accueil lors d'une mise à jour et propose la relance par défaut.
+- Client public Twitch intégré pour connecter un nouveau PC sans configuration personnelle. Comptes, destinations et profils Stream Deck conservés.
+
 ## 0.7.0-preview.7
 
 - Site de présentation public sur GitHub Pages, avec démonstration du délai, commandes Stream Deck simulées, téléchargements et guide rapide OBS.

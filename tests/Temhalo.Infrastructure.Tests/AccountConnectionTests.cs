@@ -32,8 +32,35 @@ public sealed class AccountConnectionTests
     [Fact]
     public async Task MissingClientDoesNotOpenBrowserOrCallPlatform()
     {
-        var service = new StreamingAccountService(new HttpClient(new Handler(_ => throw new Exception("No HTTP expected"))), new(), (_, _) => throw new Exception("No browser expected"));
+        var service = new StreamingAccountService(new HttpClient(new Handler(_ => throw new Exception("No HTTP expected"))), new() { TwitchClientId = "" }, (_, _) => throw new Exception("No browser expected"));
         await Assert.ThrowsAsync<AccountConnectionException>(() => service.ConnectAsync(StreamingProvider.Twitch, new Progress<AuthorizationPrompt>(), default));
+    }
+
+    [Fact]
+    public async Task FreshInstallTwitchConnectionUsesPublicTemhaloClientWithoutSecret()
+    {
+        string folder = Path.Combine(Path.GetTempPath(), "Temhalo-fresh-oauth-" + Guid.NewGuid().ToString("N"));
+        var clients = OAuthClientConfiguration.Load(folder); int browserCalls = 0;
+        var service = new StreamingAccountService(new HttpClient(new Handler(async request =>
+        {
+            string body = request.Content is null ? "" : await request.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("client_secret", body);
+            if (request.Method == HttpMethod.Post) Assert.Contains("client_id=" + OAuthClientConfiguration.PublicTwitchClientId, body);
+            return request.RequestUri!.AbsolutePath switch
+            {
+                "/oauth2/device" => Json("""{"device_code":"test-device","user_code":"CODE","verification_uri":"https://www.twitch.tv/activate","interval":1,"expires_in":60}"""),
+                "/oauth2/token" => Json("""{"access_token":"test-access","refresh_token":"test-refresh","expires_in":14400}"""),
+                "/oauth2/validate" => Json("{\"client_id\":\"" + clients.TwitchClientId + "\",\"user_id\":\"42\",\"login\":\"test\",\"scopes\":[\"channel:read:stream_key\"]}"),
+                _ => throw new InvalidOperationException("Unexpected endpoint")
+            };
+        })), clients, (uri, _) =>
+        {
+            Assert.Equal("https://www.twitch.tv/activate", uri.AbsoluteUri); browserCalls++;
+            return Task.CompletedTask;
+        });
+        var account = await service.ConnectAsync(StreamingProvider.Twitch, new Progress<AuthorizationPrompt>(), default);
+        Assert.Equal("@test", account.DisplayName); Assert.Equal(1, browserCalls);
+        Assert.False(Directory.Exists(folder));
     }
     [Fact]
     public async Task GoogleBrowserFlowUsesSystemBrowserPkceStateOfflineAccessAndReadOnlyScope()
