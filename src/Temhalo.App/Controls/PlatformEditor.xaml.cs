@@ -69,7 +69,8 @@ public sealed partial class PlatformEditor : UserControl
         _account = value.Account; _account?.ProtectDiagnostics();
         NameInput.Text = value.Name; EnabledChoice.IsChecked = value.Enabled; RememberChoice.IsChecked = value.RememberKey;
         ServerInput.Text = value.ServerUrl; KeyInput.Password = value.StreamKey;
-        ManualChoice.IsOn = _provider > 2 || value.Account is null && value.StreamKey.Length > 0;
+        ManualChoice.IsOn = _provider > 2 || value.Account is null &&
+            (value.StreamKey.Length > 0 || !_accounts.IsConnectionConfigured((StreamingProvider)_provider));
         ProviderDescription.Text = _provider switch
         {
             0 => "Reliez votre chaîne Twitch, ou renseignez votre clé de stream.",
@@ -105,17 +106,27 @@ public sealed partial class PlatformEditor : UserControl
     {
         if (AccountPanel is null) return;
         bool manual = _provider > 2 || ManualChoice.IsOn;
-        ManualChoice.Visibility = _provider <= 2 ? Visibility.Visible : Visibility.Collapsed;
+        ProviderDescription.Text = manual ? _provider switch
+        {
+            0 => "Copiez votre clé depuis les paramètres Stream du tableau de bord Twitch.",
+            1 => "Ouvrez votre diffusion dans YouTube Studio, puis copiez sa clé de diffusion ici.",
+            2 => "Copiez le serveur et la clé depuis les paramètres de diffusion de votre tableau de bord Kick.",
+            4 => "Utilisez le serveur et la clé LIVE fournis par TikTok, si votre compte y a accès.",
+            _ => "Copiez le serveur et la clé de diffusion fournis par votre service."
+        } : _provider == 1 ? "Reliez votre chaîne YouTube, puis choisissez le live préparé dans Studio."
+            : "Autorisez Temhalo dans votre navigateur. Votre mot de passe ne se saisit jamais ici.";
+        ManualChoice.Visibility = _provider <= 2 && (_account is not null || _accounts.IsConnectionConfigured((StreamingProvider)_provider))
+            ? Visibility.Visible : Visibility.Collapsed;
         ManualFields.Visibility = manual ? Visibility.Visible : Visibility.Collapsed;
         AccountPanel.Visibility = manual ? Visibility.Collapsed : Visibility.Visible;
         AuthorizationWait.Visibility = Busy ? Visibility.Visible : Visibility.Collapsed;
         ConnectButton.IsEnabled = !Busy;
-        ConnectButton.Content = _account is null ? "Connecter mon compte ↗" : "Changer / reconnecter le compte ↗";
+        ConnectButton.Content = _account is null ? "Connecter mon compte ↗" : "Reconnecter mon compte ↗";
         AccountProfile.Visibility = _account is null ? Visibility.Collapsed : Visibility.Visible;
         AccountProfile.Text = _account is null ? "" : _account.DisplayName + (_account.AccessToken.Length > 0 || _account.RefreshToken.Length > 0 ? " · Compte lié" : " · À reconnecter");
         AccountNote.Visibility = _account is null ? Visibility.Collapsed : Visibility.Visible;
         YouTubePanel.Visibility = _account?.Provider == StreamingProvider.YouTube ? Visibility.Visible : Visibility.Collapsed;
-        RememberChoice.Content = manual ? "Mémoriser la clé chiffrée pour mon compte Windows" : "Mémoriser la connexion chiffrée pour mon compte Windows";
+        RememberLabel.Text = manual ? "Mémoriser la clé chiffrée pour mon compte Windows" : "Mémoriser la connexion chiffrée pour mon compte Windows";
         ReadinessChanged?.Invoke(CanSave);
     }
     private async void ConnectClicked(object sender, RoutedEventArgs e)

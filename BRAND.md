@@ -1,6 +1,6 @@
 # Temhalo — Mini brand book
 
-Version 1.11 · 17 octobre 2026 · Stream Deck direct et retrait de l'overlay
+Version 1.12 · 18 octobre 2026 · Prise en main guidée et commandes simplifiées
 
 **Statut : identité visuelle, étapes 0 à 6 et étape 5 bis (interface et services) validées par l'utilisateur. Installeur Windows 0.6.0-preview.1 autorisé, avec raccourcis Bureau/menu Démarrer et désinstallation conservant les données du profil.**
 
@@ -432,3 +432,15 @@ Le nom de livraison est `Temhalo-0.6.0-preview.1-win-x64.zip`. Les textes de pr�
 Le dessin `design/streamdeck-v3/` est validé et intégré. Pour les commandes preset, ajout, retrait et retour à 0 : fond Ardoise, angle de 8 unités sur une grille 144 × 144, trait de pictogramme de 5 unités. L'horloge, le signe + et le retour au direct utilisent Halo ; le signe − utilise Écho. La valeur blanche et son unité grise partagent la ligne inférieure. Aucun logo ni petit libellé d'action n'est ajouté à la touche.
 
 La variante normale correspond à la maquette à 72 et 144 px. Un contour Vigilance signale les transitions et problèmes de flux. Les états hors ligne et occupé remplacent la valeur par un libellé explicite ; ils ne présentent pas une cible comme une mesure confirmée. Les touches de suivi conservent leur distinction entre mesure et cible. Le panneau de réglages reprend les contrôles compacts de Stream Deck et indique la connexion directe à Temhalo.
+
+
+## 16. Refonte de prise en main — 18 octobre 2026
+
+Maquette validée par l’utilisateur, intégrée dans WinUI 3. Navigation haute Direct / Diffusion / Réglages ; symbole et nom uniquement dans la barre de titre.
+
+- Première configuration : plateforme, réglages OBS, démarrage. Un profil déjà configuré accède au Direct. La validation du guide OBS est une déclaration manuelle, jamais une détection de flux.
+- Direct : une seule surface de commande avec mesure, cible appliquée, presets et durée personnalisée repliée. L’ouverture du champ ou du slider n’envoie aucune commande ; Appliquer valide la saisie. Entrée OBS et chaque sortie restent identifiables séparément.
+- Diffusion : formulaires intégrés à la page, modifications transactionnelles et annulation. Compte proposé si le client OAuth est configuré, clé manuelle autrement. Un compte existant reste disponible. Aucune migration ni réinitialisation des réglages.
+- Réglages : mises à jour et Stream Deck visibles ; mémoire, débits et journaux dans Options avancées et diagnostic. Aucun retour de l’overlay, du dock OBS, des raccourcis globaux ou du test local.
+- Démarrer le relais / Arrêter le relais restent les libellés communs. L’arrêt depuis l’interface demande confirmation. Les cinq touches Stream Deck gardent leurs commandes et leur liaison directe.
+- Adaptation : largeur réelle de la page, deux colonnes dès 920 DIP utiles, sinon une colonne ; navigation et commandes d’en-tête s’empilent sous 760 DIP. Aucun défilement horizontal.

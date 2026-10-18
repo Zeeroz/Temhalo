@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Temhalo — Proposition de prise en main</title>
+  <link rel="icon" href="../../assets/brand/svg/temhalo-symbol-color.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="interface.css">
+</head>
+<body>
+  <svg class="icon-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="m12 3 10 18H2Z"/><path d="M12 9v5m0 3v.1"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 5 7 7-7 7"/></symbol>
+  </svg>
+  <aside class="review-bar" aria-label="Commandes de la maquette">
+    <div><strong>Maquette interactive</strong><span>Données fictives · aucune action sur OBS, vos comptes ou votre live</span></div>
+    <div class="review-actions">
+      <label for="scenario">Situation</label>
+      <select id="scenario">
+        <option value="first">Première ouverture</option><option value="ready">Configuration terminée</option>
+        <option value="waiting">En attente d’OBS</option><option value="live">En diffusion</option>
+        <option value="reconnect">Reconnexion d’une sortie</option><option value="port">Port local occupé</option>
+        <option value="memory">Alerte mémoire</option>
+      </select>
+      <button id="simulate-obs" class="review-button" disabled>Simuler le flux OBS</button>
+    </div>
+  </aside>
+  <div class="app-window">
+    <div class="titlebar"><img src="../../assets/brand/svg/temhalo-symbol-color.svg" alt=""><span>Temhalo</span><span class="window-controls" aria-hidden="true">—　 □　 ×</span></div>
+    <header class="app-header">
+      <nav aria-label="Navigation principale">
+        <button data-page="direct">Direct</button><button data-page="diffusion">Diffusion</button><button data-page="settings">Réglages</button>
+      </nav>
+      <div class="session-actions"><span id="session-state" class="session-state"></span><button id="relay-action" hidden></button></div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+  </div>
+  <dialog id="confirmation" aria-labelledby="dialog-title"><div id="dialog-body"></div></dialog>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="parcours.js"></script>
+</body>
+</html>

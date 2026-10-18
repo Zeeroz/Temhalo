@@ -1,0 +1,69 @@
+TEMHALO — PROPOSITION DE PRISE EN MAIN
+18 octobre 2026 — Maquette à valider avant modification du logiciel.
+
+Fichier principal : Temhalo-prise-en-main.html
+Ouvrez ce fichier manuellement dans votre navigateur pour essayer les parcours.
+Les fichiers voisins interface.css et parcours.js doivent rester à côté du HTML.
+Les aperçus SVG/PNG sont dans apercus/ : Direct, première ouverture, guide OBS,
+Réglages et fenêtre compacte. Ce sont des planches de conception, pas des captures
+de la version WinUI installée.
+Le prototype fonctionne avec les polices et le symbole locaux de Temhalo.
+Les boutons et données sont des simulations en mémoire : aucun compte, jeton,
+processus, flux, presse-papiers ou fichier de réglages réel n'est modifié.
+
+PRINCIPES
+- Navigation en haut : Direct, Diffusion, Réglages. Logo et nom dans la barre de titre.
+- Assistant au premier lancement ; accès direct aux commandes une fois configuré.
+- Un vocabulaire stable : Démarrer le relais / Arrêter le relais.
+- Délai mesuré et cible appliquée distincts, format mm:ss du brand book.
+- Presets immédiats ; Personnalisé ouvre le slider et le nombre, validés par Appliquer.
+- Entrée OBS et sorties vérifiées séparément ; compte lié ne signifie pas émission.
+- Diagnostic conservé derrière les options avancées, sans statistiques FLV sur Direct.
+- Confirmation avant l'arrêt d'une émission. Pas de reprise du dock, de l'overlay,
+  des raccourcis clavier ou du test local supprimés en preview.8.
+
+PARCOURS A ESSAYER
+1. Situation Première ouverture : ajouter Twitch, puis Connecter mon compte.
+2. Simuler l'autorisation et ajouter le compte fictif. Annuler ne doit rien enregistrer.
+3. Essayer YouTube ou Kick avec une clé fictive ; Kick demande aussi un serveur.
+4. Continuer vers OBS : deux valeurs à copier, détails vidéo et audio repliés.
+5. J'ai terminé dans OBS confirme uniquement la lecture du guide.
+6. Démarrer le relais : préparation simulée, puis attente d'OBS.
+7. Simuler le flux OBS depuis la barre de relecture, extérieure à l'application.
+8. Sur Direct : 0, 15, 30, 60 s ; ouvrir Personnalisé, saisir 25 puis Appliquer.
+9. Tester la confirmation d'arrêt et son annulation.
+10. Essayer Reconnexion d'une sortie, Port local occupé et Alerte mémoire.
+11. Dans Réglages, ouvrir Options avancées et diagnostic.
+12. Redimensionner : 1920, 1280, 720 et 320 px ; utiliser Tab, Entrée et Échap.
+
+VERIFICATIONS EFFECTUEES
+- 18 contrôles de parcours passent dans un DOM hors ligne : données fictives,
+  formulaires, annulations, attente d'OBS, cibles, confirmations et erreurs.
+- Les cinq planches SVG ont été rendues en PNG et inspectées visuellement.
+- 214 fichiers de production vérifiés par empreinte, sans modification.
+- Aucun compte ni réglage utilisateur n'a été lu ou modifié pour cette maquette.
+Le navigateur automatisé refuse l'ouverture d'un fichier local. Aucun contournement
+n'a été utilisé. Le rendu HTML, le redimensionnement réel et la navigation clavier
+restent donc à vérifier manuellement ; les contrôles DOM ne valident pas la mise en page.
+Après validation, l'implémentation devra être testée dans WinUI 3 sur Windows.
+
+REPRODUCTION DES CONTROLES (DEVELOPPEMENT FACULTATIF)
+Les dépendances de vérification sont isolées dans artifacts/validation/
+refonte-prise-en-main/qa-runtime, hors du produit et ignorées par Git.
+node design/refonte-prise-en-main/verifier-parcours.cjs
+node design/refonte-prise-en-main/render-previews.cjs
+
+RACCORDEMENT PREVU APRES VALIDATION
+Les services média, la supervision, le chiffrement et le canal direct Stream Deck
+restent inchangés. Les états simulés du prototype devront être alimentés par la
+télémétrie réelle du moteur. Aucun contrôle ne doit présenter une cible comme une
+mesure ni une confirmation manuelle comme une détection automatique d'OBS.
+
+Twitch dispose du client public intégré. Pour YouTube et Kick, la clé est proposée
+par défaut lorsque leur configuration OAuth manque. Dans une installation où cette
+configuration existe, la connexion de compte et la sélection du live YouTube restent
+accessibles. La maquette illustre le parcours sans configuration OAuth personnelle.
+
+L'assistant OBS ne modifie pas OBS automatiquement. La préparation des outils reprend
+le téléchargement et la vérification existants du premier démarrage du relais.
+Les rubriques et états de BRAND.md devront être actualisés avec la proposition validée.

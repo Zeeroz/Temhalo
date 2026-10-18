@@ -1,5 +1,14 @@
 # Historique
 
+## 0.7.0-preview.9
+
+- Nouvelle interface WinUI 3 fidèle à la DA Temhalo : navigation en haut, Direct centré sur le délai actuel et la cible appliquée, presets immédiats et saisie personnalisée repliée.
+- Première configuration guidée en trois étapes : plateforme, réglages OBS, démarrage. Les profils déjà configurés accèdent au Direct ; la lecture du guide OBS reste distincte de la réception réelle du flux.
+- Formulaires de plateforme intégrés à Diffusion, avec enregistrement et annulation des modifications. La connexion de compte est proposée lorsque sa configuration OAuth est disponible ; la clé manuelle reste accessible et devient le parcours par défaut autrement.
+- État OBS et état de chaque sortie séparés ; préparation, attente du flux, reconnexion et pression mémoire accompagnées d’explications. Confirmation avant l’arrêt depuis l’interface et annulation de la préparation du relais.
+- Réglages simplifiés : mises à jour et Stream Deck visibles, mémoire, débits et journaux regroupés dans le diagnostic. Mise en page adaptée aux fenêtres étroites et au plein écran ; graphiques actualisés à la consultation du diagnostic.
+- Réglages DPAPI, comptes et commandes directes Stream Deck conservés, y compris les cinq touches de délai et de démarrage/arrêt. Le trajet média passthrough et la relecture restent inchangés.
+
 ## 0.7.0-preview.8
 
 - Réglages réunis sur une seule page : mises à jour, connexion Stream Deck, mémoire et journaux. Suppression des pages Vos commandes et Confidentialité, des raccourcis clavier globaux et des presets personnalisables dans l'application.

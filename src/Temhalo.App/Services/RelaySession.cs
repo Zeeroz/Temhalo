@@ -57,13 +57,15 @@ internal sealed class RelaySession : IAsyncDisposable
     }
 
     public async Task StartAsync(int initialSeconds, long bufferBytes, IReadOnlyList<RelayOutput> outputs,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, CancellationToken preparationCancellationToken = default)
     {
         if (outputs.Count is < 1 or > 4 || outputs.Any(output => output.Destination is null))
             throw new ArgumentException("Ajoutez puis activez au moins une plateforme de diffusion.");
         if (Running) throw new InvalidOperationException("Le relais est déjà actif.");
         _cancellation?.Dispose(); _cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var preparationToken = _cancellation.Token;
+        using var startup = CancellationTokenSource.CreateLinkedTokenSource(preparationToken, preparationCancellationToken);
+        var startupToken = startup.Token;
         Volatile.Write(ref _error, null);
         var layout = ApplicationLayout.Resolve(AppContext.BaseDirectory, Environment.CurrentDirectory, AppStorage.DataDirectory);
         string mediaMtx, ffmpeg;
@@ -71,7 +73,7 @@ internal sealed class RelaySession : IAsyncDisposable
         {
             var progress = new Progress<string>(message => { LastAction = message; RecordControlEvent(message); });
             var native = await new NativeToolProvisioner(Path.Combine(layout.ConfigurationDirectory, "native-tools.lock.json"),
-                layout.NativeCacheDirectory).EnsureAsync(progress, preparationToken);
+                layout.NativeCacheDirectory).EnsureAsync(progress, startupToken);
             mediaMtx = native.MediaMtx; ffmpeg = native.Ffmpeg;
         }
         else
@@ -86,7 +88,7 @@ internal sealed class RelaySession : IAsyncDisposable
             }
             mediaMtx = Tool("MediaMTX"); ffmpeg = Tool("FFmpeg");
         }
-        preparationToken.ThrowIfCancellationRequested();
+        startupToken.ThrowIfCancellationRequested();
         DirectoryPath = Path.Combine(layout.SessionDirectory, $"run-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
         Directory.CreateDirectory(DirectoryPath);
         Network = true;

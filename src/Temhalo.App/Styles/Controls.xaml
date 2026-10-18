@@ -83,6 +83,35 @@
     <Setter Property="Padding" Value="12,10" /><Setter Property="MinWidth" Value="60" />
     <Setter Property="BorderBrush" Value="{ThemeResource TemhaloControlBrush}" />
   </Style>
+  <Style x:Key="TemhaloLinkButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+    <Setter Property="FontFamily" Value="{StaticResource TemhaloUiFont}"/>
+    <Setter Property="Foreground" Value="{ThemeResource TemhaloHaloBrush}"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="MinHeight" Value="44"/>
+    <Setter Property="Padding" Value="0,8"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+  </Style>
+  <Style x:Key="TemhaloProviderButton" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="FontFamily" Value="{StaticResource TemhaloUiFont}"/>
+    <Setter Property="Padding" Value="20,18"/>
+    <Setter Property="MinHeight" Value="80"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="Background" Value="{ThemeResource TemhaloSurfaceBrush}"/>
+    <Setter Property="BorderBrush" Value="{ThemeResource TemhaloControlBrush}"/>
+  </Style>
+  <Style x:Key="TemhaloStepButton" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="FontFamily" Value="{StaticResource TemhaloUiFont}"/>
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="MinHeight" Value="44"/>
+    <Setter Property="Padding" Value="16,10"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+  </Style>
   <Style TargetType="TextBox">
     <Setter Property="CornerRadius" Value="8" />
     <Setter Property="FontFamily" Value="{StaticResource TemhaloUiFont}" /><Setter Property="MinHeight" Value="44" />

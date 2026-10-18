@@ -6,6 +6,22 @@ namespace Temhalo.Infrastructure.Tests;
 public sealed class OAuthClientConfigurationTests
 {
     [Fact]
+    public void ConnectionChoicesReflectProjectCapabilitiesWithoutCallingTheNetwork()
+    {
+        using var http = new HttpClient();
+        var defaults = new StreamingAccountService(http, new(), (_, _) => throw new Exception("No browser expected"));
+        Assert.True(defaults.IsConnectionConfigured(StreamingProvider.Twitch));
+        Assert.False(defaults.IsConnectionConfigured(StreamingProvider.YouTube));
+        Assert.False(defaults.IsConnectionConfigured(StreamingProvider.Kick));
+        var configured = new StreamingAccountService(http, new()
+        { YouTubeClientId = "test-google", KickClientId = "test-kick", KickBrokerUrl = "https://broker.example.test" }, (_, _) => Task.CompletedTask);
+        Assert.True(configured.IsConnectionConfigured(StreamingProvider.YouTube));
+        Assert.True(configured.IsConnectionConfigured(StreamingProvider.Kick));
+        var invalidBroker = new StreamingAccountService(http, new()
+        { KickClientId = "test-kick", KickBrokerUrl = "https://broker.example.test/?bad=1" }, (_, _) => Task.CompletedTask);
+        Assert.False(invalidBroker.IsConnectionConfigured(StreamingProvider.Kick));
+    }
+    [Fact]
     public void FreshInstallCanStartTwitchConnectionWithoutAPersonalConfigurationFile()
     {
         string folder = Path.Combine(Path.GetTempPath(), "Temhalo-oauth-" + Guid.NewGuid().ToString("N"));

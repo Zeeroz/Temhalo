@@ -7,7 +7,8 @@ namespace Temhalo.App.Controls;
 /// <summary>A setting's explanation and editor share a row, then stack at compact widths.</summary>
 public sealed class SettingRow : Panel
 {
-    private const double EditorWidth = 240, Gap = 24, Threshold = 580;
+    public double EditorWidth { get; set; } = 260;
+    private const double Gap = 24, Threshold = 580;
     protected override Size MeasureOverride(Size size)
     {
         if (Children.Count != 2) return new Size(size.Width, 0);

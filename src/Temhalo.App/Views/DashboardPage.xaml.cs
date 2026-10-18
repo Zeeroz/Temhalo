@@ -24,6 +24,7 @@ public sealed partial class DashboardPage : Page
     private readonly DpapiSettingsStore _settingsStore = CreateSettingsStore();
     private AppSettings _settings = new();
     private bool _settingsBusy = true, _settingsLoaded;
+    private CancellationTokenSource? _relayStartCancellation;
     public DashboardViewModel Vm { get; }
 
     // An explicit directory isolates native UI validation from the user's encrypted configuration.
@@ -62,6 +63,7 @@ public sealed partial class DashboardPage : Page
             MemoryLimit.Value = _settings.MemoryLimitMiB;
             InitializeDestinations();
             RenderPresets(); UpdateDestinationLabels();
+            if (_setupGuiding) Navigate("diffusion");
             _session.RecordControlEvent("Configuration chargée ; aucun démarrage automatique de diffusion.");
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
@@ -84,14 +86,23 @@ public sealed partial class DashboardPage : Page
         Grid.SetColumnSpan(SessionCommands, narrow ? 2 : 1);
         SessionCommands.Margin = narrow ? new Thickness(0, 8, 0, 0) : new Thickness(0);
         bool tiny = ActualWidth < 540;
-        Grid.SetColumnSpan(CurrentGroup, tiny ? 2 : 1);
-        Grid.SetColumnSpan(TargetGroup, tiny ? 2 : 1);
-        Grid.SetColumn(TargetGroup, tiny ? 0 : 1);
-        Grid.SetRow(TargetGroup, tiny ? 1 : 0);
-        DelayValues.RowSpacing = tiny ? 12 : 0;
+        // The second header column must release its width when commands move below navigation.
+        HeaderGrid.ColumnDefinitions[1].Width = narrow ? new GridLength(0) : GridLength.Auto;
+        HeaderGrid.Padding = tiny ? new Thickness(12, 8, 12, 12) : new Thickness(20, 8, 28, 12);
+        foreach (var (layout, label, button) in new[]
+        { (PlatformsStepLayout, PlatformsStepLabel, PlatformsStep), (ObsStepLayout, ObsStepLabel, ObsStep), (LaunchStepLayout, LaunchStepLabel, LaunchStep) })
+        {
+            layout.ColumnDefinitions[0].Width = tiny ? new GridLength(1, GridUnitType.Star) : new GridLength(28);
+            layout.ColumnDefinitions[1].Width = tiny ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            Grid.SetColumn(label, tiny ? 0 : 1); Grid.SetRow(label, tiny ? 1 : 0);
+            label.Margin = tiny ? new Thickness(0, 8, 0, 0) : new Thickness(0);
+            label.FontSize = tiny ? 12 : 14;
+            button.Padding = tiny ? new Thickness(4, 8, 4, 8) : new Thickness(16, 10, 16, 10);
+        }
         string state = ActualWidth - 56 >= 920 ? "WideLayout" : "CompactLayout";
         if (_layout == state) return;
         _layout = state;
+        DelayGrid.ColumnDefinitions[1].Width = state == "WideLayout" ? new GridLength(1.9, GridUnitType.Star) : new GridLength(0);
         VisualStateManager.GoToState(this, state, false);
     }
 
@@ -99,6 +110,7 @@ public sealed partial class DashboardPage : Page
     {
         if (DashboardView is null) return;
         string tag = (args.SelectedItem as NavigationViewItem)?.Tag as string ?? "direct";
+        if (tag != "diffusion" && _activeEditor is not null && !_editorSaving) CancelEditor();
         DashboardView.Visibility = tag == "direct" ? Visibility.Visible : Visibility.Collapsed;
         DestinationView.Visibility = tag == "diffusion" ? Visibility.Visible : Visibility.Collapsed;
         SettingsView.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
@@ -106,18 +118,18 @@ public sealed partial class DashboardPage : Page
         MainScroll.ChangeView(null, 0, null, disableAnimation: true);
     }
 
-    private void CustomClicked(object sender, RoutedEventArgs e)
-    {
-        ((Microsoft.UI.Xaml.Controls.Primitives.ToggleButton)sender).IsChecked = Vm.PresetCustom;
-        DelayNumber.Focus(FocusState.Programmatic);
-    }
     private async void StartStopClicked(object sender, RoutedEventArgs e)
     {
+        if (_dialogOpen) return;
         if (!_session.Running && !_starting && !HasPreparedOutput())
-        { Navigate("diffusion"); ShowSetupStep(1); return; }
+        { _setupGuiding = true; Navigate("diffusion"); ShowSetupStep(1); return; }
         var state = ReadRelayControlState();
         if (!(state.CanStart || state.CanStop)) return;
-        await (_relayOperationTask = ChangeRelayRunningAsync(!_session.Running));
+        bool start = !_session.Running;
+        if (!start && !await ConfirmStopAsync()) return;
+        state = ReadRelayControlState();
+        if (!(start ? state.CanStart : state.CanStop)) return;
+        await (_relayOperationTask = ChangeRelayRunningAsync(start));
     }
 
     private async Task ChangeRelayRunningAsync(bool start)
@@ -134,14 +146,16 @@ public sealed partial class DashboardPage : Page
         try
         {
             _starting = true; Vm.CanEdit = false; StartStopButton.IsEnabled = false; Notice.IsOpen = false;
+            _setupGuiding = false; Navigate("direct");
             Refresh();
             if (!double.IsFinite(MemoryLimit.Value) || MemoryLimit.Value is < 1 or > 4096 || Math.Truncate(MemoryLimit.Value) != MemoryLimit.Value)
                 throw new ArgumentException("La limite mémoire doit être un entier de 1 à 4096 Mio.");
             using var preparation = CancellationTokenSource.CreateLinkedTokenSource(_accountLifetime.Token);
+            _relayStartCancellation = preparation;
             preparation.CancelAfter(TimeSpan.FromMinutes(2));
             _accountPreparationTask = ReadOutputsAsync(preparation.Token);
             var outputs = await _accountPreparationTask;
-            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), outputs, _accountLifetime.Token);
+            await _session.StartAsync(Vm.TargetSeconds, checked((long)MemoryLimit.Value * 1048576), outputs, _accountLifetime.Token, preparation.Token);
             OutputTitle.Text = $"Sorties · {outputs.Count} destination(s)";
             OutputDetail.Text = "RTMP / RTMPS · passthrough";
             _shownError = null;
@@ -152,7 +166,7 @@ public sealed partial class DashboardPage : Page
         catch (OperationCanceledException) { ShowError("La préparation des outils a été interrompue ou a dépassé son délai. Réessayez Démarrer."); }
         catch (Exception ex) when (ex is IOException or InvalidDataException or ArgumentException or InvalidOperationException or System.Text.Json.JsonException or UnauthorizedAccessException or HttpRequestException)
         { ShowError(SecretRedactor.Shared.Redact(ex.Message)); }
-        finally { _starting = false; RenderDestinations(); Refresh(); }
+        finally { _relayStartCancellation = null; _starting = false; RenderDestinations(); Refresh(); }
     }
 
     private void Refresh()
@@ -179,13 +193,8 @@ public sealed partial class DashboardPage : Page
         IngestState.Foreground = Brush(snapshot?.IngestConnected == true && _session.Running ? "TemhaloSuccessBrush" : "TemhaloMutedBrush");
         OutputState.Foreground = Brush(snapshot?.OutputReady == true && _session.Running ? "TemhaloSuccessBrush" : "TemhaloMutedBrush");
         BufferBar.Foreground = Brush(Vm.BufferWarning ? "TemhaloWarningBrush" : "TemhaloControlBrush");
-        FooterInput.Text = "OBS · " + Vm.IngestText; FooterInput.Foreground = IngestState.Foreground;
-        FooterOutput.Text = "Sortie · " + Vm.OutputText; FooterOutput.Foreground = OutputState.Foreground;
-        if (DashboardView.Visibility == Visibility.Visible)
-        {
-            TimeRail.Update(_session.Running ? snapshot?.Delay?.LastMediaAgeMilliseconds : null, Vm.TargetSeconds);
-            RateChart.Update(Vm.Rates.Points);
-        }
+        if (SettingsView.Visibility == Visibility.Visible && JournalExpander.IsExpanded) RateChart.Update(Vm.Rates.Points);
+        RefreshDirect(snapshot);
         ReserveValue.Text = $"{snapshot?.Delay?.BufferedTags ?? 0:N0} tags FLV";
         ReconnectValue.Text = (snapshot?.Outputs is { Count: > 1 } outputs ? outputs.Sum(output => Math.Max(0, output.Attempt - 1)) : snapshot?.Delay?.OutputReconnections ?? 0).ToString();
         SkippedValue.Text = $"{(snapshot?.Delay?.SkippedMediaTags ?? 0) + (snapshot?.Outputs?.Sum(output => output.SkippedTags) ?? 0):N0} tags FLV";

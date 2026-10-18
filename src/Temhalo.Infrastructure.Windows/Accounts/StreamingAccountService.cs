@@ -17,6 +17,13 @@ public sealed class StreamingAccountService(HttpClient http, OAuthClientConfigur
     public const string YouTubeScope = "https://www.googleapis.com/auth/youtube.readonly";
     public const string KickScopes = "channel:read streamkey:read";
 
+    /// <summary>Project capability only; this never contacts a platform or inspects user tokens.</summary>
+    public bool IsConnectionConfigured(StreamingProvider provider)
+    {
+        try { clients.Require(provider); return true; }
+        catch (AccountConnectionException) { return false; }
+    }
+
     public async Task<ConnectedAccount> ConnectAsync(StreamingProvider provider, IProgress<AuthorizationPrompt> progress, CancellationToken token)
     {
         clients.Require(provider);

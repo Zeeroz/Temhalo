@@ -1,42 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UserControl x:Class="Temhalo.App.Controls.PlatformEditor" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Temhalo.App.Controls">
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled" HorizontalContentAlignment="Stretch" MaxHeight="560">
-    <StackPanel Spacing="20" Padding="0,4,16,8">
-      <ComboBox x:Name="ProviderChoice" Header="Plateforme" HorizontalAlignment="Stretch" SelectionChanged="ProviderChanged" AutomationProperties.AutomationId="AccountProvider">
-        <ComboBoxItem Content="Twitch"/><ComboBoxItem Content="YouTube"/><ComboBoxItem Content="Kick"/>
-        <ComboBoxItem Content="TikTok"/><ComboBoxItem Content="Facebook"/><ComboBoxItem Content="Restream"/><ComboBoxItem Content="Autre serveur RTMP"/>
-      </ComboBox>
-      <TextBlock x:Name="ProviderDescription" Style="{StaticResource TemhaloCaption}"/>
-      <StackPanel x:Name="AccountPanel" Spacing="12">
-        <TextBlock x:Name="AccountProfile" Style="{StaticResource TemhaloSectionTitle}" TextWrapping="Wrap" Visibility="Collapsed"/>
-        <Button x:Name="ConnectButton" Content="Connecter mon compte ↗" Click="ConnectClicked" Style="{StaticResource TemhaloPrimaryButton}" AutomationProperties.AutomationId="ConnectAccount"/>
-        <TextBlock Text="L’autorisation se fait dans votre navigateur, sur le site officiel de la plateforme." Style="{StaticResource TemhaloCaption}"/>
-        <StackPanel x:Name="AuthorizationWait" Spacing="12" Visibility="Collapsed">
-          <ProgressBar IsIndeterminate="True"/>
-          <TextBlock x:Name="AuthorizationMessage" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite" IsTextSelectionEnabled="True"/>
-          <Button Content="Annuler la connexion" Click="CancelConnectionClicked"/>
-        </StackPanel>
-        <StackPanel x:Name="YouTubePanel" Spacing="8" Visibility="Collapsed">
-          <ComboBox x:Name="BroadcastChoice" Header="Live à utiliser" HorizontalAlignment="Stretch" DisplayMemberPath="Title" SelectionChanged="BroadcastChanged" AutomationProperties.AutomationId="YouTubeBroadcast"/>
-          <TextBlock Text="Choisissez un live préparé et associé à un flux dans YouTube Studio. Temhalo ne crée ni ne publie d’événement." Style="{StaticResource TemhaloCaption}"/>
-          <Button Content="Actualiser les lives" Click="ReloadBroadcastsClicked"/>
-        </StackPanel>
-        <TextBlock x:Name="AccountNote" Text="Le compte lié prépare la destination. L’émission sera vérifiée après le démarrage du stream OBS." Style="{StaticResource TemhaloCaption}" Visibility="Collapsed"/>
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Temhalo.App.Controls" x:Class="Temhalo.App.Controls.PlatformEditor">
+  <StackPanel Spacing="20">
+    <ComboBox x:Name="ProviderChoice" Header="Plateforme" Visibility="Collapsed" HorizontalAlignment="Stretch" SelectionChanged="ProviderChanged" AutomationProperties.AutomationId="AccountProvider">
+      <ComboBoxItem Content="Twitch"/>
+      <ComboBoxItem Content="YouTube"/>
+      <ComboBoxItem Content="Kick"/>
+      <ComboBoxItem Content="TikTok"/>
+      <ComboBoxItem Content="Facebook"/>
+      <ComboBoxItem Content="Restream"/>
+      <ComboBoxItem Content="Autre serveur RTMP"/>
+    </ComboBox>
+    <TextBlock x:Name="ProviderDescription" Style="{StaticResource TemhaloCaption}"/>
+    <StackPanel x:Name="AccountPanel" Spacing="12">
+      <TextBlock x:Name="AccountProfile" Style="{StaticResource TemhaloSectionTitle}" TextWrapping="Wrap" Visibility="Collapsed"/>
+      <Button x:Name="ConnectButton" Content="Connecter mon compte ↗" Click="ConnectClicked" Style="{StaticResource TemhaloPrimaryButton}" AutomationProperties.AutomationId="ConnectAccount"/>
+      <TextBlock Text="L’autorisation se fait dans votre navigateur, sur le site officiel de la plateforme." Style="{StaticResource TemhaloCaption}"/>
+      <StackPanel x:Name="AuthorizationWait" Spacing="12" Visibility="Collapsed">
+        <ProgressBar IsIndeterminate="True"/>
+        <TextBlock x:Name="AuthorizationMessage" Style="{StaticResource TemhaloCaption}" AutomationProperties.LiveSetting="Polite" IsTextSelectionEnabled="True"/>
+        <Button Content="Annuler la connexion" Click="CancelConnectionClicked"/>
       </StackPanel>
-      <ToggleSwitch x:Name="ManualChoice" Header="Autre méthode" OnContent="Clé manuelle" OffContent="Utiliser une clé manuellement" Toggled="ManualChanged" AutomationProperties.AutomationId="ManualKeyOption"/>
-      <StackPanel x:Name="ManualFields" Spacing="12" Visibility="Collapsed">
-        <PasswordBox x:Name="KeyInput" Header="Clé de stream" PasswordRevealMode="Peek" AutomationProperties.AutomationId="StreamKey"/>
-        <TextBlock x:Name="KeyHelp" Style="{StaticResource TemhaloCaption}"/>
-        <TextBox x:Name="ServerInput" Header="Adresse du serveur RTMP ou RTMPS" PlaceholderText="rtmps://…" AutomationProperties.AutomationId="ServerUrl"/>
+      <StackPanel x:Name="YouTubePanel" Spacing="8" Visibility="Collapsed">
+        <ComboBox x:Name="BroadcastChoice" Header="Live à utiliser" HorizontalAlignment="Stretch" DisplayMemberPath="Title" SelectionChanged="BroadcastChanged" AutomationProperties.AutomationId="YouTubeBroadcast"/>
+        <TextBlock Text="Choisissez un live préparé et associé à un flux dans YouTube Studio. Temhalo ne crée ni ne publie d’événement." Style="{StaticResource TemhaloCaption}"/>
+        <Button Content="Actualiser les lives" Click="ReloadBroadcastsClicked"/>
       </StackPanel>
-      <Expander Header="Options de cette plateforme" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-        <StackPanel Spacing="12">
-          <TextBox x:Name="NameInput" Header="Nom dans Temhalo" MaxLength="40" AutomationProperties.AutomationId="DestinationName"/>
-          <CheckBox x:Name="RememberChoice" Content="Mémoriser la connexion chiffrée pour mon compte Windows" IsChecked="True"/>
-          <CheckBox x:Name="EnabledChoice" Content="Diffuser vers cette plateforme" IsChecked="True"/>
-        </StackPanel>
-      </Expander>
-      <InfoBar x:Name="EditorError" IsOpen="False" IsClosable="True" Severity="Error" AutomationProperties.AutomationId="AccountError"/>
+      <TextBlock x:Name="AccountNote" Text="Le compte lié prépare la destination. L’émission sera vérifiée après le démarrage du stream OBS." Style="{StaticResource TemhaloCaption}" Visibility="Collapsed"/>
     </StackPanel>
-  </ScrollViewer>
+    <ToggleSwitch x:Name="ManualChoice" Header="Autre méthode" OnContent="Clé manuelle" OffContent="Utiliser une clé manuellement" Toggled="ManualChanged" AutomationProperties.AutomationId="ManualKeyOption"/>
+    <StackPanel x:Name="ManualFields" Spacing="12" Visibility="Collapsed">
+      <PasswordBox x:Name="KeyInput" Header="Clé de stream" PasswordRevealMode="Peek" AutomationProperties.AutomationId="StreamKey"/>
+      <TextBlock x:Name="KeyHelp" Style="{StaticResource TemhaloCaption}"/>
+      <TextBox x:Name="ServerInput" Header="Adresse du serveur RTMP ou RTMPS" PlaceholderText="rtmps://…" AutomationProperties.AutomationId="ServerUrl"/>
+    </StackPanel>
+    <Expander Header="Options de cette plateforme" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+      <StackPanel Spacing="12">
+        <TextBox x:Name="NameInput" Header="Nom dans Temhalo" MaxLength="40" AutomationProperties.AutomationId="DestinationName"/>
+        <CheckBox x:Name="RememberChoice" IsChecked="True">
+          <TextBlock x:Name="RememberLabel" Text="Mémoriser la connexion chiffrée pour mon compte Windows" TextWrapping="Wrap"/>
+        </CheckBox>
+        <CheckBox x:Name="EnabledChoice" Content="Diffuser vers cette plateforme" IsChecked="True"/>
+      </StackPanel>
+    </Expander>
+    <InfoBar x:Name="EditorError" IsOpen="False" IsClosable="True" Severity="Error" AutomationProperties.AutomationId="AccountError"/>
+  </StackPanel>
 </UserControl>
