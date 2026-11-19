@@ -1,14 +1,14 @@
 # Historique
 
-## 0.7.0-preview.11
+## 0.7.0-preview.12
 
-La 0.7.0-preview.10 n'a pas été publiée : son build a été arrêté par le contrôle de l'inventaire de désinstallation. Cette version la remplace.
+Les 0.7.0-preview.10 et preview.11 n'ont pas été publiées : leur build a été arrêté par le contrôle de l'inventaire de désinstallation. Cette version les remplace.
 
 - Correction de l'installation de FFmpeg au premier démarrage du relais : l'archive amont verrouillée avait été supprimée par son fournisseur (lien 404), ce qui bloquait le relais. Nouvelle build FFmpeg 8.1 LGPL (n8.1.3-36), vérifiée par SHA-256.
 - Téléchargement des outils natifs depuis plusieurs sources dans l'ordre : miroir permanent Temhalo (release `native-tools`), puis release amont officielle. Une source indisponible ou altérée passe simplement à la suivante ; aucune archive n'est extraite sans empreinte conforme.
 - Le miroir est rempli et vérifié automatiquement par la CI avant chaque publication : une version dont les outils ne seraient plus téléchargeables n'est jamais publiée.
 - En cas d'échec de toutes les sources, le message indique quelle archive placer manuellement dans le cache des outils.
-- Runtime .NET 8 embarqué mis à jour vers le dernier correctif de sécurité (8.0.34) ; inventaire de désinstallation complété en conséquence.
+- Runtime .NET 8 embarqué mis à jour (8.0.33 pour les builds officielles) ; inventaire de désinstallation complété pour les runtimes 8.0.33 et 8.0.34.
 
 ## 0.7.0-preview.9
 
