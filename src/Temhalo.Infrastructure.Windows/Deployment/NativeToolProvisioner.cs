@@ -6,11 +6,14 @@ namespace Temhalo.Infrastructure.Windows.Deployment;
 
 public sealed record ProvisionedTools(string MediaMtx, string Ffmpeg);
 
-/// <summary>Pinned upstream downloads; never executes a partial or unverified installation.</summary>
+/// <summary>
+/// Pinned downloads tried from each listed mirror in order; never executes a partial or unverified installation.
+/// The SHA-256 is the identity of an archive, so any mirror may serve it.
+/// </summary>
 public sealed class NativeToolProvisioner(string lockFile, string cacheDirectory, HttpClient? client = null)
 {
     private sealed record Manifest(int SchemaVersion, string Architecture, Tool[] Tools);
-    private sealed record Tool(string Name, string Version, string Url, string Sha256, string ArchiveName,
+    private sealed record Tool(string Name, string Version, string? Url, string[]? Urls, string Sha256, string ArchiveName,
         string ArchiveRoot, string DirectoryName, string Executable);
     private sealed record Provenance(string ArchiveSha256, Dictionary<string, string> Files);
 
@@ -18,7 +21,7 @@ public sealed class NativeToolProvisioner(string lockFile, string cacheDirectory
     {
         var manifest = JsonSerializer.Deserialize<Manifest>(await File.ReadAllTextAsync(lockFile, token).ConfigureAwait(false))
             ?? throw new InvalidDataException("Manifeste des outils natifs absent.");
-        if (manifest.SchemaVersion != 1 || manifest.Architecture != "win-x64" || manifest.Tools.Length != 2 ||
+        if (manifest.SchemaVersion is not (1 or 2) || manifest.Architecture != "win-x64" || manifest.Tools.Length != 2 ||
             !manifest.Tools.Select(t => t.Name).Order().SequenceEqual(new[] { "FFmpeg", "MediaMTX" }))
             throw new InvalidDataException("Manifeste des outils natifs invalide.");
         string root = Path.GetFullPath(cacheDirectory); Directory.CreateDirectory(root);
@@ -28,35 +31,14 @@ public sealed class NativeToolProvisioner(string lockFile, string cacheDirectory
         var results = new Dictionary<string, string>();
         foreach (var tool in manifest.Tools)
         {
+            var sources = tool.Urls ?? (tool.Url is null ? Array.Empty<string>() : new[] { tool.Url });
             if (tool.Sha256.Length != 64 || tool.Sha256.Any(c => !Uri.IsHexDigit(c)) ||
                 tool.DirectoryName is not ("mediamtx" or "ffmpeg") || Path.GetFileName(tool.ArchiveName) != tool.ArchiveName ||
-                !Uri.TryCreate(tool.Url, UriKind.Absolute, out var uri) || uri.Scheme != "https" || uri.Host != "github.com")
+                sources.Length is 0 or > 8 || !sources.All(IsAllowedSource))
                 throw new InvalidDataException("Provenance native non autorisée.");
             string archive = Child(root, tool.ArchiveName);
             if (!File.Exists(archive))
-            {
-                progress?.Report($"Téléchargement de {tool.Name} {tool.Version} depuis GitHub…");
-                string partial = Child(root, tool.ArchiveName + ".partial-" + Guid.NewGuid().ToString("N"));
-                try
-                {
-                    using var response = await http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
-                    response.EnsureSuccessStatusCode();
-                    await using (var output = new FileStream(partial, FileMode.CreateNew, FileAccess.Write, FileShare.None, 65536, true))
-                    {
-                        await using var input = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
-                        var block = new byte[65536]; long length = 0; int count;
-                        while ((count = await input.ReadAsync(block, token).ConfigureAwait(false)) != 0)
-                        {
-                            length += count;
-                            if (length > 512L * 1048576) throw new InvalidDataException("Archive native trop volumineuse.");
-                            await output.WriteAsync(block.AsMemory(0, count), token).ConfigureAwait(false);
-                        }
-                    }
-                    await VerifyAsync(partial, tool.Sha256, token).ConfigureAwait(false);
-                    File.Move(partial, archive);
-                }
-                finally { File.Delete(partial); }
-            }
+                await DownloadAsync(http, tool, sources, archive, root, progress, token).ConfigureAwait(false);
             progress?.Report($"Vérification SHA-256 de {tool.Name}…");
             await VerifyAsync(archive, tool.Sha256, token).ConfigureAwait(false);
             string target = Child(root, tool.DirectoryName + "-" + tool.Sha256[..12]);
@@ -109,6 +91,54 @@ public sealed class NativeToolProvisioner(string lockFile, string cacheDirectory
         }
         progress?.Report("Outils natifs vérifiés. Préparation du relais…");
         return new(results["MediaMTX"], results["FFmpeg"]);
+    }
+    private static bool IsAllowedSource(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Scheme == "https" && uri.Host == "github.com";
+
+    /// <summary>Tries each mirror until one serves the exact pinned archive; a dead or altered source only moves to the next.</summary>
+    private static async Task DownloadAsync(HttpClient http, Tool tool, string[] sources, string archive, string root,
+        IProgress<string>? progress, CancellationToken token)
+    {
+        var failures = new List<string>();
+        for (int index = 0; index < sources.Length; index++)
+        {
+            var uri = new Uri(sources[index]);
+            progress?.Report(index == 0
+                ? $"Téléchargement de {tool.Name} {tool.Version} depuis GitHub…"
+                : $"Téléchargement de {tool.Name} {tool.Version} depuis une source de secours ({index + 1}/{sources.Length})…");
+            string partial = Child(root, tool.ArchiveName + ".partial-" + Guid.NewGuid().ToString("N"));
+            try
+            {
+                using var response = await http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+                await using (var output = new FileStream(partial, FileMode.CreateNew, FileAccess.Write, FileShare.None, 65536, true))
+                {
+                    await using var input = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
+                    var block = new byte[65536]; long length = 0; int count;
+                    while ((count = await input.ReadAsync(block, token).ConfigureAwait(false)) != 0)
+                    {
+                        length += count;
+                        if (length > 512L * 1048576) throw new InvalidDataException("Archive native trop volumineuse.");
+                        await output.WriteAsync(block.AsMemory(0, count), token).ConfigureAwait(false);
+                    }
+                }
+                await VerifyAsync(partial, tool.Sha256, token).ConfigureAwait(false);
+                File.Move(partial, archive);
+                return;
+            }
+            catch (Exception error) when (error is HttpRequestException or InvalidDataException or IOException ||
+                error is TaskCanceledException && !token.IsCancellationRequested)
+            {
+                failures.Add($"{uri.AbsolutePath}: {error.Message}");
+                if (index == sources.Length - 1)
+                {
+                    string message = $"{tool.Name} n'a pu être téléchargé depuis aucune source ({string.Join(" ; ", failures)}). " +
+                        $"Vérifiez la connexion, ou placez manuellement {tool.ArchiveName} dans {root} puis relancez le relais.";
+                    throw error is InvalidDataException ? new InvalidDataException(message, error) : new HttpRequestException(message, error);
+                }
+            }
+            finally { File.Delete(partial); }
+        }
     }
     private static string Child(string root, string relative)
     {

@@ -1,12 +1,16 @@
 {
-  "SchemaVersion": 1,
+  "SchemaVersion": 2,
   "Architecture": "win-x64",
+  "Comment": "Urls are tried in order; the SHA-256 identifies the archive. The first URL is Temhalo's permanent mirror (release tag native-tools), filled by tools/Publish-NativeMirror.ps1 before every release.",
   "Tools": [
     {
       "Name": "MediaMTX",
       "Version": "1.21.2",
       "ArchiveName": "mediamtx_v1.21.2_windows_amd64.zip",
-      "Url": "https://github.com/bluenviron/mediamtx/releases/download/v1.21.2/mediamtx_v1.21.2_windows_amd64.zip",
+      "Urls": [
+        "https://github.com/Zeeroz/Temhalo/releases/download/native-tools/mediamtx_v1.21.2_windows_amd64.zip",
+        "https://github.com/bluenviron/mediamtx/releases/download/v1.21.2/mediamtx_v1.21.2_windows_amd64.zip"
+      ],
       "Sha256": "a84224f5a490855684e62ba6fb71e80ea2a5e16aed61883bb58380290e93e467",
       "ArchiveRoot": "",
       "DirectoryName": "mediamtx",
@@ -16,16 +20,19 @@
     },
     {
       "Name": "FFmpeg",
-      "Version": "n8.1.3-18-g46d899d7a0",
-      "ArchiveName": "ffmpeg-n8.1.3-18-g46d899d7a0-win64-lgpl-shared-8.1.zip",
-      "Url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-15-13-03/ffmpeg-n8.1.3-18-g46d899d7a0-win64-lgpl-shared-8.1.zip",
-      "Sha256": "4acd82323c2cad9c7ffea5b8e335ebcda39beae83a3138d729545e5a7666a3fd",
-      "ArchiveRoot": "ffmpeg-n8.1.3-18-g46d899d7a0-win64-lgpl-shared-8.1",
+      "Version": "n8.1.3-36-ge22a4510c9",
+      "ArchiveName": "ffmpeg-n8.1.3-36-ge22a4510c9-win64-lgpl-shared-8.1.zip",
+      "Urls": [
+        "https://github.com/Zeeroz/Temhalo/releases/download/native-tools/ffmpeg-n8.1.3-36-ge22a4510c9-win64-lgpl-shared-8.1.zip",
+        "https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases/download/autobuild-2026-11-19-12-39/ffmpeg-n8.1.3-36-ge22a4510c9-win64-lgpl-shared-8.1.zip"
+      ],
+      "Sha256": "ae947c6f7f87d19cf3de80e448409419a9e81a18987d55ead133c55c2db29e9c",
+      "ArchiveRoot": "ffmpeg-n8.1.3-36-ge22a4510c9-win64-lgpl-shared-8.1",
       "DirectoryName": "ffmpeg",
       "Executable": "bin/ffmpeg.exe",
       "LicenseSource": "https://ffmpeg.org/legal.html",
-      "Source": "https://github.com/FFmpeg/FFmpeg/tree/46d899d7a0",
-      "BuildRecipes": "https://github.com/BtbN/FFmpeg-Builds/tree/autobuild-2026-10-15-13-03"
+      "Source": "https://github.com/FFmpeg/FFmpeg/tree/e22a4510c9",
+      "BuildRecipes": "https://github.com/FFmpeg-Builds/FFmpeg-Builds/tree/autobuild-2026-11-19-12-39"
     }
   ]
 }

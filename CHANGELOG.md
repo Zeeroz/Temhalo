@@ -1,5 +1,12 @@
 # Historique
 
+## 0.7.0-preview.10
+
+- Correction de l'installation de FFmpeg au premier démarrage du relais : l'archive amont verrouillée avait été supprimée par son fournisseur (lien 404), ce qui bloquait le relais. Nouvelle build FFmpeg 8.1 LGPL (n8.1.3-36), vérifiée par SHA-256.
+- Téléchargement des outils natifs depuis plusieurs sources dans l'ordre : miroir permanent Temhalo (release `native-tools`), puis release amont officielle. Une source indisponible ou altérée passe simplement à la suivante ; aucune archive n'est extraite sans empreinte conforme.
+- Le miroir est rempli et vérifié automatiquement par la CI avant chaque publication : une version dont les outils ne seraient plus téléchargeables n'est jamais publiée.
+- En cas d'échec de toutes les sources, le message indique quelle archive placer manuellement dans le cache des outils.
+
 ## 0.7.0-preview.9
 
 - Nouvelle interface WinUI 3 fidèle à la DA Temhalo : navigation en haut, Direct centré sur le délai actuel et la cible appliquée, presets immédiats et saisie personnalisée repliée.

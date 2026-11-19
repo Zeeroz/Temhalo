@@ -6,10 +6,10 @@ Les polices Inter, Space Grotesk et JetBrains Mono sont fournies sous OFL, avec 
 
 ## Outils média acquis au premier démarrage du relais
 
-Les binaires MediaMTX et FFmpeg ne sont pas redistribués dans cette archive. L'application les télécharge directement depuis les releases GitHub fixées dans `config/native-tools.lock.json`, vérifie les empreintes avant extraction, puis conserve leurs fichiers de licence et leurs DLL sans modification.
+Les binaires MediaMTX et FFmpeg ne sont pas redistribués dans cette archive. L'application les télécharge depuis les sources GitHub fixées dans `config/native-tools.lock.json` (miroir `native-tools` du dépôt Temhalo, contenant des copies non modifiées des archives amont, puis releases officielles), vérifie les empreintes avant extraction, puis conserve leurs fichiers de licence et leurs DLL sans modification.
 
 - MediaMTX : MIT, [projet et sources](https://github.com/bluenviron/mediamtx), version et archive exactes dans le manifeste.
-- FFmpeg : build LGPL partagée, sans `--enable-gpl` ni `--enable-nonfree`, [licences officielles](https://ffmpeg.org/legal.html), [fournisseur BtbN](https://github.com/BtbN/FFmpeg-Builds). Version, SHA-256, sources FFmpeg et recettes de build exactes dans le manifeste. Le dossier téléchargé garde `LICENSE.txt` et la documentation amont.
+- FFmpeg : build LGPL partagée, sans `--enable-gpl` ni `--enable-nonfree`, [licences officielles](https://ffmpeg.org/legal.html), [fournisseur FFmpeg-Builds (ex-BtbN)](https://github.com/FFmpeg-Builds/FFmpeg-Builds). Version, SHA-256, sources FFmpeg et recettes de build exactes dans le manifeste. Le dossier téléchargé garde `LICENSE.txt` et la documentation amont.
 
 Une future archive embarquant ces outils devra également préparer les sources correspondantes et les éléments de redistribution requis ; ce package choisit l'acquisition amont directe. Les détails de ce choix sont dans le guide de l'étape 6 et `docs/DEPENDANCES.md` des sources.
 ## Plugin Stream Deck

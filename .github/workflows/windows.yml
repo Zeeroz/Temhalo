@@ -114,6 +114,11 @@ jobs:
         with:
           name: Temhalo-windows-x64
           path: artifacts/packages
+      - name: Garantir le miroir permanent de MediaMTX et FFmpeg
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/Publish-NativeMirror.ps1
       - name: Publier la release après vérification des fichiers
         shell: pwsh
         env:
@@ -144,6 +149,11 @@ jobs:
           path: artifacts/packages
           run-id: ${{ inputs.recovery_run_id }}
           github-token: ${{ github.token }}
+      - name: Garantir le miroir permanent de MediaMTX et FFmpeg
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/Publish-NativeMirror.ps1
       - name: Reprendre sans remplacer les fichiers du brouillon
         shell: pwsh
         env:

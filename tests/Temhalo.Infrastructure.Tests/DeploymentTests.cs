@@ -69,6 +69,31 @@ public sealed class DeploymentTests
         Assert.Empty(Directory.EnumerateDirectories(fixture.Cache, "staging-*"));
     }
     [Fact]
+    public async Task RemovedUpstreamArchiveFallsBackToNextMirror()
+    {
+        using var fixture = new Fixture(ffmpegMirrors: ["https://github.com/gone/ff.zip", "https://github.com/ff.zip"]);
+        var tools = await fixture.Provisioner.EnsureAsync();
+        Assert.True(File.Exists(tools.Ffmpeg));
+        Assert.Equal(3, fixture.Handler.Requests);
+        Assert.Empty(Directory.EnumerateFiles(fixture.Cache, "*.partial-*"));
+    }
+    [Fact]
+    public async Task AlteredMirrorIsSkippedAndAllSourcesMissingExplainsManualFallback()
+    {
+        using var fixture = new Fixture(ffmpegMirrors: ["https://github.com/mtx.zip", "https://github.com/ff.zip"]);
+        Assert.True(File.Exists((await fixture.Provisioner.EnsureAsync()).Ffmpeg));
+        using var missing = new Fixture(ffmpegMirrors: ["https://github.com/gone/a.zip", "https://github.com/gone/b.zip"]);
+        var error = await Assert.ThrowsAsync<HttpRequestException>(() => missing.Provisioner.EnsureAsync());
+        Assert.Contains("ff.zip", error.Message);
+        Assert.Empty(Directory.EnumerateFiles(missing.Cache, "ffmpeg.exe", SearchOption.AllDirectories));
+    }
+    [Fact]
+    public async Task NonGitHubMirrorIsRejected()
+    {
+        using var fixture = new Fixture(ffmpegMirrors: ["https://github.com/ff.zip", "https://example.com/ff.zip"]);
+        await Assert.ThrowsAsync<InvalidDataException>(() => fixture.Provisioner.EnsureAsync());
+    }
+    [Fact]
     public async Task OfflineFirstRunCanRetryWithoutPartialInstallation()
     {
         using var fixture = new Fixture(); fixture.Handler.Offline = true;
@@ -104,7 +129,7 @@ public sealed class DeploymentTests
         public FakeHttp Handler { get; } = new();
         private readonly HttpClient _http;
         public NativeToolProvisioner Provisioner { get; }
-        public Fixture(bool wrongHash = false, bool traversal = false)
+        public Fixture(bool wrongHash = false, bool traversal = false, string[]? ffmpegMirrors = null)
         {
             Directory.CreateDirectory(Root); _http = new(Handler);
             byte[] mtx = Archive((traversal ? "../escape.exe" : "mediamtx.exe", "mtx"));
@@ -112,12 +137,13 @@ public sealed class DeploymentTests
             Handler.Files.Add("/mtx.zip", mtx); Handler.Files.Add("/ff.zip", ff);
             object Tool(string name, string file, string directory, byte[] bytes, string root, string executable) => new
             {
-                Name = name, Version = "test", Url = "https://github.com/" + file,
+                Name = name, Version = "test",
+                Urls = name == "FFmpeg" && ffmpegMirrors is not null ? ffmpegMirrors : new[] { "https://github.com/" + file },
                 Sha256 = wrongHash ? new string('0', 64) : Convert.ToHexString(SHA256.HashData(bytes)),
                 ArchiveName = file, ArchiveRoot = root, DirectoryName = directory, Executable = executable
             };
             string manifest = Path.Combine(Root, "lock.json");
-            File.WriteAllText(manifest, JsonSerializer.Serialize(new { SchemaVersion = 1, Architecture = "win-x64", Tools = new[]
+            File.WriteAllText(manifest, JsonSerializer.Serialize(new { SchemaVersion = 2, Architecture = "win-x64", Tools = new[]
             { Tool("MediaMTX", "mtx.zip", "mediamtx", mtx, "", "mediamtx.exe"), Tool("FFmpeg", "ff.zip", "ffmpeg", ff, "ffroot", "bin/ffmpeg.exe") } }));
             Provisioner = new(manifest, Cache, _http);
         }
@@ -138,7 +164,9 @@ public sealed class DeploymentTests
         {
             Interlocked.Increment(ref Requests); await Task.Delay(DelayMilliseconds, token);
             if (Offline) throw new HttpRequestException("Synthetic offline");
-            return new(HttpStatusCode.OK) { Content = new ByteArrayContent(Files[request.RequestUri!.AbsolutePath]) };
+            return Files.TryGetValue(request.RequestUri!.AbsolutePath, out var bytes)
+                ? new(HttpStatusCode.OK) { Content = new ByteArrayContent(bytes) }
+                : new(HttpStatusCode.NotFound);
         }
     }
 }

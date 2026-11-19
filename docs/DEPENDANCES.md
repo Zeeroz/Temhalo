@@ -4,6 +4,8 @@ L'option initiale d'embarquer MediaMTX et FFmpeg est remplacée pour la **préve
 
 En développement, `tools/native/Get-NativeTools.ps1` acquiert ces fichiers dans `artifacts/`. Ce téléchargement préalable permet de compiler et vérifier le poste sans construire immédiatement un installeur. Les URL ne suivent pas `latest` et les empreintes sont conservées dans le manifeste versionné.
 
+Depuis la **0.7.0-preview.10**, chaque outil liste plusieurs sources (`Urls`) essayées dans l'ordre : d'abord le miroir permanent de Temhalo (release GitHub `native-tools` du dépôt, jamais supprimée), puis la release amont. L'empreinte SHA-256 identifie l'archive : une source absente ou altérée est ignorée au profit de la suivante. `tools/Publish-NativeMirror.ps1` copie les archives verrouillées dans ce miroir avant chaque publication (job `release` de la CI) et refuse de publier si aucune source ne les fournit plus. Pour changer de build, mettre à jour `Version`, `ArchiveName`, `ArchiveRoot`, `Sha256` et les deux URL ; le miroir est complété à la publication suivante.
+
 ## MediaMTX
 
 Version : **1.21.2**, archive officielle Windows amd64 du projet bluenviron/mediamtx. Licence : **MIT**. L'archive extraite conserve `LICENSE` et la configuration amont. Temhalo emploie sa propre configuration dans `config/mediamtx.yml`.
@@ -12,13 +14,13 @@ Conserver la notice de copyright et le texte de licence dans les redistributions
 
 ## FFmpeg
 
-Version vérifiée : **n8.1.3-18-g46d899d7a0-20261015**, branche 8.1, archive BtbN datée `autobuild-2026-10-15-13-03`. Le projet FFmpeg publie son code source et référence des fournisseurs de builds Windows, dont BtbN, depuis sa [page de téléchargement](https://ffmpeg.org/download.html).
+Version vérifiée : **n8.1.3-36-ge22a4510c9-20261119**, branche 8.1, archive FFmpeg-Builds (ex-BtbN) datée `autobuild-2026-11-19-12-39`. Le fournisseur supprime ses autobuilds après quelques semaines : l'archive exacte est conservée dans le miroir `native-tools` de Temhalo. Le projet FFmpeg publie son code source et référence des fournisseurs de builds Windows, dont BtbN, depuis sa [page de téléchargement](https://ffmpeg.org/download.html).
 
 La build choisie est **LGPL-3.0-or-later** : elle active `--enable-version3`, n'active ni `--enable-gpl` ni `--enable-nonfree`, et annonce la LGPL version 3 ou ultérieure avec `ffmpeg -L`. Elle utilise des DLL partagées. Garder le contenu installé nécessaire, en particulier les DLL adjacentes à `bin/ffmpeg.exe`, et sa notice `LICENSE.txt`.
 
 Le passthrough H.264/AAC ne nécessite pas libx264 ni libx265 : les flux sont encodés dans OBS. Une future stratégie de réencodage devra réexaminer les options et licences de la build choisie.
 
-À l'étape de distribution, préparer les notices, les textes de licence, les informations de build et l'accès aux sources correspondantes de FFmpeg et de ses bibliothèques, selon les exigences applicables. Le seul lien vers une archive binaire ne fournit pas les sources correspondantes. Conserver aussi les recettes de compilation et les références des dépendances. Le téléchargement préalable ou l'exécution par processus séparé ne supprime pas ces obligations. Voir les [considérations officielles FFmpeg](https://ffmpeg.org/legal.html), la [build verrouillée](https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2026-10-15-13-03) et les [sources FFmpeg correspondantes](https://github.com/FFmpeg/FFmpeg/tree/46d899d7a0).
+À l'étape de distribution, préparer les notices, les textes de licence, les informations de build et l'accès aux sources correspondantes de FFmpeg et de ses bibliothèques, selon les exigences applicables. Le seul lien vers une archive binaire ne fournit pas les sources correspondantes. Conserver aussi les recettes de compilation et les références des dépendances. Le téléchargement préalable ou l'exécution par processus séparé ne supprime pas ces obligations. Voir les [considérations officielles FFmpeg](https://ffmpeg.org/legal.html), les [recettes de la build verrouillée](https://github.com/FFmpeg-Builds/FFmpeg-Builds/tree/autobuild-2026-11-19-12-39) et les [sources FFmpeg correspondantes](https://github.com/FFmpeg/FFmpeg/tree/e22a4510c9).
 
 Le package collecte les licences, notices et métadonnées des composants NuGet et runtimes qu'il fournit, dans `Licenses/`. Il conserve aussi les licences des fontes. Les outils média sont acquis directement en amont ; une future variante qui les embarque demandera le dossier de sources correspondant décrit ci-dessus. Le code propre de Temhalo est sous licence MIT ; voir `LICENSE` à la racine. Les licences des dépendances restent distinctes.
 

@@ -13,7 +13,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).Path
 $lockPath = Join-Path $repoRoot 'config\native-tools.lock.json'
 $lock = Get-Content -LiteralPath $lockPath -Raw | ConvertFrom-Json
-if ($lock.SchemaVersion -ne 1 -or $lock.Architecture -ne 'win-x64') {
+if ($lock.SchemaVersion -notin 1, 2 -or $lock.Architecture -ne 'win-x64') {
     throw 'Unsupported native tool manifest.'
 }
 $cacheRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts\downloads'))
@@ -120,7 +120,23 @@ foreach ($item in $selected) {
         if ($VerifyOnly) { throw "Archive missing: $archivePath" }
         [void][IO.Directory]::CreateDirectory($cacheRoot)
         Write-Host "Downloading $($item.Name) $($item.Version)..."
-        Save-Archive ([Uri]$item.Url) $archivePath
+        $sources = @(if ($item.PSObject.Properties['Urls']) { $item.Urls } else { $item.Url })
+        $saved = $false
+        foreach ($source in $sources) {
+            try {
+                Save-Archive ([Uri]$source) $archivePath
+                Assert-Sha256 $archivePath $item.Sha256
+                $saved = $true
+                break
+            }
+            catch {
+                Write-Warning "Source unavailable or altered ($source): $($_.Exception.Message)"
+                if (Test-Path -LiteralPath $archivePath) { Remove-Item -LiteralPath $archivePath }
+                $partialPath = $archivePath + '.partial'
+                if (Test-Path -LiteralPath $partialPath) { Remove-Item -LiteralPath $partialPath }
+            }
+        }
+        if (-not $saved) { throw "No source could provide $($item.ArchiveName) with the pinned SHA-256." }
     }
     Assert-Sha256 $archivePath $item.Sha256
     if (-not (Test-Path -LiteralPath $provenancePath)) {
